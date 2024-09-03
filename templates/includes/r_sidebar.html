@@ -1,0 +1,17 @@
+<div class="user-account-nav user-account-sidebar">
+    <div class="user-nav-list">
+        <ul>
+            <li class="{% if '/restaurantDashboard/' == request.path or '/restaurant/' == request.path %}active{% endif %}"><a href="{% url 'restaurantDashboard'  %}"><i class="icon-dashboard3"></i>Dashboard</a></li>
+            <li class="{% if 'profile' in request.path %} active{% endif %}"><a href="{% url 'rprofile'  %}"><i class="icon-building"></i>My Restaurant</a></li>
+            <li class="{% if 'menu-builder' in request.path %} active{% endif %}"><a href="{% url 'menu_builder' %}"><i class="icon-menu5"></i>Menu Builder</a></li>
+            <li class="{% if 'opening-hour' in request.path %} active{% endif %}"><a href="{% url 'opening_hours' %}"><i class="fa-regular fa-clock"></i>Opening Hours</a></li>
+            <li class="{% if 'seating-plan' in request.path %} active{% endif %}"><a href="{% url 'seating_plan' %}"> <i class="fas fa-chair"></i>Seating Plan</a></li>
+            <li class="{% if '/my_orders/' in request.path %} active {%endif%}"><a href="{% url 'restaurant_my_orders' %}"><i class="icon-add_shopping_cart"></i>Orders</a></li>
+            <li class="{% if '/pending_orders/' in request.path %} active {%endif%}"><a href="{% url 'restaurant_pending_orders' %}"><i class="fa-regular fa-hourglass-half"></i> Pending Orders</a></li>
+            <li class="{% if '/contact-us/' in request.path %} active {%endif%}"><a href="{% url 'contact_us' %}"><i class="fa-regular fa-message"></i> Contact Us </a></li>
+
+            <li><a class="logout-btn" href="{% url 'logout' %}"><i class="icon-log-out"></i>Signout</a></li>
+
+        </ul>
+    </div>
+</div>

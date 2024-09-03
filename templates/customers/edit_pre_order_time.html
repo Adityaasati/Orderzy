@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2>Edit Pre-Order Time</h2>
+
+    <form method="post" action="{% url 'pre_order_time_change' order.order_number %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="pre_order_time">New Pre-Order Time (minutes):</label>
+            <input type="number" id="pre_order_time" name="pre_order_time" value="{{ order.pre_order_time }}" class="form-control" step="0.01" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'customer_my_orders' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+{% endblock %}

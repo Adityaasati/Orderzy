@@ -1,0 +1,20 @@
+anyio==4.4.0
+asgiref==3.8.1
+certifi==2024.7.4
+charset-normalizer==3.3.2
+Django==5.0.6
+GDAL @ file:///C:/Users/asati/OneDrive/Desktop/Work_New/Orderzy/GDAL-3.8.4-cp311-cp311-win_amd64.whl#sha256=13115dae539ab85b7b4b5bf8b7eb13abf2026d95313cec0837bff034a8c25c58
+h11==0.14.0
+httpcore==1.0.5
+httpx==0.27.0
+idna==3.7
+olamaps==0.5.2
+pillow==10.3.0
+psycopg2==2.9.9
+python-decouple==3.8
+requests==2.32.3
+simplejson==3.19.2
+sniffio==1.3.1
+sqlparse==0.5.0
+tzdata==2024.1
+urllib3==2.2.2

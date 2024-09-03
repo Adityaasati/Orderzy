@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="main-section">
+    <div class="page-section nopadding cs-nomargin" style="margin-top: 0px;padding-top: 60px;padding-bottom: 10px;margin-bottom: 0px;">
+        <div class="container">
+            <div class="row">
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="container">
+                        <div class="row">
+                          <div class="col-lg-3 col-md-4 col-sm-12">
+                            <div class="container my-4">
+                                {% if food_hubs_count > 0 %}
+                                    <div class="mb-4">
+                                        <h4 class="mb-3 restaurant-count-title//">
+                                            Select Food Hub / Food Court
+                                        </h4>
+                                        <form method="get" action="{% url 'search' %}">
+                                            <div class="form-group">
+                                                <select name="food_hub" class="form-select" onchange="this.form.submit()">
+                                                    <option value="">All Food Hubs</option>
+                                                    {% if nearby_food_hubs %}
+                                                        {% for hub in nearby_food_hubs %}
+                                                            <option value="{{ hub.id }}" {% if hub.id|stringformat:"s" == selected_food_hub %}selected{% endif %}>
+                                                                {{ hub.foodhub_name }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                          </div>
+                        </div>
+                      </div>
+                                  
+                        <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
+                            <div class="listing-sorting-holder">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <h4 class="restaurant-count-title mb-3">
+                                            Discover Available Restaurants:
+                                        </h4>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="listing simple">
+                                <ul>
+                                    {% for restaurant in restaurants %}
+                                    <li style="line-height: 15px;">
+                                        <div class="img-holder">
+                                            <figure>
+                                                <a href="{% url 'restaurant_detail' restaurant.restaurant_slug %}">
+                                                {% if restaurant.user_profile.profile_picture %}
+                                                <img src="{{ restaurant.user_profile.profile_picture.url }}" class="img-list wp-post-image" alt="">
+                                                {% else %}
+                                                <img src="{% static 'images/default-profile.png' %}" class="img-list wp-post-image" alt="">
+                                                {% endif %}
+                                                </a>
+                                            </figure>
+                                            {% if restaurant.is_open %}
+                                            <span class="restaurant-status open"><em class="bookmarkRibbon"></em>Open</span>
+                                            {% else %}
+                                            <span class="restaurant-status close"><em class="bookmarkRibbon"></em>Close</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-holder">
+                                            <div class="post-title">
+                                                <h5>
+                                                    <a href="{% url 'restaurant_detail' restaurant.restaurant_slug %}">{{ restaurant.restaurant_name }}</a>
+                                                </h5>
+                                            </div>
+                                            {% if restaurant.user_profile.address %}
+                                            <span>
+                                             <small class="text-muted">{{ restaurant.user_profile.address|slice:":70" }}{% if restaurant.user_profile.address|length > 70 %}...{% endif %}</small>
+                                             </span>
+                                            {% endif %}
+                                            {% if source_location and restaurant.kms %}
+                                            <br>
+                                            <br>
+                                            <span><small><b>{{ restaurant.kms }}</b> km away from {{ source_location |slice:":40"}}{% if source_location|length > 40 %}...{% endif %}</small></span>
+                                            
+                                            {% endif %}
+                                        </div>
+                                        <div class="list-option mt-2">
+                                            <a href="{% url 'restaurant_detail' restaurant.restaurant_slug %}" class="viewmenu-btn text-color mb-2">View Menu</a>
+                                        </div>
+                                        
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="section-sidebar col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                            <div class="message-box" style="background-color: #fa9918;">
+                                <strong>I'm not Listed!</strong><span>Is your restaurant or business not listed on our site?</span>
+                                <a href="{% url 'registerRestaurant' %}" class="request-btn">Add Your Business!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

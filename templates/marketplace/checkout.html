@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="main-section pt-5">
+
+    <div class="page-section">
+        <div class="container">
+            <div class="row">
+
+                <form action="{% url 'place_order' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                        <div class="tabs-holder horizontal">
+                            <ul class="stickynav-tabs nav nav-tabs">
+                                <li class="active"><a data-toggle="tab" href="#preorder"><i
+                                            class="icon- icon-room_service"></i> Pre-Order</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div id="preorder" class="tab-pane in active">
+                                    <div class="pre-order-times">
+
+                                        <!-- <div class="menu-item-holder p-3">
+                                            <div class="btn-toolbar mb-3" role="toolbar"
+                                                aria-label="Toolbar with button groups">
+                                                <div class="btn-group mr-2 " role="group" aria-label="First group">
+                                                    <button type="button" class="btn btn-primary active pre-order-time"
+                                                        data-time="0" id="order-now"
+                                                        onclick="setActiveButton(this)">Order
+                                                        Now</button>
+                                                </div>
+                                                <div class="btn-group mr-2" role="group" aria-label="Second group">
+                                                    <button type="button" class="btn btn-secondary pre-order-time"
+                                                        data-time="0.25" id="15-mins" onclick="setActiveButton(this)">15
+                                                        mins</button>
+                                                </div>
+                                                <div class="btn-group mr-2" role="group" aria-label="Third group">
+                                                    <button type="button" class="btn btn-secondary pre-order-time"
+                                                        data-time="0.5" id="30-mins" onclick="setActiveButton(this)">30
+                                                        mins</button>
+                                                </div>
+                                                <div class="btn-group mr-2" role="group" aria-label="Fourth group">
+                                                    <button type="button" class="btn btn-secondary pre-order-time"
+                                                        data-time="0.75" id="45-mins" onclick="setActiveButton(this)">45
+                                                        mins</button>
+                                                </div>
+                                                <div class="btn-group mr-2" role="group" aria-label="Fifth group">
+                                                    <button type="button" class="btn btn-secondary pre-order-time"
+                                                        data-time="1" id="1-hr" onclick="setActiveButton(this)">1
+                                                        hr</button>
+                                                </div>
+                                                <div class="btn-group mr-2" role="group" aria-label="Sixth group">
+                                                    <button type="button" class="btn btn-secondary pre-order-time"
+                                                        data-time="1.5" id="1.5-hrs" onclick="setActiveButton(this)">1.5
+                                                        hrs</button>
+                                                </div>
+                                                <div class="btn-group" role="group" aria-label="Seventh group">
+                                                    <button type="button" class="btn btn-secondary pre-order-time"
+                                                        data-time="2" id="2-hrs" onclick="setActiveButton(this)">2
+                                                        hrs</button>
+                                                </div>
+                                                <input type="hidden" id="pre_order_time" name="pre_order_time"
+                                                    value="0">
+                                            </div>
+
+                                            <h4 class="mb-3">Preparing order number:</h4>
+                                            <h4>You will get order number:</h4>
+                                        </div> -->
+                                        <div class="tab-content">
+                                            <div id="preorder" class="tab-pane in active">
+                                                <div class="pre-order-times">
+                                        
+                                                    <div class="menu-item-holder p-3">
+                                                        <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+                                                            <div class="row w-100">
+                                                                <div class="col-6 col-md-3 mb-2">
+                                                                    <button type="button" class="btn btn-primary w-100 active pre-order-time"
+                                                                        data-time="0" id="order-now" onclick="setActiveButton(this)">Order Now</button>
+                                                                </div>
+                                                                <div class="col-6 col-md-3 mb-2">
+                                                                    <button type="button" class="btn btn-secondary w-100 pre-order-time"
+                                                                        data-time="15" id="15-mins" onclick="setActiveButton(this)">15 mins</button>
+                                                                </div>
+                                                                <div class="col-6 col-md-3 mb-2">
+                                                                    <button type="button" class="btn btn-secondary w-100 pre-order-time"
+                                                                        data-time="30" id="30-mins" onclick="setActiveButton(this)">30 mins</button>
+                                                                </div>
+                                                                <div class="col-6 col-md-3 mb-2">
+                                                                    <button type="button" class="btn btn-secondary w-100 pre-order-time"
+                                                                        data-time="45" id="45-mins" onclick="setActiveButton(this)">45 mins</button>
+                                                                </div>
+                                                                <div class="col-6 col-md-3 mb-2">
+                                                                    <button type="button" class="btn btn-secondary w-100 pre-order-time"
+                                                                        data-time="60" id="1-hr" onclick="setActiveButton(this)">1 hr</button>
+                                                                </div>
+                                                                <div class="col-6 col-md-3 mb-2">
+                                                                    <button type="button" class="btn btn-secondary w-100 pre-order-time"
+                                                                        data-time="90" id="1.5-hrs" onclick="setActiveButton(this)">1.5 hrs</button>
+                                                                </div>
+                                                                <div class="col-6 col-md-3 mb-2">
+                                                                    <button type="button" class="btn btn-secondary w-100 pre-order-time"
+                                                                        data-time="120" id="2-hrs" onclick="setActiveButton(this)">2 hrs</button>
+                                                                </div>
+                                                            </div>
+                                                            <input type="hidden" id="pre_order_time" name="pre_order_time" value="0">
+                                                        </div>
+                                        
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg- col-md- col-sm-12 col-xs-12">
+                        <div class="tabs-holder horizontal">
+                            <ul class="stickynav-tabs nav nav-tabs">
+                                <li class="active"><a data-toggle="tab" href="#home"><i
+                                            class="fa fa-shopping-cart text-danger"></i>Billing Address</a></li>
+
+                            </ul>
+                            <div class="tab-content">
+                                <div id="home" class="tab-pane in active">
+                                    <div class="menu-itam-holder">
+
+
+                                        <div id="menu-item-list-6272" class="menu-itam-list">
+                                            <div class="row">
+                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                    First Name: {{ form.first_name}}
+                                                </div>
+                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                    Last Name: {{ form.last_name}}
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                    Phone Number: {{ form.phone}}
+                                                </div>
+                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                    Email Address: {{ form.email}}
+                                                </div>
+                                            </div>
+                                            <!-- {% if num_of_restaurants == 1  and seating_plan_available == True%} -->
+                                            <div class="row">
+                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                    Number of People: {{ form.num_of_people}}
+                                                </div>
+                                            </div>
+                                            <!-- {% endif %} -->
+                                            <!-- <div class="row">
+                                                <div class="form-group col-md-12 col-sm-12 col-lg-12">
+                                                    Address: {{ form.address}}
+                                                </div>
+
+                                            </div> -->
+                                            <!-- <div class="row">
+                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                    Country: {{ form.country}}
+                                                </div>
+                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                    State: {{ form.state}}
+                                                </div>
+                                            </div> -->
+                                            <!-- <div class="row">
+                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                    City: {{ form.city}}
+                                                </div>
+                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                    Pin Code: {{ form.pin_code}}
+                                                </div>
+                                            </div> -->
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="tabs-holder horizontal">
+                            <ul class="stickynav-tabs nav nav-tabs">
+                                <li class="active"><a data-toggle="tab" href="#home"><i
+                                            class="icon- icon-room_service"></i>Your Order</a></li>
+
+                            </ul>
+                            <div class="tab-content">
+                                <div id="home" class="tab-pane in active">
+                                    <div class="menu-itam-holder">
+                                        <div id="menu-item-list-6272" class="menu-itam-list">
+
+
+                                            <ul>
+
+                                                {% for cart_item in cart_items_with_totals %}
+
+                                                <li id="cart-item-{{cart_item.item.id }}">
+                                                    
+                                                    <div class="image-holder"> <img src="{{cart_item.item.fooditem.image.url}}"
+                                                            alt="Food Image"></div>
+                                                            <div class="text-holder">
+                                                                <h6>{{cart_item.item.fooditem}}</h6>
+                                                                <span>{{cart_item.item.fooditem.description}}</span>
+                                                                <a href="{% url 'restaurant_detail' cart_item.item.fooditem.restaurant.restaurant_slug %}"
+                                                                    class="badge badge-warning">{{cart_item.item.fooditem.restaurant}}</a>
+                                                            </div>
+                                                            <div class="quantity"
+                                                                style="display: inline-block; position:absolute; top:50%; transform:translateY(-50%); margin-top:-10px;">
+                                                                <span>{{cart_item.item.quantity}} Qty</span>
+                                                            </div>
+                                                            <div class="price-holder">
+                                                                <span class="price">₹{{cart_item.total_price}}</span>
+                                                            </div>
+                                                        </li>
+            
+                                                        {% endfor %}
+
+
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <ul>
+                                                <li style="list-style-type: none;">Subtotal
+                                                    <span class="price float-right">
+                                                        <span class="currency">₹</span>
+                                                        <span id="subtotal">{{subtotal}}</span>
+                                                    </span>
+                                                </li>
+                                                {%for key, value in service_charge_dict.items %}
+                                                {% for i, j in value.items %}
+                                                <li style="list-style-type: none;">{{key}} <small>({{i}}%)</small>
+                                                    <span class="price float-right">
+                                                        <span class="currency">₹</span>
+                                                        <span id="tax-{{key}}">{{j}}</span>
+                                                    </span>
+                                                </li>
+                                                {% endfor%}
+                                                {% endfor %}
+
+                                                <li style="list-style-type: none; font: weight 600px;">Total
+                                                    <span class="price float-right">
+                                                        <span class="currency">₹</span>
+                                                        <span id="total">{{grand_total}}</span>
+                                                    </span>
+                                                </li>
+                                                <h5>SELECT PAYMENT METHOD</h5>
+                                                <div class="payment-method">
+                                                    <label>
+                                                        <input type="radio" name="payment_method" value="PayPal" >
+                                                        <img src="{% static 'images/PayPal.png' %}" alt="PayPal"
+                                                            width="100">
+                                                    </label>
+                                                    &nbsp;
+                                                    {% if user.is_authenticated and user.role == 1 %}
+                                                    <label>
+                                                        <input type="radio" name="payment_method" value="Cash" >
+                                                        <label for="mark_payment_done">Mark payment as done</label>
+                                                    </label>
+                                                    {% endif %}
+
+
+
+                                                    <!-- <label>
+                                                        <input type="radio" name="payment_method" value="RazorPay">
+                                                        <img src="{% static 'images/razorpay_logo.png' %}"
+                                                            alt="RazorPay" width="100">
+                                                    </label> -->
+                                                </div>
+                                                <span class="text-danger" id="payment-method-error"></span>
+
+                                                <button onclick="return payMethodConfirm();" type="submit"
+                                                    class="btn btn-danger w-100 p-2 mt-3">Place
+                                                    Order</button>
+
+                                            </ul>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<script>
+    function setActiveButton(button) {
+        // Remove active class from all buttons
+        var buttons = document.querySelectorAll('.btn-toolbar .btn');
+        buttons.forEach(function (btn) {
+            btn.classList.remove('btn-primary', 'active');
+            btn.classList.add('btn-secondary');
+        });
+        // Add active class to the clicked button
+        button.classList.remove('btn-secondary');
+        button.classList.add('btn-primary', 'active');
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        const preOrderTimeButtons = document.querySelectorAll('.pre-order-time');
+        const preOrderTimeInput = document.getElementById('pre_order_time');
+        console.log("preOrderTimeButtons", preOrderTimeButtons)
+        console.log("preOrderTimeInput", preOrderTimeInput)
+
+
+        preOrderTimeButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                // Update the hidden input with the selected time
+                preOrderTimeInput.value = this.getAttribute('data-time');
+                console.log("preOrderTimeInput.value",preOrderTimeInput.value)
+
+                // Optionally update button styles to indicate selection
+                preOrderTimeButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+            });
+        }
+        )
+    })
+    function payMethodConfirm() {
+        var payMethod = $("input[name= 'payment_method']:checked").val()
+
+        if (!payMethod) {
+            $('#payment-method-error').html("Select Payment Method!")
+            return False
+        }
+        else {
+            var confMessage = payMethod === "done_payment"
+            ? "You have chosen to mark the payment as done. Click 'OK' to complete the order."
+            : "You have selected " + payMethod + " as your preferred payment method.\nClick 'OK' to continue.";
+
+            var conf = confirm(confMessage);
+            if (conf == true) {
+                return true;
+            }
+            else {
+                return false
+            }
+
+        }
+
+    }
+    $('input[name=payment_method]').on('change', function () {
+        $('payment-method-error').html("")
+    })
+</script>
+{% endblock content %}

@@ -1,0 +1,137 @@
+{% load static %}
+<div class="wrapper">
+    <header id="header">
+        <div class="main-header">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 col-md-8 col-sm-12 col-xs-12 text-center text-md-start">
+                        <div class="header-content d-flex flex-column flex-md-row align-items-center justify-content-between">
+                            <div class="logo">
+                                <figure>
+                                    <a href="{% url 'home' %}" class="light-logo">
+                                        <div class="brand_name text-center mb-2 mb-md-0">
+                                            <h5>Orderzy</h5>
+                                        </div>
+                                    </a>
+                                </figure>
+                            </div>
+                          
+                            <div class="main-location mt-2 mt-md-0 w-100 w-md-auto">
+                                <ul class="list-unstyled">
+                                    <li class="location-has-children choose-location">
+                                        <form action="#" class="d-flex align-items-center">
+                                            <input type="text" value="" name="location" id="location"
+                                                placeholder="Enter your current location" class="form-control w-100"
+                                                autocomplete="off" readonly>
+                                            <span id="foodbakery_radius_location_open" class="foodbakery-radius-location ms-2"
+                                                onclick="getLocation()"><i class="icon-target5"></i></span>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                          
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-4 col-sm-12 col-xs-12 mt-3 mt-md-0 text-center text-md-end">
+                        <div class="login-option d-lg-block d-md-block d-sm-flex d-xs-flex flex-wrap justify-content-center justify-content-md-end align-items-center">
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'cart' %}" class="me-3 mb-2 mb-md-0">
+                                <i class="fas fa-cart-shopping" style="font-size: 20px;"></i>
+                                <span class="badge badge-warning" id="cart_counter"
+                                    style="border-radius: 50px; position:relative; bottom:10px; left:-5px;">{{cart_count}}</span>
+                            </a>
+                            {% endif %}
+                            <a id="marketplace-link" href="javascript:void(0);" class="btn btn-outline-primary text-uppercase font-weight-bold me-2 mb-2 mb-md-0">MarketPlace</a>
+
+                            {% if user.is_authenticated %}
+                            <a class="cs-color cs-popup-joinus-btn login-popup me-2 mb-2 mb-md-0" href="{% url 'myAccount' %}">My Account</a>
+                            <a class="cs-color cs-popup-joinus-btn login-popup text-danger mb-2 mb-md-0" href="{% url 'logout' %}">Logout</a>
+                            {% else %}
+                            <a class="get-start-btn ms-2 mt-2 mt-md-0" href="{% url 'login' %}">Login</a>
+                            <a class="get-start-btn ms-2 mt-2 mt-md-0" href="{% url 'registerUser' %}">Register</a>
+                            <a class="get-start-btn ms-2 mt-2 mt-md-0" href="{% url 'registerRestaurant' %}">Register Restaurant</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <script>
+        var x = document.getElementById("location");
+        var current_location = sessionStorage.getItem("current_location");
+        var current_lat_lng = sessionStorage.getItem("current_lat_lng");
+        var searched_location = "{{ request.GET.address|default:'' }}";
+        
+        window.onload = function() {
+            if (searched_location) {
+                x.value = searched_location;
+                sessionStorage.setItem("current_location", searched_location);
+            } else if (current_location && current_lat_lng) {
+                x.value = current_location;
+            } else {
+                getLocation();
+            }
+        };
+        
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else { 
+                console.log("Geolocation is not supported by this browser.");
+            }
+        }
+        
+        function showPosition(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            var GOOGLE_API_KEY = "{{ GOOGLE_API_KEY }}";
+            var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + encodeURIComponent(lat) + "," + encodeURIComponent(lng) + "&key=" + encodeURIComponent(GOOGLE_API_KEY);
+        
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function(response){
+                    if (response.results.length > 0) {
+                        var current_location = response.results[0].formatted_address;
+                        x.value = current_location;
+        
+                        sessionStorage.setItem("current_location", current_location);
+                        sessionStorage.setItem("current_lat_lng", JSON.stringify({ lat: lat, lng: lng }));
+                        
+                        window.location = '?lat=' + lat + '&lng=' + lng + '&location=' + encodeURIComponent(current_location);
+                    } else {
+                        console.log("No location found for the coordinates.");
+                    }
+                },
+                error: function(error) {
+                    console.error("Error fetching location data:", error);
+                }
+            });
+        }
+        
+        function handleMarketplaceLinkClick() {
+            var stored_lat_lng = sessionStorage.getItem("current_lat_lng");
+        
+            if (stored_lat_lng) {
+                try {
+                    var searchUrl = '{% url "search" %}';
+                    var latLngData = JSON.parse(stored_lat_lng);
+                    var lat = latLngData.lat;
+                    var lng = latLngData.lng;
+        
+                    window.location.href = searchUrl + '?lat=' + lat + '&lng=' + lng;
+                } catch (e) {
+                    console.error("Error parsing stored coordinates:", e);
+                }
+            } else {
+                getLocation();
+            }
+        }
+        
+        document.getElementById("marketplace-link").addEventListener("click", handleMarketplaceLinkClick);
+        </script>
+        
+    
+    

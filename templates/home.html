@@ -1,0 +1,204 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="main-section">
+   <div class="page-section  main-search-bar" style=" width: 100vw; height: 70vh; background: url({% static 'extra-images/bg11.jpg' %}) no-repeat center / cover;">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+		<div class="element-title">
+				<div class="brand_name">
+					<h1>Orderzy</h1>
+				</div>
+			
+			<p style=" margin-top:2.5%; font-size: 18px; letter-spacing: 1px; color: #155edd; text-align:center; ">
+				Skip the line! Pre-order your favorite dishes now.</p>
+		</div>
+		<div class="main-search fancy ">
+						<form action="{% url 'search' %}" method="GET">
+              <div class="row justify-content-center">
+                <div class="col-lg-10 col-md-10">
+                  <div class="form-container d-flex justify-content-center align-items-center" style="background-color: rgb(201, 201, 205); padding: 20px; border-radius: 15px;">
+                   
+							<div class="row w-100">
+								<div class="col-lg-5 col-md-5 col-sm-3 col-xs-12">
+									<div class="field-holder holder_radius">
+										<input type="text" name="keyword" placeholder="Resturant name or Food name" class="form-control">
+									</div>
+								</div>
+								<div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+									<div class="field-holder holder_radius">
+										<ul>
+											<li class="select-location">
+												<div class="foodbakery-locations-fields-group foodbakery-focus-out holder_radius">
+													<span class="foodbakery-search-location-icon"><i class="icon-location"></i></span>
+													
+													<input type="text" name="address" class="location-field-text filter form-control" id="id_address"  placeholder="All Locations">
+													<input type="hidden" name="lat" value="" id="id_latitude">
+													<input type="hidden" name="lng" value="" id="id_longitude">
+												</div>
+												
+											</li>
+										</ul>
+									</div>
+								</div>
+								<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+									<div class="field-holder holder_radius">
+										<input type="submit" value="Search">
+									</div>
+								</div>
+							</div>
+              </div>
+              </div>
+              </div>
+						</form>
+					</div>
+	</div>
+   </div>
+
+  <div
+    class="page-section nopadding cs-nomargin"
+    style="
+      margin-top: 0px;
+      padding-top: 60px;
+      padding-bottom: 0px;
+      margin-bottom: 0px;
+      background: #ffffff;
+    "
+  >
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <div class="element-title align-left">
+            <h2>Top Restaurants</h2>
+            <p>Explore restaurants, bars, and cafés by locality</p>
+          </div>
+        </div>
+        <div
+          class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+          style="padding-right: 0 !important; padding-left: 0 !important"
+        >
+          <div class="company-logo">
+            <ul>
+              {% for restaurant in restaurants %}
+              <li class="has-border">
+                <figure>
+                  {% if restaurant.user_profile.profile_picture %}
+                  <a
+                    href="{% url 'restaurant_detail' restaurant.restaurant_slug %}"
+                    ><img
+                      src="{{ restaurant.user_profile.profile_picture.url }}"
+                      height="125"
+                      class="attachment-full size-full wp-post-image home-restaurant-img"
+                      alt=""
+                  /></a>
+                  {% else %}
+                  <a
+                    href="{% url 'restaurant_detail' restaurant.restaurant_slug %}"
+                    ><img
+                      src="{% static 'images/default-profile.png' %}"
+                      height="125"
+                      class="attachment-full size-full wp-post-image home-restaurant-img"
+                      alt=""
+                  /></a>
+                  {% endif %}
+                </figure>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="page-section nopadding cs-nomargin"
+    style="
+      margin-top: 0px;
+      padding-top: 60px;
+      padding-bottom: 50px;
+      margin-bottom: 0px;
+      background: #ffffff;
+    "
+  >
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <div class="element-title align-center">
+            <h2>Choose From Most Popular Restaurants</h2>
+          </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <div class="listing fancy">
+            <ul class="row">
+              {% for restaurant in restaurants %}
+              <li class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="list-post featured">
+                  <div class="img-holder">
+                    <figure>
+                      <a
+                        href="{% url 'restaurant_detail' restaurant.restaurant_slug %}"
+                      >
+                        {% if restaurant.user_profile.profile_picture %}
+                        <img
+                          src="{{ restaurant.user_profile.profile_picture.url }}"
+                          class="img-thumb wp-post-image"
+                          alt=""
+                        />
+                        {% else %}
+                        <img
+                          src="{% static 'images/default-profile.png' %}"
+                          class="img-thumb wp-post-image"
+                          alt=""
+                        />
+                        {% endif %}
+                      </a>
+                    </figure>
+                    {% if restaurant.is_open %}
+                    <span class="restaurant-status open">
+                      <em class="bookmarkRibbon"></em>Open
+                    </span>
+                    {% else %}
+                    <span class="restaurant-status close">
+                      <em class="bookmarkRibbon"></em>Close
+                    </span>
+                    {% endif %}
+                  </div>
+                  <div class="text-holder">
+                    <div class="post-title">
+                      <h5>
+                        <a
+                          href="{% url 'restaurant_detail' restaurant.restaurant_slug %}"
+                          >{{ restaurant }}</a
+                        >
+                      </h5>
+                    </div>
+                    {% if restaurant.user_profile.city and restaurant.user_profile.state and restaurant.user_profile.pin_code %}
+                    <span>{{ restaurant.user_profile.city }}, {{ restaurant.user_profile.state }}, {{ restaurant.user_profile.pin_code }}</span>
+                    {% endif %} 
+					
+					{% if restaurant.kms %}
+                    <br>
+                    <span><small><b>{{restaurant.kms}} km </b>away</small></span>
+                    {% endif %}
+                  </div>
+                  <div class="list-option">
+                    <a
+                      href="javascript:void(0);"
+                      class="shortlist-btn"
+                      data-toggle="modal"
+                      data-target="#sign-in"
+                    >
+                      
+                    </a>
+                  </div>
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

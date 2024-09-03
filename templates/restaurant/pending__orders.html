@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+{% include 'includes/alerts.html' %}
+
+<div class="main-section">
+    {% include 'includes/cover.html' %}
+    <div class="page-section account-header buyer-logged-in">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                    {% include 'includes/r_sidebar.html' %}
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                    <div class="user-dashboard loader-holder">
+                        <div class="user-holder">
+
+                            <h5 class="text-uppercase">Pending Orders</h5>
+
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="user-orders-list">
+                                        <div class="responsive-table">
+                                            <h4 class="text-center alert alert-info">Immediate Orders</h4>
+                                            {% if pending_orders %}
+                                          
+                                            <table class="table table-hover w-100">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Order #</th>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Total</th>
+                                                        <th scope="col">Guests</th>
+                                                        <th scope="col">Item x Quantity</th>
+                                                        <th scope="col">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tr>
+                                                    {% for order in pending_orders %}
+                                                    {% if order.po_order_type == 'Immediate' %}
+                                                   {% if order.po_status != 'Completed' and order.po_status != 'Cancelled'  %}
+
+                                                <tr>
+
+                                                    <th scope="row"><b><a
+                                                                href="{% url 'restaurant_order_detail' order.po_order_number %}"
+                                                                class="text-dark">{{order.po_order_number|slice:"12:"}}</a></b>
+                                                    </th>
+                                                    <td class="border">{{ order.po_name }} </td>
+
+                                                    <td class="border">₹{{ order.po_total }}</td>
+                                                    <td class="border">{{ order.po_num_of_people }} </td>
+
+                                                    <td class="border">
+                                                        {% if order.po_ordered_food_details %}
+                                                            <ul>
+                                                                {% for item in order.po_ordered_food_details %}
+                                                                    <li>{{ item.fooditem }} x {{ item.quantity }}</li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        {% else %}
+                                                            <span>No items</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td class="border">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            {% if order.po_status == 'New'  %}
+                                                            <form action="{% url 'accept_po' order.po_id %}"
+                                                                method="post" class="d-inline"> {% csrf_token %}
+                                                                <input type="submit" class="btn btn-primary btn-sm"
+                                                                    value="Accept">
+                                                            </form>
+                                                            {% endif %}
+                                                            {% if order.po_status == 'Accepted'  %}
+                                                            <form action="{% url 'ready_po' order.po_id %}"
+                                                                method="post" class="d-inline"> {% csrf_token %}
+                                                                <input type="submit" class="btn btn-primary btn-sm"
+                                                                    value="Ready">
+                                                            </form>
+                                                            {% endif %}
+                                                            {% if order.po_status == 'Ready'  %}
+
+                                                            <form
+                                                                action="{% url 'completed_po' order.po_id %}"
+                                                                method="post" class="d-inline"> {% csrf_token %}
+                                                                <input type="submit" class="btn btn-warning btn-sm"
+                                                                    value="Completed">
+                                                            </form>
+                                                            {% endif %}
+                                                            <form action="{% url 'delete_po' order.po_id %}"
+                                                                method="post" class="d-inline"> {% csrf_token %}
+                                                                <input type="submit" class="btn btn-danger btn-sm"
+                                                                    value="Delete">
+                                                            </form>
+
+                                                        </div>
+                                                    </td>
+
+                                                </tr>
+   
+                                                {% endif %}
+                                                {% endif %}
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+
+                                            {% else %}
+                                            <h4 class="text-center alert alert-warning">No Records</h4>
+                                            {% endif %}
+                                     
+
+                                            <h4 class="text-center alert alert-info">Pre-Orders</h4>
+                                           
+
+                                            {% if pending_orders %}
+                                       
+                                            <table class="table table-hover w-100">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Order #</th>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Total</th>
+                                                        <th scope="col">Pre Order</th>
+                                                        <th scope="col">Item x Quantity</th>
+                                                        <th scope="col">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tr>
+                                                    {% for order in pending_orders %}
+                                                    {% if order.po_order_type == 'Preorder' %}
+                                                    {% if order.po_status != 'Completed' and order.po_status != 'Cancelled' %}
+                                                <tr>
+
+                                                    <th scope="row">
+                                                        <b>
+                                                            <a
+                                                                href="{% url 'restaurant_order_detail' order.po_order_number %}"
+                                                                class="text-dark">{{order.po_order_number|slice:"12:"}}
+                                                            </a>
+                                                        </b>
+                                                    </th>
+                                                    <td class="border">{{ order.po_name }} </td>
+                                                    <td class="border">₹{{ order.po_total }}</td>
+                                                    <td class="border">{{ order.po_pre_order_time }} hr</td>
+                                                    <td class="border">
+                                                        {% if order.po_ordered_food_details %}
+                                                            <ul>
+                                                                {% for item in order.po_ordered_food_details %}
+                                                                    <li>{{ item.fooditem }} x {{ item.quantity }}</li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        {% else %}
+                                                            <span>No items</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td class="border">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            {% if order.po_status == 'New' %}
+
+                                                            <form action="{% url 'accept_po' order.po_id %}"
+                                                                method="post" class="d-inline"> {% csrf_token %}
+                                                                <input type="submit" class="btn btn-primary btn-sm"
+                                                                    value="Accept">
+                                                            </form>
+                                                            {% endif %}
+                                                            {% if order.po_status == 'Accepted'  %}
+
+                                                            <form action="{% url 'ready_po' order.po_id %}"
+                                                                method="post" class="d-inline"> {% csrf_token %}
+                                                                <input type="submit" class="btn btn-primary btn-sm"
+                                                                    value="Ready">
+                                                            </form>
+                                                            {% endif %}
+                                                            {% if order.po_status == 'Ready'  %}
+                                                            <form
+                                                                action="{% url 'completed_po' order.po_id %}"
+                                                                method="post" class="d-inline"> {% csrf_token %}
+                                                                <input type="submit" class="btn btn-warning btn-sm"
+                                                                    value="Completed">
+                                                            </form>
+                                                            {% endif %}
+                                                            <form action="{% url 'delete_po' order.po_id %}"
+                                                                method="post" class="d-inline"> {% csrf_token %}
+                                                                <input type="submit" class="btn btn-danger btn-sm"
+                                                                    value="Delete">
+                                                            </form>
+
+                                                        </div>
+                                                    </td>
+
+                                                </tr>
+   
+                                                {% endif %}
+                                                {% endif %}
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+
+                                            {% else %}
+                                            <h4 class="text-center alert alert-warning">No Records</h4>
+                                            {% endif %}
+                                        
+
+                                          
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

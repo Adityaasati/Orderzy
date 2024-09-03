@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% include 'includes/alerts.html' %}
+
+<div class="main-section">
+    {% include 'includes/cover.html' %}
+    <div class="page-section account-header buyer-logged-in">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                    {% include 'includes/r_sidebar.html' %}
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                    <div class="user-dashboard loader-holder">
+                        <div class="user-holder">
+
+                            <h5 class="text-uppercase">Manage Your Seating Plan</h5>
+                            <hr>
+                            
+                            <h6> Current Seating Plan</h6>
+                            <table class="table table-hover table-borderless" style="width:500px;">
+                                <tbody>
+                                    <tr>
+                                       
+                                        <td><strong>Seating Plan Available:</strong></td>
+                                        <td>{{ seating_plan.seating_plan_available|yesno:"Yes,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Tables for Two:</strong></td>
+                                        <td>{{ seating_plan.tables_for_two }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Tables for Four:</strong></td>
+                                        <td>{{ seating_plan.tables_for_four }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Tables for Six:</strong></td>
+                                        <td>{{ seating_plan.tables_for_six }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <hr>
+
+                            <h6> Update Seating Plan</h6>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        {{ form.seating_plan_available.label_tag }}<br>
+                                        {{ form.seating_plan_available }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {{ form.tables_for_two.label_tag }}<br>
+                                        {{ form.tables_for_two }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {{ form.tables_for_four.label_tag }}<br>
+                                        {{ form.tables_for_four }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {{ form.tables_for_six.label_tag }}<br>
+                                        {{ form.tables_for_six }}
+                                    </div>
+                                </div>
+                                <br>
+                                <button type="submit" class="btn btn-success">Save</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
