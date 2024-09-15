@@ -63,18 +63,18 @@
             </div>
         </div>
     </div>
-    {% if seating_available == 0 %}
-    <p style="color: #ff6347 !important; font-style: italic; font-size: 0.9em; text-align: center; margin-top: 20px;">
-        We’re currently at full capacity. You can place your order now, and feel free to check back later for table availability.
-    </p>
     
-    {% endif %}
     <section class="product spad">
         <div class="container">
             <div class="row">
                 <div class="col-lg-9 col-md-7">
                     <div class="row">
-                        
+                        {% if seating_available == 0 %}
+    <p style="color: #ff6347 !important; font-style: italic; font-size: 0.9em; text-align: center; margin-top: 20px;">
+        We’re currently at full capacity. You can place your order now, and feel free to check back later for table availability.
+    </p>
+    
+    {% endif %}
                        
                         {% for category in categories %}
                         

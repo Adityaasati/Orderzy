@@ -44,26 +44,23 @@ class Restaurant(models.Model):
     def __str__(self):
         return self.restaurant_name
     
-    def is_open(self):
-        today_date= date.today()
-        today = today_date.isoweekday()
-        
-        current_opening_hours = OpeningHour.objects.filter(restaurant=self, day=today)
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
-        
-        is_open=None
-        for i in current_opening_hours:
-            if not i.is_closed:
-                start = str(datetime.strptime(i.from_hour,"%I:%M %p").time())
-                end = str(datetime.strptime(i.to_hour,"%I:%M %p").time())
-                if current_time > start and current_time < end:
-                    is_open=True
-                    break
-                else:
-                    is_open = False
-        return is_open
 
+    def is_open(self):
+        today = date.today().isoweekday()  
+    
+        current_opening_hours = OpeningHour.objects.filter(restaurant=self, day=today)
+    
+        now = datetime.now().time()  
+        for opening_hour in current_opening_hours:
+            if not opening_hour.is_closed:
+                start = datetime.strptime(opening_hour.from_hour, "%I:%M %p").time()
+                end = datetime.strptime(opening_hour.to_hour, "%I:%M %p").time()
+            
+                if start <= now <= end:
+                    return True 
+        return False  
+    
+    
     
     def save(self, *args, **kwargs):
         if not self.pk:  # If the restaurant is being created

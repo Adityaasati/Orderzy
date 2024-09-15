@@ -3,6 +3,8 @@ from accounts.models import User
 from menu.models import FoodItem
 from restaurant.models import Restaurant
 import simplejson as json
+from django.core.validators import MinValueValidator
+from decimal import Decimal
 
 request_object = ''
 
@@ -14,7 +16,7 @@ class Payment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     transaction_id = models.CharField(max_length=100)
     payment_method = models.CharField(choices=PAYMENT_METHOD, max_length=100)
-    amount = models.CharField(max_length=10)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.00'))])
     status = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -61,7 +63,7 @@ class Order(models.Model):
         return ",".join([str(i) for i in self.restaurants.all()])
     
     def get_total_by_restaurant(self):
-        restaurant = Restaurant.objects.get(user=request_object.user)
+        restaurant = Restaurant.objects.get(user=self.user)
         subtotal = 0
         service_charge = 0
         service_charge_dict = {}
@@ -87,11 +89,9 @@ class Order(models.Model):
             'service_charge_dict':service_charge_dict,
             'grand_total':grand_total,
         }    
-            
-        
+
         return context
-    
-    
+
     def __str__(self):
         return self.order_number
 
@@ -111,7 +111,11 @@ class OrderedFood(models.Model):
         return self.fooditem.food_title
     
 
-class PendingOrder(models.Model):
+
+
+
+
+class PendingOrders(models.Model):
     STATUS = (
         ('New', 'New'),
         ('Accepted', 'Accepted'),
@@ -120,7 +124,7 @@ class PendingOrder(models.Model):
         ('Cancelled', 'Cancelled'),
     )
 
-    po_id = models.AutoField(primary_key=True)
+
     po_order_number = models.CharField(max_length=20, default='N/A')
     po_is_ordered = models.BooleanField(default=False)
     po_created_at = models.DateTimeField(auto_now_add=True)
@@ -142,13 +146,12 @@ class PendingOrder(models.Model):
     
     
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  
+        
         if not self.po_restaurant_order:
-            last_order = PendingOrder.objects.filter(
-            po_restaurant_id=self.po_restaurant_id
-            ).exclude(
-                po_id=self.po_id
-            ).order_by('po_id').last()
+            last_order = PendingOrders.objects.filter(
+                po_restaurant_id=self.po_restaurant_id,
+                po_status__in=['New', 'Accepted', 'Ready']
+            ).order_by('id').last()
         
             if last_order and last_order.po_restaurant_order:
                 last_num = int(last_order.po_restaurant_order.split('_')[-1])
@@ -156,7 +159,7 @@ class PendingOrder(models.Model):
             else:
                 new_num = 1
             self.po_restaurant_order = f"{self.po_restaurant_id}_{new_num}"
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
     def get_restaurant_order_number(self):
@@ -169,10 +172,10 @@ class PendingOrder(models.Model):
 
     def preparing_restaurant_order_number(self):
         """Prepare the next order number for this restaurant."""
-        last_order = PendingOrder.objects.filter(
+        last_order = PendingOrders.objects.filter(
             po_restaurant_id=self.po_restaurant_id,
             po_status='Completed'
-        ).order_by('po_id').last()
+        ).order_by('id').last()
         if last_order is None:
             last_order = 0
             
@@ -216,3 +219,6 @@ class PendingOrder(models.Model):
         }    
 
         return context
+
+
+

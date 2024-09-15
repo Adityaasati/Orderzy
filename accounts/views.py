@@ -1,15 +1,20 @@
-from django.shortcuts import render
 from .forms import UserForm, LoginForm, ContactForm
 from django.shortcuts import redirect, render
 from .models import User, UserProfile, ContactMessage
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 from restaurant.forms import RestaurantForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import auth
-from django.shortcuts import render
+from django.core.exceptions import ValidationError
+from django.core.validators import EmailValidator, ValidationError
+from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.password_validation import validate_password
 from .utils import detectUser, send_verification_email
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.urls import reverse
 from django.contrib.auth.tokens import default_token_generator
 from restaurant.models import Restaurant
 from django.template.defaultfilters import slugify
@@ -38,7 +43,9 @@ def registerUser(request):
         return redirect('custDashboard')
     elif request.method == 'POST':
         form = UserForm(request.POST)
+        print(f"Form data: {request.POST}")
         if form.is_valid():  
+            print("Form is valid")
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             username = form.cleaned_data['username']
@@ -55,6 +62,8 @@ def registerUser(request):
             user.save()
             user.is_active = True
             user.save()
+            print(f"User created: {user.username}")
+
             messages.success(request, "Your Account has been registered successfully!")
             return redirect('login')
         else:
@@ -87,6 +96,8 @@ def registerRestaurant(request):
                 email=email, phone_number=phone_number, password=password)
             user.role = User.RESTAURANT
             user.save()
+            user.is_active = False
+            user.save()
             restaurant = r_form.save(commit=False)
             restaurant.user = user
             restaurant_name = r_form.cleaned_data['restaurant_name']
@@ -101,18 +112,20 @@ def registerRestaurant(request):
                 # send_verification_email(request, user, mail_subject, email_template)
                 print(f"Sending email to {username}")
             elif re.match(r"^\+?\d{10,15}$", username):
-                # Username is a phone number, send WhatsApp message
+                
                 message = "Please activate your account using the following code: 12345" 
                 # send_whatsapp_message(username, message)
                 print(f"Sending WhatsApp message to {username}")
             else:
                 # Invalid username format
-                messages.error(request, "Invalid username format.")
-                return redirect('registerUser')
+                messages.error(request, "Username must be a valid email or phone number.")
+                return redirect('registerRestaurant')
             messages.success(request, 'Your Account is created successfully. Please wait for the Approval.')
-            return redirect('registerRestaurant')
+            return redirect('login')
         else:
             print(form.errors)
+            return render(request, 'accounts/registerRestaurant.html', {'form': form, 'r_form': r_form})
+
     else:
         
         form  = UserForm()
@@ -136,18 +149,20 @@ def login(request):
             username = form.cleaned_data['identifier']
             password = form.cleaned_data['password']
             user = auth.authenticate(request, username=username, password=password)
-            if user.is_active:
-                
-                if user is not None :
-                
+            if user is not None :
+                if user.is_active:
                     auth.login(request, user)
                     messages.success(request, 'You are logged in')
+                    print("Redirected...145")
                     return redirect('marketplace')
+                
                 else:
-                    messages.error(request, 'Invalid credentials')
+                    messages.error(request, 'Kindly wait until you receive approval before proceeding.')
             else:
-                messages.error(request, 'Kindly wait until you receive approval before proceeding.')
+                messages.error(request, 'Invalid credentials')
+            
         else: 
+            
             print(form.errors) 
     else:
         
@@ -155,32 +170,82 @@ def login(request):
     return render(request, 'accounts/login.html', {'form': form})
 
 
+# def activate(request, uidb64, token):
+#     print("Entered in activate")
+#     try:
+#         uid = urlsafe_base64_decode(uidb64).decode()
+#         user = User._default_manager.get(pk=uid)
+#     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+#         user = None
+#     if user is not None and default_token_generator.check_token(user, token) :
+#         user.is_active = True
+#         user.save()
+#         print(f"User {user.username} is now active: {user.is_active}")
+#         if re.match(r"[^@]+@[^@]+\.[^@]+", user.username):
+#             messages.success(request, 'Congrats! Your account is activated.')
+#             messages.success(request, 'Congrats! Your account is activated.')
+#             return redirect('myAccount')
+#         elif re.match(r"^\+?\d{10,15}$", user.username):
+#             message = "Congrats! Your account is activated."
+#             # send_activate_message(user.username, message)  # Uncomment and implement this function
+#             print(f"Sending WhatsApp activation message to {user.username}")
+#             print("User activated!")
+#             messages.success(request, 'Congrats! Your account is activated.')
+#             return redirect('myAccount')
+#         else:
+#             messages.error(request, 'Invalid username format.')
+#             return redirect('myAccount')
+#     else:
+#         print("Some error", user)
+#         messages.error(request, 'Invalid Activation Link')
+#         return redirect('myAccount')
+
+
+
 def activate(request, uidb64, token):
+    print("Entered in activate")
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
         user = User._default_manager.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
+        print(f"Error decoding UID or fetching user: {e}")
         user = None
 
     if user is not None and default_token_generator.check_token(user, token):
-        user.is_active = True
-        user.save()
+        if not user.is_active:
+            user.is_active = True
+            user.save()
+            print(f"User {user.username} is now active: {user.is_active}")
 
-        if re.match(r"[^@]+@[^@]+\.[^@]+", user.username):
-            messages.success(request, 'Congrats! Your account is activated.')
-            return redirect('myAccount')
-        else:
-            messages.error(request, 'Invalid Activation Link')
-            return redirect('myAccount')
+
+            auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            print(f"User {user.username} has been logged in.")
             
-    elif re.match(r"^\+?\d{10,15}$", user.username):
-        message = "Congrats! Your account is activated."
-            # send_activate_message(user.username, message)
-        print(f"Sending WhatsApp activation message to {user.username}")
+            # Check if username is an email using Django's EmailValidator
+            try:
+                email_validator = EmailValidator()
+                email_validator(user.username)  # Will raise ValidationError if not a valid email
+                print(f"Valid email: {user.username}")
+                messages.success(request, 'Congrats! Your account is activated.')
+                return redirect('myAccount')
+            except ValidationError:
+                # If it's not an email, check if it's a valid phone number
+                if re.match(r"^\+?\d{10,15}$", user.username):
+                    print(f"Valid phone number: {user.username}")
+                    # Optionally, send a WhatsApp activation message here
+                    messages.success(request, 'Congrats! Your account is activated.')
+                    return redirect('myAccount')
+                else:
+                    print(f"Invalid username format: {user.username}")
+                    messages.error(request, 'Invalid username format.')
+                    return redirect('myAccount')
+        else:
+            messages.info(request, 'Your account is already activated.')
+            return redirect('myAccount')
     else:
+        print(f"Invalid token or user: {user}")
         messages.error(request, 'Invalid Activation Link')
         return redirect('myAccount')
-
 
 def logout(request):
     auth.logout(request)
@@ -240,7 +305,28 @@ def restaurantDashboard(request):
 
 
 @login_required(login_url='login')
-def contact_us(request):
+def r_contact_us(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            message = form.cleaned_data['message']
+
+            ContactMessage.objects.create(
+                user=request.user,
+                name=name,
+                message=message
+            )
+            messages.success(request, 'Thank you for reaching out! Your message has been sent successfully.')
+            return render(request, 'accounts/r_contactUs.html', {'form_submitted': True})
+
+    else:
+        form = ContactForm()
+
+    return render(request, 'accounts/r_contactUs.html', {'form': form, 'form_submitted': False})
+
+@login_required(login_url='login')
+def c_contact_us(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -254,131 +340,59 @@ def contact_us(request):
             )
 
             messages.success(request, 'Thank you for reaching out! Your message has been sent successfully.')
-            return render(request, 'accounts/contactUs.html', {'form_submitted': True})
+            return render(request, 'accounts/c_contactUs.html', {'form_submitted': True})
 
     else:
         form = ContactForm()
 
-    return render(request, 'contactUs.html', {'form': form, 'form_submitted': False})
+    return render(request, 'accounts/c_contactUs.html', {'form': form, 'form_submitted': False})
 
 
 
-
-
-
-# def forgot_password(request):
-#     if request.method == 'POST':
-#         email = request.POST['email']
-        
-#         if User.objects.filter(email=email).exists():
-#             user = User.objects.get(email__exact=email)
-            
-#             mail_subject = "Reset Your Password"
-#             email_template = 'accounts/emails/reset_password_email.html'
-#             send_verification_email(request, user,mail_subject,email_template)
-#             messages.success(request,'Password reset link has been sent to your emaill')
-#             return redirect('login')
-#         else:
-#             messages.error(request,'Account does not exist')
-#             return redirect('forgot_password')
-#     return render(request, 'accounts/forgot_password.html')
-
-import re
-
-# def forgot_password_message(phone_number, message):
-#     # Logic to send a WhatsApp message
-#     pass
-
-# def forgot_password(request):
-#     if request.method == 'POST':
-#         identifier = request.POST['identifier']
-
-#         # Check if the identifier is an email or phone number
-#         if re.match(r"[^@]+@[^@]+\.[^@]+", identifier):
-#             # Identifier is an email
-#             if User.objects.filter(email=identifier).exists():
-#                 user = User.objects.get(email__exact=identifier)
-                
-#                 mail_subject = "Reset Your Password"
-#                 email_template = 'accounts/emails/reset_password_email.html'
-#                 send_verification_email(request, user, mail_subject, email_template)
-#                 messages.success(request, 'Password reset link has been sent to your email')
-#                 return redirect('login')
-#             else:
-#                 messages.error(request, 'Account does not exist')
-#                 return redirect('forgot_password')
-
-#         # elif re.match(r"^\+?\d{10,15}$", identifier):
-#         #     # Identifier is a phone number
-#         #     if User.objects.filter(username=identifier).exists():
-#         #         user = User.objects.get(username=identifier)
-
-#         #         reset_link = request.build_absolute_uri(
-#         #             reverse('reset_password_confirm', kwargs={
-#         #                 'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
-#         #                 'token': default_token_generator.make_token(user),
-#         #             })
-#         #         )
-#         #         whatsapp_message = f"Reset your password by clicking the link: {reset_link}"
-#         #         forgot_password_message(identifier, whatsapp_message)
-#         #         messages.success(request, 'Password reset link has been sent to your WhatsApp number')
-#         #         return redirect('login')
-#             # else:
-#             #     messages.error(request, 'Account does not exist')
-#             #     return redirect('forgot_password')
-
-#         else:
-#             messages.error(request, 'Please enter a valid email address or phone number')
-#             return redirect('forgot_password')
-
-#     return render(request, 'accounts/forgot_password.html')
-
-
-import re
 
 def forgot_password(request):
     if request.method == 'POST':
-        identifier = request.POST.get('identifier')  # Use get to avoid KeyError
+        identifier = request.POST.get('identifier')  # Safely get identifier
 
-        # Check if the identifier is an email
-        if re.match(r"[^@]+@[^@]+\.[^@]+", identifier):
-            if User.objects.filter(email=identifier).exists():
-                user = User.objects.get(email__exact=identifier)
+        # Try to validate as an email first
+        email_validator = EmailValidator()
+        try:
+            email_validator(identifier)  # If it's valid, this means it's an email
+            user_filter = {'email': identifier}
+        except ValidationError:
+            print(f"Invalid email, trying phone number: {identifier}")
+            if re.match(r"^\+?\d{10,15}$", identifier):
+                print(f"Valid phone number: {identifier}")
+                user_filter = {'username': identifier}  # Assuming username stores the phone number
+            else:
+                print(f"Invalid identifier: {identifier}")
+                messages.error(request, 'Please enter a valid email address or phone number.')
+                return redirect('forgot_password')
 
+        if User.objects.filter(**user_filter).exists():
+            user = User.objects.get(**user_filter)
+
+            if 'email' in user_filter:
                 mail_subject = "Reset Your Password"
                 email_template = 'accounts/emails/reset_password_email.html'
                 send_verification_email(request, user, mail_subject, email_template)
-                messages.success(request, 'Password reset link has been sent to your email')
-                return redirect('login')
+                messages.success(request, 'Password reset link has been sent to your email.')
             else:
-                messages.error(request, 'Account does not exist')
-                return redirect('forgot_password')
+                print("Phone number")
+                reset_link = request.build_absolute_uri(reverse('reset_password_validate', kwargs={
+                    'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': default_token_generator.make_token(user),
+                }))
+                whatsapp_message = f"Reset your password by clicking the link: {reset_link}"
+                # send_whatsapp_message(identifier, whatsapp_message)  # Function to send WhatsApp messages
+                messages.success(request, 'Password reset link has been sent to your WhatsApp number.')
 
-        # Check if the identifier is a phone number
-        # elif re.match(r"^\+?\d{10,15}$", identifier):
-        #     if User.objects.filter(username=identifier).exists():
-        #         user = User.objects.get(username=identifier)
-
-        #         reset_link = request.build_absolute_uri(
-        #             reverse('reset_password_confirm', kwargs={
-        #                 'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
-        #                 'token': default_token_generator.make_token(user),
-        #             })
-        #         )
-        #         whatsapp_message = f"Reset your password by clicking the link: {reset_link}"
-        #         send_whatsapp_message(identifier, whatsapp_message)
-        #         messages.success(request, 'Password reset link has been sent to your WhatsApp number')
-        #         return redirect('login')
-        #     else:
-        #         messages.error(request, 'Account does not exist')
-        #         return redirect('forgot_password')
-
+            return redirect('login')
         else:
-            messages.error(request, 'Please enter a valid email address or phone number')
+            messages.error(request, 'Account does not exist.')
             return redirect('forgot_password')
 
     return render(request, 'accounts/forgot_password.html')
-
 
 
 def reset_password_validate(request, uidb64, token):
@@ -386,89 +400,61 @@ def reset_password_validate(request, uidb64, token):
         uid = urlsafe_base64_decode(uidb64).decode()
         user = User._default_manager.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user=None
+        user = None
+    
     if user is not None and default_token_generator.check_token(user, token):
         request.session['uid'] = uid
-        messages.info(request, 'Please Reset Your Password')
+        messages.info(request, 'Please reset your password.')
         return redirect('reset_password')
     else:
-        messages.error(request, 'This link has been expired')
+        messages.error(request, 'This link has expired or is invalid.')
         return redirect('myAccount')
+
+
 
 def reset_password(request):
     if request.method == 'POST':
-        password = request.POST['password']
-        confirm_password = request.POST['confirm_password']
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
         
-        if password == confirm_password:
-            pk = request.session.get('uid')
-            user = User.objects.get(pk=pk)
-            user.set_password(password)
-            user.is_active = True
-            user.save()
-            messages.success(request, 'Password reset Successfully')
-            return redirect('login')
-            
-        else:
-            messages.error(request, "Password does not match")
+        if not password or not confirm_password:
+            messages.error(request, "Both password fields are required.")
             return redirect('reset_password')
-        
+
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return redirect('reset_password')
+
+
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            for error in e.messages:
+                messages.error(request, error)
+            return redirect('reset_password')
+
+        pk = request.session.get('uid')
+        if not pk:
+            messages.error(request, "Session expired. Please try resetting your password again.")
+            return redirect('forgot_password')
+
+
+        try:
+            user = User.objects.get(pk=pk)
+        except ObjectDoesNotExist:
+            messages.error(request, "User does not exist.")
+            return redirect('forgot_password')
+
+        user.set_password(password)
+        user.is_active = True 
+        user.save()
+
+        del request.session['uid']
+
+        messages.success(request, 'Password reset successfully. You can now log in with your new password.')
+        return redirect('login')
+
     return render(request, 'accounts/reset_password.html')
 
-# accounts/views.py
-# from django.contrib.auth import authenticate, login as auth_login
-# from django.shortcuts import render, redirect
-# from django.contrib import messages
-# from .forms import UserForm, LoginForm
-
-
-# def login(request):
-#     if request.user.is_authenticated:
-#         messages.warning(request, "You are already logged in")
-#         return redirect('myAccount')
-
-#     if request.method == 'POST':
-#         form = LoginForm(request.POST)
-#         if form.is_valid():
-#             username = form.cleaned_data['username']
-#             password = form.cleaned_data['password']
-#             user = authenticate(request, username=username, password=password)
-#             if user is not None:
-#                 auth_login(request, user)
-#                 messages.success(request, 'You are logged in')
-#                 return redirect('marketplace')
-#             else:
-#                 messages.error(request, 'Invalid Credentials')
-#                 return redirect('login')
-#     else:
-#         form = LoginForm()
-
-#     return render(request, 'accounts/login.html', {'form': form})
-
-# def registerUser(request):
-#     if request.user.is_authenticated:
-#         messages.warning(request, "You are already logged in")
-#         return redirect('custDashboard')
-
-#     if request.method == 'POST':
-#         form = UserForm(request.POST)
-#         if form.is_valid():
-#             first_name = form.cleaned_data['first_name']
-#             last_name = form.cleaned_data['last_name']
-#             username = form.cleaned_data['username']
-#             email = form.cleaned_data['email']
-#             phone_number = form.cleaned_data.get('phone_number', '')
-#             password = form.cleaned_data['password']
-#             user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, phone_number=phone_number, password=password)
-#             user.role = User.CUSTOMER
-#             user.save()
-#             user.is_active = True
-#             user.save()
-#             messages.success(request, "Your Account has been registered successfully!")
-#             return redirect('registerUser')
-#         else:
-#             messages.error(request, form.errors)
-#     else:
-#         form = UserForm()
-
-#     return render(request, 'accounts/registerUser.html', {'form': form})

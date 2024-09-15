@@ -13,6 +13,7 @@ from django.db.models import Q
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
+from django.contrib import messages
 
 
 def marketplace(request):
@@ -199,18 +200,23 @@ def search(request):
 
     else:
         print("Entered in else")
+        note = "Sorry for your inconvenience. Currently we do not have your item."
+        # messages.warning(request, "Sorry, Currently we do not have your item.")
+        print(note)
         
         nearby_food_hubs = 0
         food_hubs_count = 0
-
 
     context = {
         'restaurants': restaurants,
         'nearby_food_hubs': nearby_food_hubs,
         'food_hubs_count': food_hubs_count,
         'source_location': address,
+        
     }
     
+    
+    print(context)
     return render(request, 'marketplace/listings.html', context)
 
 
@@ -219,6 +225,7 @@ def checkout(request):
     cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
     cart_count = cart_items.count()
     if cart_count <=0:
+        messages.warning(request, 'Currently, your cart is empty.')
         return redirect('marketplace')
     
     user_profile = UserProfile.objects.get(user = request.user)

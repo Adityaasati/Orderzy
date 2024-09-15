@@ -25,14 +25,10 @@ def order_total_by_restaurant(order, restaurant_id):
         for i in val:
             for j in val[i]:
                 service_charge += float(val[i][j])
-            
-                
     grand_total = float(subtotal) + float(service_charge) 
     context = {
         'subtotal':subtotal,
         'service_charge_dict':service_charge_dict,
         'grand_total':grand_total,
         }    
-            
-        
     return context

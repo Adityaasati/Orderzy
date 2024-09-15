@@ -5,31 +5,26 @@ from .validators import allow_only_images_validator
         
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
-    phone_number = forms.CharField(max_length=12, required=False, help_text='Optional. Enter your mobile number if you wish.')
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'username', 'phone_number', 'password']
+        fields = ['first_name', 'last_name', 'username','password']
     
     def clean(self):
         cleaned_data = super().clean()
         username = cleaned_data.get('username')
-        phone_number = cleaned_data.get('phone_number')
 
         if not username:
             raise forms.ValidationError("Username is required.")
         
         if '@' in username:
             email = username
-            if phone_number:
-                raise forms.ValidationError("Provide either an email address or a phone number, not both.")
-            cleaned_data['email'] = email
-            cleaned_data['phone_number'] = None
+            if User.objects.filter(username=email).exists():
+                raise forms.ValidationError("User with this Email already exists.")
         else:
-            if phone_number and phone_number != username:
-                raise forms.ValidationError("Provide either an email address or a phone number, not both.")
-            cleaned_data['email'] = None
-            cleaned_data['phone_number'] = username
+            phone_number = username
+            if User.objects.filter(username=phone_number).exists():
+                raise forms.ValidationError("User with this Phone Number already exists.")
 
         return cleaned_data
     

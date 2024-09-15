@@ -1,19 +1,25 @@
 from .models import Cart
 from menu.models import FoodItem
 from marketplace.models import Service_Charge
+from django.db.models import Sum
+
 
 def get_cart_counter(request):
     cart_count=0
     if request.user.is_authenticated:
         try:
-            cart_items = Cart.objects.filter(user=request.user)
-            if cart_items:
-                for cart_item in cart_items:
-                    cart_count+=cart_item.quantity
-            else:
-                cart_count=0
+            # cart_items = Cart.objects.filter(user=request.user)
+            # if cart_items:
+            #     for cart_item in cart_items:
+            #         cart_count+=cart_item.quantity
+            # else:
+            #     cart_count=0
+            cart_count = Cart.objects.filter(user=request.user).aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
         except:
             cart_count = 0
+    else:
+        # Logic for anonymous users (use session to store cart)
+        cart_count = request.session.get('cart_count', 0)
     return dict(cart_count=cart_count)            
             
             

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Payment, Order,OrderedFood, PendingOrder
+from .models import Payment, Order,OrderedFood, PendingOrders
 
 class OrderedFoodInline(admin.TabularInline):
     model = OrderedFood
@@ -13,11 +13,11 @@ class OrderAdmin(admin.ModelAdmin):
   
 
 
-class PendingOrderAdmin(admin.ModelAdmin):
-    list_display = ['po_id','po_order_number','po_restaurant_order','po_restaurant_id','po_num_of_people','po_status','po_order_type','po_name','po_total','po_pre_order_time','order_placed_to','preparing_restaurant_order_number','get_restaurant_order_number','po_ordered_food_details','po_is_ordered']
+class PendingOrdersAdmin(admin.ModelAdmin):
+    list_display = ['po_order_number','po_restaurant_order','po_restaurant_id','po_num_of_people','po_status','po_order_type','po_name','po_total','po_pre_order_time','order_placed_to','preparing_restaurant_order_number','get_restaurant_order_number','po_ordered_food_details','po_is_ordered']
 
 
-admin.site.register(PendingOrder,PendingOrderAdmin)
+admin.site.register(PendingOrders,PendingOrdersAdmin)
 admin.site.register(Payment)
 admin.site.register(Order,OrderAdmin)
 admin.site.register(OrderedFood)

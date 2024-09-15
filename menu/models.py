@@ -1,6 +1,6 @@
 from django.db import models
 from restaurant.models import Restaurant
-
+from django.utils.text import slugify
 
 class Category(models.Model):
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
@@ -20,14 +20,13 @@ class Category(models.Model):
     def __str__(self):
         return self.category_name
     
-    
         
 
 class FoodItem(models.Model):
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='fooditems')
     food_title = models.CharField(max_length=50)
-    slug = models.SlugField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
     description = models.TextField(max_length=250, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='foodimages')
@@ -37,3 +36,9 @@ class FoodItem(models.Model):
     
     def __str__(self):
         return self.food_title
+    
+    def save(self, *args, **kwargs):
+        # Generate slug if not provided
+        if not self.slug:
+            self.slug = slugify(self.food_title)
+        super(FoodItem, self).save(*args, **kwargs)

@@ -20,57 +20,10 @@
                             <div class="tab-content">
                                 <div id="preorder" class="tab-pane in active">
                                     <div class="pre-order-times">
-
-                                        <!-- <div class="menu-item-holder p-3">
-                                            <div class="btn-toolbar mb-3" role="toolbar"
-                                                aria-label="Toolbar with button groups">
-                                                <div class="btn-group mr-2 " role="group" aria-label="First group">
-                                                    <button type="button" class="btn btn-primary active pre-order-time"
-                                                        data-time="0" id="order-now"
-                                                        onclick="setActiveButton(this)">Order
-                                                        Now</button>
-                                                </div>
-                                                <div class="btn-group mr-2" role="group" aria-label="Second group">
-                                                    <button type="button" class="btn btn-secondary pre-order-time"
-                                                        data-time="0.25" id="15-mins" onclick="setActiveButton(this)">15
-                                                        mins</button>
-                                                </div>
-                                                <div class="btn-group mr-2" role="group" aria-label="Third group">
-                                                    <button type="button" class="btn btn-secondary pre-order-time"
-                                                        data-time="0.5" id="30-mins" onclick="setActiveButton(this)">30
-                                                        mins</button>
-                                                </div>
-                                                <div class="btn-group mr-2" role="group" aria-label="Fourth group">
-                                                    <button type="button" class="btn btn-secondary pre-order-time"
-                                                        data-time="0.75" id="45-mins" onclick="setActiveButton(this)">45
-                                                        mins</button>
-                                                </div>
-                                                <div class="btn-group mr-2" role="group" aria-label="Fifth group">
-                                                    <button type="button" class="btn btn-secondary pre-order-time"
-                                                        data-time="1" id="1-hr" onclick="setActiveButton(this)">1
-                                                        hr</button>
-                                                </div>
-                                                <div class="btn-group mr-2" role="group" aria-label="Sixth group">
-                                                    <button type="button" class="btn btn-secondary pre-order-time"
-                                                        data-time="1.5" id="1.5-hrs" onclick="setActiveButton(this)">1.5
-                                                        hrs</button>
-                                                </div>
-                                                <div class="btn-group" role="group" aria-label="Seventh group">
-                                                    <button type="button" class="btn btn-secondary pre-order-time"
-                                                        data-time="2" id="2-hrs" onclick="setActiveButton(this)">2
-                                                        hrs</button>
-                                                </div>
-                                                <input type="hidden" id="pre_order_time" name="pre_order_time"
-                                                    value="0">
-                                            </div>
-
-                                            <h4 class="mb-3">Preparing order number:</h4>
-                                            <h4>You will get order number:</h4>
-                                        </div> -->
                                         <div class="tab-content">
                                             <div id="preorder" class="tab-pane in active">
                                                 <div class="pre-order-times">
-                                        
+                                                
                                                     <div class="menu-item-holder p-3">
                                                         <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
                                                             <div class="row w-100">
@@ -105,13 +58,13 @@
                                                             </div>
                                                             <input type="hidden" id="pre_order_time" name="pre_order_time" value="0">
                                                         </div>
-                                        
+                                                
                                                         
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                       
+                                    
                                     </div>
                                 </div>
                             </div>
@@ -146,37 +99,11 @@
                                                     Email Address: {{ form.email}}
                                                 </div>
                                             </div>
-                                            <!-- {% if num_of_restaurants == 1  and seating_plan_available == True%} -->
                                             <div class="row">
                                                 <div class="form-group col-md-6 col-sm-12 col-lg-6">
                                                     Number of People: {{ form.num_of_people}}
                                                 </div>
                                             </div>
-                                            <!-- {% endif %} -->
-                                            <!-- <div class="row">
-                                                <div class="form-group col-md-12 col-sm-12 col-lg-12">
-                                                    Address: {{ form.address}}
-                                                </div>
-
-                                            </div> -->
-                                            <!-- <div class="row">
-                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                                    Country: {{ form.country}}
-                                                </div>
-                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                                    State: {{ form.state}}
-                                                </div>
-                                            </div> -->
-                                            <!-- <div class="row">
-                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                                    City: {{ form.city}}
-                                                </div>
-                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                                    Pin Code: {{ form.pin_code}}
-                                                </div>
-                                            </div> -->
-
-
                                         </div>
 
                                     </div>
@@ -203,7 +130,7 @@
                                                 {% for cart_item in cart_items_with_totals %}
 
                                                 <li id="cart-item-{{cart_item.item.id }}">
-                                                    
+                                                
                                                     <div class="image-holder"> <img src="{{cart_item.item.fooditem.image.url}}"
                                                             alt="Food Image"></div>
                                                             <div class="text-holder">
@@ -267,12 +194,6 @@
                                                     {% endif %}
 
 
-
-                                                    <!-- <label>
-                                                        <input type="radio" name="payment_method" value="RazorPay">
-                                                        <img src="{% static 'images/razorpay_logo.png' %}"
-                                                            alt="RazorPay" width="100">
-                                                    </label> -->
                                                 </div>
                                                 <span class="text-danger" id="payment-method-error"></span>
 

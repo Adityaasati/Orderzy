@@ -35,10 +35,10 @@ urlpatterns = [
     path('order_detail/<int:order_number>',views.order_detail, name="restaurant_order_detail"),
     path('my_orders/', views.my_orders, name = 'restaurant_my_orders'),
     path('pending_orders/', views.pending_orders, name = 'restaurant_pending_orders'),
-    path('accept_po/<int:po_id>/', views.accept_po, name = 'accept_po'),
-    path('ready_po/<int:po_id>/', views.ready_po, name = 'ready_po'),
-    path('completed_po/<int:po_id>/', views.completed_po, name = 'completed_po'),
-    path('delete_po/<int:po_id>/', views.delete_po, name='delete_po'),
+    path('accept_po/<int:id>/', views.accept_po, name = 'accept_po'),
+    path('ready_po/<int:id>/', views.ready_po, name = 'ready_po'),
+    path('completed_po/<int:id>/', views.completed_po, name = 'completed_po'),
+    path('delete_po/<int:id>/', views.delete_po, name='delete_po'),
     path('seating-plan/', views.seating_plan_view, name='seating_plan'),
     
 

@@ -7,7 +7,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from orders.models import Order,OrderedFood
 import simplejson as json
-from orders.models import PendingOrder
+from orders.models import PendingOrders
 
 
 @login_required(login_url='login')
@@ -35,7 +35,7 @@ def cprofile(request):
     }
     return render(request, 'customers/cprofile.html', context)
 
-
+@login_required(login_url='login')
 def my_orders(request):
     orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
     
@@ -44,40 +44,45 @@ def my_orders(request):
     }
     return render(request, 'customers/my_orders.html',context)
 
-
+@login_required(login_url='login')
 def order_detail(request, order_number):
     try:
         order = Order.objects.get(order_number=order_number, is_ordered = True)
-        ordered_food = OrderedFood.objects.filter(order=order)
-        subtotal = 0
-        ordered_food_details = []
+    except:
+        return redirect('customer')
+    ordered_food = OrderedFood.objects.filter(order=order)
+    subtotal = 0
+    ordered_food_details = []
         
-        for item in ordered_food:
-            subtotal+=(item.price * item.quantity)
-            item_sum_price = item.price * item.quantity
-            subtotal += item_sum_price
+    for item in ordered_food:
+        subtotal+=(item.price * item.quantity)
+        item_sum_price = item.price * item.quantity
+        subtotal += item_sum_price
+        image_url = item.fooditem.image.url if item.fooditem.image else '/static/default_image.png'
 
-            ordered_food_details.append({
+        ordered_food_details.append({
                 'fooditem': item.fooditem.food_title,
                 'quantity': item.quantity,
                 'price': item.price,
                 'item_sum_price': item_sum_price,
-                'image_url': item.fooditem.image.url,
+                'image_url': image_url,
                 'restaurant_slug': item.fooditem.restaurant.restaurant_slug,
                 'restaurant_name': item.fooditem.restaurant.restaurant_name,
             })
             
             
+    try:
         service_charge_data = json.loads(order.service_charge_data)
-        context = {
+    except  (json.JSONDecodeError, TypeError):
+        service_charge_data = {}
+    context = {
             'order':order,
             'ordered_food_details':ordered_food_details,
             'subtotal':subtotal,
             'service_charge_data':service_charge_data
         }
 
-    except:
-        return redirect('customer')
+    
     return render (request, 'customers/order_detail.html',context)
 
 
@@ -97,10 +102,10 @@ def order_cancel(request, order_number):
     order.status = "Cancelled"    
     order.save()
     try:
-            pending_order = PendingOrder.objects.get(po_order_number=order.order_number)
+            pending_order = PendingOrders.objects.get(po_order_number=order.order_number)
             pending_order.po_status = 'Cancelled'
             pending_order.save()
-    except PendingOrder.DoesNotExist:
+    except PendingOrders.DoesNotExist:
             # Handle the case where there is no related PendingOrder
             print("No PendingOrder found for this order.")
     messages.success(request, "Your order has been successfully cancelled.")
@@ -128,10 +133,10 @@ def pre_order_time_change(request, order_number):
         order.save()
         
         try:
-            pending_order = PendingOrder.objects.get(po_order_number=order.order_number)
+            pending_order = PendingOrders.objects.get(po_order_number=order.order_number)
             pending_order.po_pre_order_time = changed_time
             pending_order.save()
-        except PendingOrder.DoesNotExist:
+        except PendingOrders.DoesNotExist:
             print("No PendingOrder found for this order.")
 
         messages.success(request, "Your pre-order time has been successfully updated.")

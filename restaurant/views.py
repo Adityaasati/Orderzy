@@ -13,7 +13,7 @@ from django.template.defaultfilters import slugify
 from django.http import HttpResponse, JsonResponse
 from django.db import IntegrityError
 from orders.models import Order,OrderedFood
-from orders.models import PendingOrder
+from orders.models import PendingOrders
 import json
 from django.urls import reverse
 from django.shortcuts import render, HttpResponseRedirect
@@ -49,6 +49,7 @@ def rprofile(request):
             messages.success(request, 'Settings Updated')
             return redirect ('rprofile')
         else:
+            messages.error(request, 'Please correct the errors below.')
             print(profile_form.errors)
             print(restaurant_form.errors)
     else:
@@ -162,7 +163,6 @@ def add_food(request):
             foodtitle = form.cleaned_data['food_title']
             food = form.save(commit=False)
             food.restaurant = get_restaurant(request)
-            # food.slug=slugify(foodtitle)
             food.save()
             food.slug=slugify(foodtitle)+'-'+str(food.id)
             food.save()
@@ -256,7 +256,11 @@ def remove_opening_hours(request, pk=None):
             hour = get_object_or_404(OpeningHour,pk=pk)
             hour.delete()
             return JsonResponse({'status':'success','id':pk})
-            
+        else:
+            # Handle non-AJAX requests appropriately
+            return HttpResponse('This action can only be performed via an AJAX request.', status=400)
+    else:
+        return HttpResponse('Unauthorized', status=401)   
 
 def order_detail(request, order_number):
     try:
@@ -295,12 +299,7 @@ def order_detail(request, order_number):
 def my_orders(request):
     restaurant = Restaurant.objects.get(user=request.user)
     orders = Order.objects.filter( restaurants__in=[restaurant.id],is_ordered=True).order_by('-created_at')
-    print("my_orders",orders)
-    
-    for order in orders:
-        print(order.total,"order.total")
-        print(order.name,"order.name")
-    
+
     context = {
         'orders':orders,
     }
@@ -308,27 +307,22 @@ def my_orders(request):
     return render(request, 'restaurant/my_orders.html',context)
 
 
-
-
-# restaurant/views.py
 @login_required(login_url='login')
 @user_passes_test(check_role_restaurant)  
 def pending_orders(request):
     restaurant = Restaurant.objects.get(user=request.user)
-    pending_orders = PendingOrder.objects.filter( po_restaurant_id=restaurant.id,po_is_ordered=True).order_by('-po_created_at')
-
-
+    pending_orders = PendingOrders.objects.filter( po_restaurant_id=restaurant.id,po_is_ordered=True).order_by('-po_created_at')
+    
     context = {
 
-        'pending_orders':pending_orders,
-        
+        'pending_orders':pending_orders,   
     }
 
     return render(request, 'restaurant/pending__orders.html', context)
 
-def accept_po(request, po_id):
+def accept_po(request, id):
     if request.method == 'POST':
-        pending_order = get_object_or_404(PendingOrder, pk=po_id)
+        pending_order = get_object_or_404(PendingOrders, pk=id)
         pending_order.po_status = 'Accepted'
         pending_order.save()
         
@@ -336,7 +330,7 @@ def accept_po(request, po_id):
     return redirect('restaurant_pending_orders')
 
         
-def ready_po(request, po_id):
+def ready_po(request, id):
     restaurant = Restaurant.objects.get(user=request.user)
     
     seating_plan, created = SeatingPlan.objects.get_or_create(
@@ -347,13 +341,13 @@ def ready_po(request, po_id):
     
     if not seating_plan.seating_plan_available:
         if request.method == 'POST':
-            pending_order = get_object_or_404(PendingOrder, pk=po_id)
+            pending_order = get_object_or_404(PendingOrders, pk=id)
             pending_order.po_status = 'Ready'
             pending_order.save()
             return redirect('restaurant_pending_orders')
 
     if request.method == 'POST':
-        pending_order = get_object_or_404(PendingOrder, pk=po_id)
+        pending_order = get_object_or_404(PendingOrders, pk=id)
         pending_order.po_status = 'Ready'
         pending_order.save()
 
@@ -371,9 +365,9 @@ def ready_po(request, po_id):
     
 
     
-def delete_po(request, po_id):
+def delete_po(request, id):
     if request.method == 'POST':
-        pending_order = get_object_or_404(PendingOrder, pk=po_id)
+        pending_order = get_object_or_404(PendingOrders, pk=id)
         try:
             pending_order.delete()
             return redirect('restaurant_pending_orders')
@@ -384,7 +378,7 @@ def delete_po(request, po_id):
         
         
         
-def completed_po(request, po_id):
+def completed_po(request, id):
     restaurant = Restaurant.objects.get(user=request.user)
     seating_plan, created = SeatingPlan.objects.get_or_create(
         restaurant=restaurant,
@@ -393,14 +387,14 @@ def completed_po(request, po_id):
     
     if not seating_plan.seating_plan_available:
         if request.method == 'POST':
-            pending_order = get_object_or_404(PendingOrder, pk=po_id)
+            pending_order = get_object_or_404(PendingOrders, pk=id)
             pending_order.po_status = 'Completed'
             pending_order.save()
             return redirect('restaurant_pending_orders')
             
         
     if request.method == 'POST':
-        pending_order = get_object_or_404(PendingOrder, pk=po_id)
+        pending_order = get_object_or_404(PendingOrders, pk=id)
         pending_order.po_status = 'Completed'
         pending_order.save()
         if pending_order.po_num_of_people > 0 & pending_order.po_num_of_people <=2:

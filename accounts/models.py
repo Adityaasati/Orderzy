@@ -8,17 +8,25 @@ from django.contrib.gis.geos import Point
 
 class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email=None,phone_number=None, password=None,**extra_fields):
-        if not (phone_number or email):
-            raise ValueError('Either phone number or email must be set')
+        if not username:
+            raise ValueError('Username is required')
         if not password:
             raise ValueError('Password is required')
         
+        if '@' in username:
+            email = self.normalize_email(username)
+            phone_number = None
+        else:
+            email = None
+            phone_number = username
+        
         user = self.model(
-            email = self.normalize_email(email),
-            username = username,
-            first_name = first_name,
+            first_name=first_name,
             last_name=last_name,
+            username=username,
+            email=email,
             phone_number=phone_number,
+            **extra_fields
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -26,14 +34,13 @@ class UserManager(BaseUserManager):
         
     
     
-    def create_superuser(self, first_name, last_name, username, email=None,phone_number=None, password=None):
+    def create_superuser(self, first_name, last_name, username, email=None,phone_number=None, password=None, **extra_fields):
         user = self.create_user(
-            email = self.normalize_email(email),
-            username = username,
-            password=password,
-            first_name = first_name,
+            first_name=first_name,
             last_name=last_name,
-            phone_number=phone_number,
+            username=username,
+            password=password,
+            **extra_fields
         )
         user.is_admin=True
         user.is_active = True

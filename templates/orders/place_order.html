@@ -17,21 +17,21 @@
             <div class="tab-content">
               <div id="home" class="tab-pane in active">
                 <div class="menu-itam-holder">
-                  {% if restaurant_ids|length == 1 and order.pre_order_time == 0%}
+                  {% if restaurant_ids|length == 1 and order.pre_order_time == 0%} {% if away_restaurant_order %}
                   <p
                     style="
                       font-style: italic !important;
-                      color: #F28500  !important;
+                      color: #f28500 !important;
                     "
-                    
                   >
                     You are <strong>{{ away_restaurant_order }}</strong>
                     <sup>{{ away_restaurant_order|ordinal }}</sup> in a queue.
                   </p>
-                  {% endif %}
+                  {% endif %} {% endif %}
 
                   <div id="menu-item-list-6272" class="menu-itam-list">
                     <div class="billing-address">
+                     
                       <div><b>{{ order.name }}</b></div>
                       <div><b>Phone: </b>{{ order.phone }}</div>
                       {% if order.email %}
@@ -119,13 +119,13 @@
                       </li>
                       {% if order.payment_method == 'Done' %}
                       <a
-    href="{% url 'order_complete' %}?order_no={{ order.order_number }}&trans_id=RESTAURANTORDER"
-    class="btn btn-success w-100 p-2 mt-3"
-  >
-    Order Completed
-  </a>
+                        href="{% url 'order_complete' %}?order_no={{ order.order_number }}&trans_id=RESTAURANTORDER"
+                        class="btn btn-success w-100 p-2 mt-3"
+                      >
+                        Order Completed
+                      </a>
 
-{% else %}
+                      {% else %}
 
                       <div id="paypal-button-container"></div>
                       {% if order.payment_method == 'Paypal' %}
@@ -135,8 +135,7 @@
                       <button class="btn btn-danger w-100">
                         Pay with RazorPay
                       </button>
-                      {% endif %}
-                      {% endif %}
+                      {% endif %} {% endif %}
                       <!-- <a
                         href="{% url 'checkout' %}"
                         class="btn btn-danger w-100 p-2 mt-3"
@@ -190,7 +189,6 @@
       },
       onApprove: function (data, actions) {
         return actions.order.capture().then(function (orderData) {
-
           var transaction = orderData.purchase_units[0].payments.captures[0];
           var transaction_id = transaction.id;
           var status = orderData.status;
