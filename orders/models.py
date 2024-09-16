@@ -63,7 +63,7 @@ class Order(models.Model):
         return ",".join([str(i) for i in self.restaurants.all()])
     
     def get_total_by_restaurant(self):
-        restaurant = Restaurant.objects.get(user=self.user)
+        restaurant = Restaurant.objects.get(user=request_object.user)
         subtotal = 0
         service_charge = 0
         service_charge_dict = {}

@@ -273,7 +273,10 @@ def custDashboard(request):
 @login_required(login_url='login')
 @user_passes_test(check_role_restaurant)
 def restaurantDashboard(request):
+    print(request.user,"rquest.user")
     restaurant = Restaurant.objects.get(user=request.user)
+    print(restaurant)
+    
     orders = Order.objects.filter( restaurants__in=[restaurant.id],is_ordered=True).order_by('-created_at')
     recent_orders = orders[:10]
 

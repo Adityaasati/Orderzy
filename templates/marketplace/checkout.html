@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load custom_filters %}
 {% block content %}
 
 <div class="main-section pt-5">
@@ -99,11 +99,14 @@
                                                     Email Address: {{ form.email}}
                                                 </div>
                                             </div>
+                                            
+                                            {% if seating_plan_available and num_of_restaurants == 1 %}
                                             <div class="row">
                                                 <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                                    Number of People: {{ form.num_of_people}}
+                                                    Number of People: {{ form.num_of_people|add_class:"form-control" }}
                                                 </div>
                                             </div>
+                                            {%endif %}
                                         </div>
 
                                     </div>
@@ -189,7 +192,8 @@
                                                     {% if user.is_authenticated and user.role == 1 %}
                                                     <label>
                                                         <input type="radio" name="payment_method" value="Cash" >
-                                                        <label for="mark_payment_done">Mark payment as done</label>
+                                                        <img src="{% static 'images/Cash.png' %}" alt="Cash"
+                                                        width="100">
                                                     </label>
                                                     {% endif %}
 
@@ -219,6 +223,7 @@
 
 
 <script>
+    
     function setActiveButton(button) {
         // Remove active class from all buttons
         var buttons = document.querySelectorAll('.btn-toolbar .btn');
@@ -251,24 +256,30 @@
         )
     })
     function payMethodConfirm() {
+        var numOfPeopleInput = document.getElementById('id_num_of_people');
+
+        if (numOfPeopleInput) {
+            var numOfPeopleValue = numOfPeopleInput.value;
+
+
+            if (!numOfPeopleValue || numOfPeopleValue <= 0) {
+                alert('Please enter a valid number of people.');
+                return false;  
+            }}
+    
         var payMethod = $("input[name= 'payment_method']:checked").val()
 
         if (!payMethod) {
             $('#payment-method-error').html("Select Payment Method!")
-            return False
+            return false
         }
         else {
-            var confMessage = payMethod === "done_payment"
+            var confMessage = payMethod === "Cash"
             ? "You have chosen to mark the payment as done. Click 'OK' to complete the order."
             : "You have selected " + payMethod + " as your preferred payment method.\nClick 'OK' to continue.";
 
             var conf = confirm(confMessage);
-            if (conf == true) {
-                return true;
-            }
-            else {
-                return false
-            }
+            return conf; 
 
         }
 

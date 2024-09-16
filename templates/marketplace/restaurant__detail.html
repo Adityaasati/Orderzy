@@ -107,9 +107,15 @@
                                                     <a href="#" class="decrease_cart btn btn-outline-secondary" data-id="{{food.id}}" data-url="{% url 'decrease_cart' food.id %}">
                                                         <i class="icon-minus text-color"></i>
                                                     </a>
+                                                    
                                                     <label id="qty-{{ food.id }}" class="mx-3">
-                                                        {{ cart_item_quantities|get_item:food.id|default:0 }}
+                                                        {% if cart_item_quantities %}
+                                                            {{ cart_item_quantities|get_item:food.id|default:0 }}
+                                                        {% else %}
+                                                            0  <!-- For anonymous users, show 0 -->
+                                                        {% endif %}
                                                     </label>
+                                                    
                                                     <a href="#" class="add_to_cart btn btn-outline-primary" data-id="{{food.id}}" data-url="{% url 'add_to_cart' food.id %}">
                                                         <i class="icon-plus4 text-color"></i>
                                                     </a>

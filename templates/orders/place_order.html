@@ -117,7 +117,7 @@
                           <span id="total">{{grand_total}}</span>
                         </span>
                       </li>
-                      {% if order.payment_method == 'Done' %}
+                      {% if order.payment_method == 'Cash' %}
                       <a
                         href="{% url 'order_complete' %}?order_no={{ order.order_number }}&trans_id=RESTAURANTORDER"
                         class="btn btn-success w-100 p-2 mt-3"
@@ -126,16 +126,19 @@
                       </a>
 
                       {% else %}
-
-                      <div id="paypal-button-container"></div>
                       {% if order.payment_method == 'Paypal' %}
                       <div id="paypal-button-container"></div>
-                      {% elif order.payment_method == 'RazorPay' %}
 
-                      <button class="btn btn-danger w-100">
-                        Pay with RazorPay
+                      {% elif order.payment_method == 'RazorPay' %}
+                        <button class="btn btn-danger w-100">
+                      Pay with RazorPay
                       </button>
-                      {% endif %} {% endif %}
+
+                      {% else %}
+                      <div id="paypal-button-container"></div>
+        
+                        {% endif %}
+                      {% endif %}
                       <!-- <a
                         href="{% url 'checkout' %}"
                         class="btn btn-danger w-100 p-2 mt-3"
