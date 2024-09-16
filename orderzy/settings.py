@@ -181,11 +181,10 @@ GOOGLE_API_KEY = 'AIzaSyBzaYo0Lsv_1yGGLJhMIlDHwsEZ0DuhdCI'
 
 gdal_dll_path = str(BASE_DIR / 'env' / 'Lib' / 'site-packages' / 'osgeo' / 'gdal.dll')
 
-os.environ['PATH'] = str(BASE_DIR / 'env' / 'Lib' / 'site-packages' / 'osgeo') + ';' + os.environ['PATH']
-os.environ['PROJ_LIB'] = str(BASE_DIR / 'env' / 'Lib' / 'site-packages' / 'osgeo' / 'data' / 'proj')
-
-# Set GDAL_LIBRARY_PATH
-GDAL_LIBRARY_PATH = gdal_dll_path
+if DEBUG == True:
+    os.environ['PATH'] = str(BASE_DIR / 'env' / 'Lib' / 'site-packages' / 'osgeo') + ';' + os.environ['PATH']
+    os.environ['PROJ_LIB'] = str(BASE_DIR / 'env' / 'Lib' / 'site-packages' / 'osgeo' / 'data' / 'proj')
+    GDAL_LIBRARY_PATH = gdal_dll_path
 
 
 
