@@ -7,7 +7,7 @@ from django.contrib.gis.db import models as gismodels
 from django.contrib.gis.geos import Point
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .utils import generate_qr
+# from .utils import generate_qr
 from django.utils.text import slugify
 from django.contrib.sites.models import Site
 
@@ -92,11 +92,11 @@ class Restaurant(models.Model):
 
 
 
-@receiver(post_save, sender=Restaurant)
-def generate_qr_code(sender, instance, **kwargs):
-    print(f"Generating QR for: {instance.restaurant_name} with URL: {instance.menu_url}")
-    filename = instance.qr_code_path
-    generate_qr(instance.menu_url, filename)
+# @receiver(post_save, sender=Restaurant)
+# def generate_qr_code(sender, instance, **kwargs):
+#     print(f"Generating QR for: {instance.restaurant_name} with URL: {instance.menu_url}")
+#     filename = instance.qr_code_path
+#     generate_qr(instance.menu_url, filename)
 
 
         

@@ -89,11 +89,11 @@ class RestaurantModelTest(TestCase):
             }
         )
 
-    @patch('restaurant.models.generate_qr')
-    def test_qr_code_generation_on_save(self, mock_generate_qr):
-        """Test if the QR code is generated after saving the Restaurant"""
-        self.restaurant.save()
-        mock_generate_qr.assert_called_with(self.restaurant.menu_url, self.restaurant.qr_code_path)
+    # @patch('restaurant.models.generate_qr')
+    # def test_qr_code_generation_on_save(self, mock_generate_qr):
+    #     """Test if the QR code is generated after saving the Restaurant"""
+    #     self.restaurant.save()
+    #     mock_generate_qr.assert_called_with(self.restaurant.menu_url, self.restaurant.qr_code_path)
 
     @patch('restaurant.models.datetime', wraps=datetime) 
     def test_is_open(self, mock_datetime):
