@@ -18,7 +18,8 @@ urlpatterns = [
     path('customer/', include('customers.urls')),
     path('restaurant-contact-us/', views.r_contact_us, name='r_contact_us'),
     path('customer-contact-us/', views.c_contact_us, name='c_contact_us'),
-    
+    path('newsletter-signup/', views.newsletter_signup, name='newsletter_signup'),
+
 
 ]
 

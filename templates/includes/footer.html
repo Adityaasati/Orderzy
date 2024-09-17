@@ -7,10 +7,11 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="widget widget-newsletter">
                         <div class="widget-title">
-                            <h5>Subscribe to our Newsletter</h5>
+                            <h5>For more updates, please subscribe here!</h5>
                         </div>
                         <div class="fieldset">
-                            <form action="#">
+                            <form method="POST" action="">
+                                {% csrf_token %}
                                 <div class="field-holder">
                                     <label>
                                         <i class=" icon-envelope3"></i>
@@ -19,11 +20,12 @@
                                     </label>
                                 </div>
                                 <div class="field-holder btn-holder">
-                                    <input class="subscribe-btn bgcolor" type="submit" value="Sign Up">
+                                    <input class="subscribe-btn" type="submit" value="Sign Up">
                                 </div>
                             </form>
                         </div>
                     </div>
+                    
                 </div>
             </div>
         </div>

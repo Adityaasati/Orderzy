@@ -13,7 +13,7 @@
         height: 35vw; /* Height relative to viewport width */
         max-width: 18rem; /* Set a maximum width */
         max-height: 14rem; /* Set a maximum height */
-        object-fit: cover; /* Ensures the image covers the container */
+        object-fit: cover; 
     }
 }
 #qr-code-img{
@@ -96,6 +96,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: flex-start; /* Default alignment for larger screens */
+    /* flex-wrap: nowrap; */
 }
 
 

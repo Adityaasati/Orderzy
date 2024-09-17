@@ -7,8 +7,9 @@
 					<h1>Orderzy</h1>
 				</div>
 			
-			<p style=" margin-top:2.5%; font-size: 18px; letter-spacing: 1px; color: #155edd; text-align:center; ">
-				Skip the line! Pre-order your favorite dishes now.</p>
+		
+        <p style=" margin-top:2.5%; font-size: 18px; letter-spacing: 1px; color: #155edd; text-align:center; ">
+          Skip the Line, Enjoy Your Time!</p>
 		</div>
 		<div class="main-search fancy ">
 						<form action="{% url 'search' %}" method="GET">
@@ -22,22 +23,20 @@
 										<input type="text" name="keyword" placeholder="Resturant name or Food name" class="form-control">
 									</div>
 								</div>
-								<div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
-									<div class="field-holder holder_radius">
-										<ul>
-											<li class="select-location">
-												<div class="foodbakery-locations-fields-group foodbakery-focus-out holder_radius">
-													<span class="foodbakery-search-location-icon"><i class="icon-location"></i></span>
-													
-													<input type="text" name="address" class="location-field-text filter form-control" id="id_address"  placeholder="All Locations">
-													<input type="hidden" name="lat" value="" id="id_latitude">
-													<input type="hidden" name="lng" value="" id="id_longitude">
-												</div>
-												
-											</li>
-										</ul>
-									</div>
-								</div>
+           
+            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+              <div class="field-holder holder_radius position-relative" style="position: relative;">
+                  <span class="foodbakery-search-location-icon position-absolute" 
+                        style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); font-size: 1.2rem; color: #999;">
+                      <i class="icon-location"></i>
+                  </span>
+                  <input type="text" name="address" class="form-control ps-5" id="id_address" placeholder="All Locations" 
+                         style="padding-left: 2.5rem; vertical-align: middle;">
+                  <input type="hidden" name="lat" value="" id="id_latitude">
+                  <input type="hidden" name="lng" value="" id="id_longitude">
+              </div>
+          </div>
+                
 								<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
 									<div class="field-holder holder_radius">
 										<input type="submit" value="Search">

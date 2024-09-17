@@ -214,9 +214,7 @@ def search(request):
         'source_location': address,
         
     }
-    
-    
-    print(context)
+
     return render(request, 'marketplace/listings.html', context)
 
 

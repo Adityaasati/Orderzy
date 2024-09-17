@@ -154,3 +154,12 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"Message from {self.name} at {self.sent_at}"
+
+
+
+class Newsletter(models.Model):
+    email = models.EmailField(unique=True)
+    date_subscribed = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email

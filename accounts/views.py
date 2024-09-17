@@ -1,6 +1,6 @@
 from .forms import UserForm, LoginForm, ContactForm
 from django.shortcuts import redirect, render
-from .models import User, UserProfile, ContactMessage
+from .models import User, UserProfile, ContactMessage,Newsletter
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from restaurant.forms import RestaurantForm
@@ -23,6 +23,8 @@ from django.conf import settings
 import os
 import datetime
 import re
+
+
 
 def check_role_restaurant(user):
     if user.role == 1:
@@ -170,36 +172,6 @@ def login(request):
     return render(request, 'accounts/login.html', {'form': form})
 
 
-# def activate(request, uidb64, token):
-#     print("Entered in activate")
-#     try:
-#         uid = urlsafe_base64_decode(uidb64).decode()
-#         user = User._default_manager.get(pk=uid)
-#     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-#         user = None
-#     if user is not None and default_token_generator.check_token(user, token) :
-#         user.is_active = True
-#         user.save()
-#         print(f"User {user.username} is now active: {user.is_active}")
-#         if re.match(r"[^@]+@[^@]+\.[^@]+", user.username):
-#             messages.success(request, 'Congrats! Your account is activated.')
-#             messages.success(request, 'Congrats! Your account is activated.')
-#             return redirect('myAccount')
-#         elif re.match(r"^\+?\d{10,15}$", user.username):
-#             message = "Congrats! Your account is activated."
-#             # send_activate_message(user.username, message)  # Uncomment and implement this function
-#             print(f"Sending WhatsApp activation message to {user.username}")
-#             print("User activated!")
-#             messages.success(request, 'Congrats! Your account is activated.')
-#             return redirect('myAccount')
-#         else:
-#             messages.error(request, 'Invalid username format.')
-#             return redirect('myAccount')
-#     else:
-#         print("Some error", user)
-#         messages.error(request, 'Invalid Activation Link')
-#         return redirect('myAccount')
-
 
 
 def activate(request, uidb64, token):
@@ -221,18 +193,15 @@ def activate(request, uidb64, token):
             auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             print(f"User {user.username} has been logged in.")
             
-            # Check if username is an email using Django's EmailValidator
             try:
                 email_validator = EmailValidator()
-                email_validator(user.username)  # Will raise ValidationError if not a valid email
+                email_validator(user.username)  
                 print(f"Valid email: {user.username}")
                 messages.success(request, 'Congrats! Your account is activated.')
                 return redirect('myAccount')
             except ValidationError:
-                # If it's not an email, check if it's a valid phone number
                 if re.match(r"^\+?\d{10,15}$", user.username):
                     print(f"Valid phone number: {user.username}")
-                    # Optionally, send a WhatsApp activation message here
                     messages.success(request, 'Congrats! Your account is activated.')
                     return redirect('myAccount')
                 else:
@@ -461,3 +430,19 @@ def reset_password(request):
 
     return render(request, 'accounts/reset_password.html')
 
+
+
+def newsletter_signup(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if email:
+            if not Newsletter.objects.filter(email=email).exists():
+                Newsletter.objects.create(email=email)
+                print("Thank you for signing up for the newsletter!")
+                messages.success(request, "Thank you for signing up for the newsletter!")
+        else:
+            messages.error(request, "Please enter a valid email address.")
+        return redirect('newsletter_signup')
+
+    return redirect('home')
+    

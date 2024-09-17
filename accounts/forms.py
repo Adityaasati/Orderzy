@@ -4,12 +4,21 @@ from .validators import allow_only_images_validator
 
         
 class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Enter your password'
+        })
+    )
 
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username','password']
     
+    def __init__(self, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'placeholder': 'Please enter your email or phone number'
+        })
     def clean(self):
         cleaned_data = super().clean()
         username = cleaned_data.get('username')

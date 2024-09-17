@@ -101,13 +101,14 @@
                                 </ul>
                             </div>
                         </div>
-
+                        {% if not request.user.is_authenticated %}
                         <div class="section-sidebar col-lg-3 col-md-3 col-sm-12 col-xs-12">
                             <div class="message-box" style="background-color: #fa9918;">
                                 <strong>I'm not Listed!</strong><span>Is your restaurant or business not listed on our site?</span>
                                 <a href="{% url 'registerRestaurant' %}" class="request-btn">Add Your Business!</a>
                             </div>
                         </div>
+                       {% endif %}
                     </div>
                 </div>
             </div>
