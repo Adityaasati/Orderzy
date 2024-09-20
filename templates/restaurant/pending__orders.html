@@ -2,12 +2,13 @@
 
 {% load static %}
 {% load custom_filters %}
+{% block title %} Pendings | {% endblock %}
 {% block content %}
 
 {% include 'includes/alerts.html' %}
 
 <div class="main-section">
-    {% include 'includes/cover.html' %}
+
     <div class="page-section account-header buyer-logged-in">
         <div class="container">
             <div class="row">
@@ -18,7 +19,7 @@
                     <div class="user-dashboard loader-holder">
                         <div class="user-holder">
 
-                            <h5 class="text-uppercase">Pending Orders</h5>
+                            <h5 class="text-uppercase text-center">Pending Orders</h5>
 
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">

@@ -1,0 +1,14 @@
+User-agent: *
+Disallow: /admin/            
+Disallow: /login/              
+Disallow: /register/          
+Disallow: /cart/             
+Disallow: /checkout/            
+Disallow: /profile/           
+Disallow: /restaurantDashboard/ 
+Disallow: /custDashboard/      
+Disallow: /restaurant_my_orders/    
+Disallow: /customer_my_orders/          
+Allow: /                  
+
+Sitemap: https://orderzy.in/sitemap.xml

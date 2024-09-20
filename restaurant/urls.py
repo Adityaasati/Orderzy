@@ -3,9 +3,15 @@ from . import views
 from accounts import views as AccountViews
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import RestaurantSitemap
 
+sitemaps = {
+    'restaurant': RestaurantSitemap,
+}
 
 urlpatterns = [
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('',AccountViews.restaurantDashboard, name='restaurant'),
     path('profile/', views.rprofile, name = 'rprofile'),
     path('menu-builder/', views.menu_builder, name='menu_builder'),

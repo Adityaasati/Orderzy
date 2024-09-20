@@ -139,8 +139,6 @@ def registerRestaurant(request):
     }
     return render(request, 'accounts/registerRestaurant.html', context)
 
-
-
 def login(request):
     if request.user.is_authenticated:
         messages.warning(request, "You are already logged in")
@@ -155,7 +153,6 @@ def login(request):
                 if user.is_active:
                     auth.login(request, user)
                     messages.success(request, 'You are logged in')
-                    print("Redirected...145")
                     return redirect('marketplace')
                 
                 else:

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block title %} Order Detail | {% endblock %} 
 {% block content %}
 
 <div class="container mt-5 mb-5">
@@ -68,7 +69,7 @@
                 </table>
                 <div class="row mt-5">
                     <div class="col-md-6 col-12 d-flex justify-content-center mb-3 mb-md-0">
-                        <img src="{% static 'images/paid.png' %}" width="200" class="img-fluid">
+                        <img src="{% static 'images/paid.png' %}" alt="Paid" width="200" class="img-fluid">
                     </div>
                     <div class="col-md-6 col-12">
                         <ul class="list-unstyled">

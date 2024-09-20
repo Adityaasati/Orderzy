@@ -4,7 +4,6 @@
 {% include 'includes/alerts.html' %}
 
 <div class="main-section">
-    {% include 'includes/cover.html' %}
     <div class="page-section account-header buyer-logged-in">
         <div class="container">
             <div class="row">
@@ -37,7 +36,7 @@
                                     <textarea name="message" id="id_message" class="form-control" rows="4" placeholder="Enter your message" required></textarea>
                                 </div>
                                 <input type="hidden" name="user_type" value="{{ user_type }}">
-                                <button type="submit" class="btn btn-primary btn-block rounded-pill">
+                                <button type="submit" class="subscribe btn btn-primary w-100 rounded-pill shadow-sm mt-3 ">
                                     Send Message
                                 </button>
                                 {% if form.errors %}

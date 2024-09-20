@@ -1,4 +1,10 @@
 {% load static %}
+<style>
+  .no-overlay:before {
+    background: none; /* This removes the dark overlay */
+}
+
+</style>
  <div
   class="page-section restaurant-detail-image-section"
   style=" background: url({% if restaurant.user_profile.cover_photo %} {{ restaurant.user_profile.cover_photo.url }} {% else %} {% static 'images/default-cover.png' %}{% endif %}) no-repeat scroll 0 0 / cover;"
@@ -15,18 +21,19 @@
               <figure>
                 {% if restaurant.user_profile.profile_picture %}
                 <img
-                  src="({{restaurant.user_profile.profile_picture.url}})"
-                  alt=""
+                  src="{% static 'images/chef_logo.png' %}"
+                  alt="Profile Picture"
                 />
                 {% else %}
-                <img src="{% static 'images/default-profile.png' %}" alt="" />
+                <img src="{% static 'images/chef_logo.png' %}" alt="Profile Picture" />
                 {% endif %}
               </figure>
             </div>
 
             <div class="text-holder">
-              <span class="restaurant-title"
-                >{{restaurant.restaurant_name}}</span
+              <span class="restaurant-title no-overlay"  style="color: #ffffff"
+                >{{restaurant.restaurant_name}}
+                </span
               >
               <div class="text">
                 {% if restaurant.user_profile.address%}
@@ -34,7 +41,7 @@
                 <p>{{restaurant.user_profile.address}}</p>
                 {% endif %}
                 <i class="icon-envelope"></i>
-                <p>{{restaurant.user_profile.email}}</p>
+                <p>{{restaurant.user.email}}</p>
               </div>
             </div>
           </div>

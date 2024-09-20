@@ -20,8 +20,25 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from marketplace import views as MarketplaceViews
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import HomeSitemap
+from marketplace.sitemaps import MarketplaceSitemap, RestaurantSitemap
+from customers.sitemaps import CustomerSitemap
+from accounts.sitemaps import AccountsSitemap
+from orders.sitemaps import OrdersSitemap
+from django.views.generic import TemplateView
 
+sitemaps = {
+    'home': HomeSitemap,
+    'marketplace': MarketplaceSitemap,
+    'restaurant': RestaurantSitemap,
+    'customers': CustomerSitemap,
+    'accounts': AccountsSitemap,
+    'orders': OrdersSitemap,
+}
 urlpatterns = [
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path("admin/", admin.site.urls),
     path('', views.home, name = 'home'),
     path('base/', views.base, name = 'base'),

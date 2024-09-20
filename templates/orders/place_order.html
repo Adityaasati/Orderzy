@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% load custom_filters %} {% block content %}
+{% extends 'base.html' %} {% load custom_filters %}
+{% block title %} Confirmation | {% endblock %} 
+ {% block content %}
 
 <div class="main-section pt-5">
   <div class="page-section">
@@ -8,7 +10,7 @@
           <div class="tabs-holder horizontal">
             <ul class="stickynav-tabs nav nav-tabs">
               <li class="active">
-                <a data-toggle="tab" href="#home"
+                <a data-bs-toggle="tab" href="#home"
                   ><i class="fa fa-shopping-cart text-danger"></i>Review Your
                   Billing Address</a
                 >
@@ -63,7 +65,7 @@
           <div class="tabs-holder horizontal">
             <ul class="stickynav-tabs nav nav-tabs">
               <li class="active">
-                <a data-toggle="tab" href="#home"
+                <a data-bs-toggle="tab" href="#home"
                   ><i class="icon- icon-room_service"></i>Your Order</a
                 >
               </li>

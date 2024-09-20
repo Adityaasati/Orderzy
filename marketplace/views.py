@@ -35,7 +35,6 @@ def restaurant_detail(request, restaurant_slug):
             seating_available = "None"
     except:
         seating_available = "None"
-        print("HH")
         pass
     
     categories = Category.objects.filter(restaurant=restaurant).prefetch_related(

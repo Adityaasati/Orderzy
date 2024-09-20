@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 {% load custom_filters %}
 {% load static %}
+{% block title %} {{user.first_name}} | {% endblock %} 
 {% block content %}
 
+    
 <div class="main-section">
     <div class="page-section restaurant-detail-image-section"
         style=" background: url({% if restaurant.user_profile.cover_photo %} {{restaurant.user_profile.cover_photo.url}} {% else %} {% static 'images/default-cover.png' %}{% endif %}) no-repeat scroll 0 0 / cover;">
@@ -15,9 +17,9 @@
                             <div class="img-holder">
                                 <figure>
                                     {% if restaurant.user_profile.profile_picture %}
-                                    <img src="{{restaurant.user_profile.profile_picture.url}}" alt="">
+                                    <img src="{{restaurant.user_profile.profile_picture.url}}" alt="Profile Picture">
                                     {% else %}
-                                    <img src="{% static 'images/default-profile.png' %}" alt="">
+                                    <img src="{% static 'images/default-profile.png' %}" alt="Profile Picture">
 
                                     {% endif %}
                                 </figure>
@@ -78,8 +80,8 @@
                        
                         {% for category in categories %}
                         
-                        <button class="btn btn-primary mb-3 mt-2  mx-md-3  catName" type="button" data-toggle="collapse"
-                            data-target="#collapse{{ forloop.counter }}" aria-expanded="false"
+                        <button class="btn btn-primary mb-3 mt-2  mx-md-3  catName" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false"
                             aria-controls="collapse{{ forloop.counter }}" >
                             {{category}}
                         </button>
@@ -92,7 +94,7 @@
                                     <div class="col mb-5">
                                         <div class="card h-100 border border-dark rounded">
                                             <img class="card-img-top" src="{{food.image.url}}"
-                                                alt="..." />
+                                                alt="Food Image" />
                                             <div class="card-body p-4">
                                                 <div class="text-center">
                                                     <h5 class="fw-bolder">{{food}}</h5>
@@ -138,4 +140,62 @@
         </div>
     </section>
 </div>
+
+
+
 {% endblock content %}
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "{{ restaurant.restaurant_name }}",
+  "image": "{% if restaurant.user_profile.cover_photo %} {{ restaurant.user_profile.cover_photo.url }} {% else %} {% static 'images/default-cover.png' %} {% endif %}",
+  "description": "{{ restaurant.user_profile.description|default:'No description available' }}",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "{{ restaurant.user_profile.address }}",
+    "addressLocality": "{{ restaurant.user_profile.city }}",
+    "addressRegion": "{{ restaurant.user_profile.state }}",
+    "postalCode": "{{ restaurant.user_profile.zip_code }}",
+    "addressCountry": "{{ restaurant.user_profile.country }}"
+  },
+  "telephone": "{{ restaurant.user_profile.phone_number }}",
+  "servesCuisine": "{{ restaurant.cuisine }}",
+  "openingHoursSpecification": [
+    {% for hour in opening_hours %}
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "{{ hour.day_of_week }}",
+      "opens": "{{ hour.from_hour }}",
+      "closes": "{{ hour.to_hour }}",
+      "isClosed": "{% if hour.is_closed %}true{% else %}false{% endif %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ],
+  "menu": [
+    {% for category in categories %}
+    {
+      "@type": "MenuSection",
+      "name": "{{ category }}",
+      "hasMenuItem": [
+        {% for food in category.fooditems.all %}
+        {
+          "@type": "MenuItem",
+          "name": "{{ food }}",
+          "image": "{{ food.image.url }}",
+          "offers": {
+            "@type": "Offer",
+            "priceCurrency": "INR",
+            "price": "{{ food.price }}",
+            "availability": "{% if restaurant.is_open %}InStock{% else %}OutOfStock{% endif %}"
+          }
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ]
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>

@@ -7,13 +7,15 @@
     100% {bottom: -100%}
 }
 
+
+
 @media (max-width: 440px) {
     .img-list {
         width: 40vw !important; /* 40% of the viewport width */
         height: 35vw; /* Height relative to viewport width */
         max-width: 18rem; /* Set a maximum width */
         max-height: 14rem; /* Set a maximum height */
-        object-fit: cover; 
+        object-fit: cover; /* Ensures the image covers the container */
     }
 }
 #qr-code-img{
@@ -96,7 +98,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: flex-start; /* Default alignment for larger screens */
-    /* flex-wrap: nowrap; */
 }
 
 

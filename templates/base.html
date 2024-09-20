@@ -6,61 +6,66 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>  {% block title %} {% endblock %} Orderzy</title>
+	<meta name="description" content="Orderzy connects you with nearby restaurants to order and pay ahead, saving you time and enhancing your dining experience. Explore exclusive deals, skip the queue, and discover new favorite spots in your locality with Orderzy.">
+	<meta name="keywords" content="Orderzy, online food ordering, local restaurants, nearby dining, order ahead, restaurant deals, discover new spots, quick service, food ordering app, neighborhood restaurants">
+	<meta name="author" content="Orderzy">
+	<meta property="og:url" content="https://orderzy.in">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Order Ahead, Relax Later with Orderzy | Pre Order at Nearby Restaurants">
+	<meta property="og:description" content="Orderzy enables you to preorder from nearby restaurants, saving you time and enhancing your dining experience. Discover new favorite spots close to you.">
+	<meta property="og:image" content="{% static 'images/Orderzy_og.png' %}">
+	<meta name="twitter:image" content="{% static 'images/orderzy_twitter.png' %}">
 
-	<title>Orderzy</title>
-	<!-- Google Font Family Link Start -->
 	<link rel="icon" href="{% static 'favicon/favicon.ico' %}" type="image/x-icon">
-    <link rel="icon" href="{% static 'favicon/favicon-16x16.png' %}" sizes="16x16" type="image/png">
-    <link rel="icon" href="{% static 'favicon/favicon-32x32.png' %}" sizes="32x32" type="image/png">
-    <link rel="icon" href="{% static 'favicon/favicon-48x48.png' %}" sizes="48x48" type="image/png">
-    <!-- <link rel="icon" href="{% static 'favicon/android-chrome-192x192.png' %}" sizes="192x192" type="image/png"> -->
-    <link rel="icon" href="{% static 'favicon/android-chrome-512x512.png' %}" sizes="512x512" type="image/png">
-
-
-    <!-- Apple Touch Icon (optional) -->
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
-    
-    <!-- Manifest (optional) -->
-    <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+	<link rel="icon" href="{% static 'favicon/favicon-16x16.png' %}" sizes="16x16" type="image/png">
+	<link rel="icon" href="{% static 'favicon/favicon-32x32.png' %}" sizes="32x32" type="image/png">
+	<link rel="icon" href="{% static 'favicon/favicon-48x48.png' %}" sizes="48x48" type="image/png">
+	<link rel="icon" href="{% static 'favicon/android-chrome-512x512.png' %}" sizes="512x512" type="image/png">
 	
+	<link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+	
+	<link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+
 	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800">
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Sansita:wght@400;700&display=swap" rel="stylesheet">
+
 	<link href="{% static 'css/iconmoon.css' %}" rel="stylesheet">
 	<link href="{% static 'css/style.css' %}" rel="stylesheet">
 	<link href="{% static 'css/cs-foodbakery-plugin.css' %}" rel="stylesheet">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 	<link href="{% static 'css/bootstrap-slider.css' %}" rel="stylesheet">
 	<link href="{% static 'css/custom.css' %}" rel="stylesheet">
-	<link href="{% static 'fontawesome/fontawesome.min.css' %}" rel="stylesheet">
+	
+	<!-- Font Awesome (Choose one method: CDN or Static) -->
+	<!-- Option 1: Using CDN (Recommended for Latest Version) -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	
+	<!-- Bootstrap CSS (Choose one version: Bootstrap 5) -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-	<!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet"> -->
-	 <!-- Correct Bootstrap CDN Link -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css2?family=Sansita:wght@400;700&display=swap" rel="stylesheet">
+	
+	<!-- DataTables CSS -->
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css">
-
-
-<!-- Bootstrap Bundle with Popper -->
-	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	
+	<!-- jQuery (Ensure Only One Version is Included) -->
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	
+	<!-- Bootstrap JS Bundle (Includes Popper.js) -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	
+	<!-- Additional JavaScript Libraries -->
+	<script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency=USD"></script>
+	
+	<!-- Local JavaScript Files -->
 	<script src="{% static 'js/modernizr.js' %}"></script>
 	<script src="{% static 'js/custom.js' %}"></script>
-	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	<script src="{% static 'js/bootstrap.js' %}"></script>
-	<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency=USD"></script>
-	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-	<script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
-
-
+	
+	<!-- Google Maps API (Conditional) -->
 	{% if '/profile/' in request.path or '/' == request.path %}
-	<script src="https://maps.googleapis.com/maps/api/js?key={{GOOGLE_API_KEY}}&libraries=places&loading=async&callback=initAutoComplete" async defer></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&loading=async&callback=initAutoComplete" async defer></script>
 	{% endif %}
 	<script type="text/javascript" language="javascript" class="init">
 		document.addEventListener('DOMContentLoaded', function () {

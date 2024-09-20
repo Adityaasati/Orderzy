@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% block title %} MarketPlace | {% endblock %} 
 {% block content %}
 <div class="main-section">
     <div class="page-section nopadding cs-nomargin" style="margin-top: 0px;padding-top: 60px;padding-bottom: 10px;margin-bottom: 0px;">
@@ -62,9 +62,9 @@
                                             <figure>
                                                 <a href="{% url 'restaurant_detail' restaurant.restaurant_slug %}">
                                                 {% if restaurant.user_profile.profile_picture %}
-                                                <img src="{{ restaurant.user_profile.profile_picture.url }}" class="img-list wp-post-image" alt="">
+                                                <img src="{{ restaurant.user_profile.profile_picture.url }}" class="img-list wp-post-image" alt="Profile Picture">
                                                 {% else %}
-                                                <img src="{% static 'images/default-profile.png' %}" class="img-list wp-post-image" alt="">
+                                                <img src="{% static 'images/default-profile.png' %}" class="img-list wp-post-image" alt="Profile Picture">
                                                 {% endif %}
                                                 </a>
                                             </figure>
@@ -116,3 +116,42 @@
     </div>
 </div>
 {% endblock content %}
+<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Available Restaurants",
+      "itemListElement": [
+        {% for restaurant in restaurants %}
+        {
+          "@type": "Restaurant",
+          "name": "{{ restaurant.restaurant_name }}",
+          "url": "{% url 'restaurant_detail' restaurant.restaurant_slug %}",
+          "image": "{% if restaurant.user_profile.profile_picture %} {{ restaurant.user_profile.profile_picture.url }} {% else %} {% static 'images/default-profile.png' %} {% endif %}",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "{{ restaurant.user_profile.address }}",
+            "addressLocality": "{{ restaurant.user_profile.city }}",
+            "addressRegion": "{{ restaurant.user_profile.state }}",
+            "postalCode": "{{ restaurant.user_profile.zip_code }}",
+            "addressCountry": "{{ restaurant.user_profile.country }}"
+          },
+          "telephone": "{{ restaurant.user_profile.phone_number }}",
+          "servesCuisine": "{{ restaurant.cuisine }}",
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "{{ restaurant.average_rating|default:0 }}",
+            "reviewCount": "{{ restaurant.review_count|default:0 }}"
+          },
+          "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": "Monday",
+            "opens": "{{ restaurant.opening_time }}",
+            "closes": "{{ restaurant.closing_time }}"
+          }
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ]
+    }
+    </script>
+    

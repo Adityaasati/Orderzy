@@ -42,3 +42,10 @@ class FoodItem(models.Model):
         if not self.slug:
             self.slug = slugify(self.food_title)
         super(FoodItem, self).save(*args, **kwargs)
+        
+        
+        
+        
+        
+ 
+

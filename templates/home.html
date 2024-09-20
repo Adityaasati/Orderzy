@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% load static %} {% block content %}
+{% extends 'base.html' %} {% load static %}
+{% block title %} Home | {% endblock %}
+ {% block content %}
 <div class="main-section">
    <div class="page-section  main-search-bar" style=" width: 100vw; height: 70vh; background: url({% static 'extra-images/bg11.jpg' %}) no-repeat center / cover;">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
@@ -6,8 +8,7 @@
 				<div class="brand_name">
 					<h1>Orderzy</h1>
 				</div>
-			
-		
+
         <p style=" margin-top:2.5%; font-size: 18px; letter-spacing: 1px; color: #155edd; text-align:center; ">
           Skip the Line, Enjoy Your Time!</p>
 		</div>
@@ -85,7 +86,7 @@
                       src="{{ restaurant.user_profile.profile_picture.url }}"
                       height="125"
                       class="attachment-full size-full wp-post-image home-restaurant-img"
-                      alt=""
+                      alt="Profile Picture"
                   /></a>
                   {% else %}
                   <a
@@ -94,7 +95,7 @@
                       src="{% static 'images/default-profile.png' %}"
                       height="125"
                       class="attachment-full size-full wp-post-image home-restaurant-img"
-                      alt=""
+                      alt="Profile Picture"
                   /></a>
                   {% endif %}
                 </figure>
@@ -139,13 +140,13 @@
                         <img
                           src="{{ restaurant.user_profile.profile_picture.url }}"
                           class="img-thumb wp-post-image"
-                          alt=""
+                          alt="Profile Picture"
                         />
                         {% else %}
                         <img
                           src="{% static 'images/default-profile.png' %}"
                           class="img-thumb wp-post-image"
-                          alt=""
+                          alt="Profile Picture"
                         />
                         {% endif %}
                       </a>
@@ -182,8 +183,8 @@
                     <a
                       href="javascript:void(0);"
                       class="shortlist-btn"
-                      data-toggle="modal"
-                      data-target="#sign-in"
+                      data-bs-toggle="modal"
+                      data-bs-target="#sign-in"
                     >
                       
                     </a>

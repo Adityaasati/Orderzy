@@ -15,15 +15,9 @@ from django.db import IntegrityError
 from orders.models import Order,OrderedFood
 from orders.models import PendingOrders
 import json
-from django.urls import reverse
-from django.shortcuts import render, HttpResponseRedirect
-import requests
-import uuid
-from django.conf import settings
-from collections import defaultdict
-from django.db import connection
-from django.db import transaction
-import logging
+from django.shortcuts import render
+
+
 
 # Create your views here.
 
@@ -257,7 +251,7 @@ def remove_opening_hours(request, pk=None):
             hour.delete()
             return JsonResponse({'status':'success','id':pk})
         else:
-            # Handle non-AJAX requests appropriately
+            
             return HttpResponse('This action can only be performed via an AJAX request.', status=400)
     else:
         return HttpResponse('Unauthorized', status=401)   
@@ -299,6 +293,7 @@ def order_detail(request, order_number):
 def my_orders(request):
     restaurant = Restaurant.objects.get(user=request.user)
     orders = Order.objects.filter( restaurants__in=[restaurant.id],is_ordered=True).order_by('-created_at')
+    print("order",orders)
 
     context = {
         'orders':orders,

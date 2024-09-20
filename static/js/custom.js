@@ -90,7 +90,7 @@ $(document).ready(function () {
       success: function (response) {
         console.log(response);
         if (response.status == "login_required") {
-          swal("response.message", "", "info").then(function () {
+          swal(response.message, "", "info").then(function () {
             window.location = "/login";
           });
         } else if (response.status == "Failed") {
