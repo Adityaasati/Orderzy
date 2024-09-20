@@ -94,30 +94,33 @@
                         {% endfor %}
                       </tbody>
                     </table>
-                    <ul>
-                      <li style="list-style-type: none">
-                        Subtotal
-                        <span class="price float-right">
-                          <span class="currency">₹</span>
-                          <span id="subtotal">{{subtotal}}</span>
-                        </span>
+                    <ul class="list-unstyled">
+                      <li class="d-flex justify-content-between">
+                          <span>Subtotal</span>
+                          <span class="price">
+                              <span class="currency">₹</span>
+                              <span id="subtotal">{{subtotal}}</span>
+                          </span>
                       </li>
-                      {%for key, value in service_charge_dict.items %} {% for i,j in value.items %}
-                      <li style="list-style-type: none">
-                        {{key}} <small>({{i}}%)</small>
-                        <span class="price float-right">
-                          <span class="currency">₹</span>
-                          <span id="tax-{{key}}">{{j}}</span>
-                        </span>
-                      </li>
-                      {% endfor%} {% endfor %}
-
-                      <li style="list-style-type: none; font: weight 600px">
-                        Total
-                        <span class="price float-right">
-                          <span class="currency">₹</span>
-                          <span id="total">{{grand_total}}</span>
-                        </span>
+                  
+                      {% for key, value in service_charge_dict.items %}
+                          {% for i, j in value.items %}
+                              <li class="d-flex justify-content-between">
+                                  <span>{{key}} <small>({{i}}%)</small></span>
+                                  <span class="price">
+                                      <span class="currency">₹</span>
+                                      <span id="tax-{{key}}">{{j}}</span>
+                                  </span>
+                              </li>
+                          {% endfor %}
+                      {% endfor %}
+                  
+                      <li class="d-flex justify-content-between fw-bold">
+                          <span>Total</span>
+                          <span class="price">
+                              <span class="currency">₹</span>
+                              <span id="total">{{grand_total}}</span>
+                          </span>
                       </li>
                       {% if order.payment_method == 'Cash' %}
                       <a

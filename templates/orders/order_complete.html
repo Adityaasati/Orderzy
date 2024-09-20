@@ -74,24 +74,29 @@
                     </div>
                     <div class="col-md-6 col-12">
                         <ul style="list-style-type: none; padding-left: 0;">
-                            <li>Subtotal
-                                <span class="price float-right">
+                            <li class="d-flex justify-content-between">
+                                <span>Subtotal</span>
+                                <span class="price">
                                     <span class="currency">₹</span>
                                     <span id="subtotal">{{subtotal}}</span>
                                 </span>
                             </li>
+                        
                             {% for key, value in service_charge_data.items %}
                             {% for i, j in value.items %}
-                            <li>{{key}}
-                                <span class="price float-right">
-                                    <span class="currency">₹</span>
-                                    <span id="tax-{{key}}">{{j}}</span>
-                                </span>
-                            </li>
+                                    <li class="d-flex justify-content-between">
+                                        <span>{{key}} <small>({{i}}%)</small></span>
+                                        <span class="price">
+                                            <span class="currency">₹</span>
+                                            <span id="tax-{{key}}">{{j}}</span>
+                                        </span>
+                                    </li>
+                                {% endfor %}
                             {% endfor %}
-                            {% endfor %}
-                            <li class="font-weight-bold">Total
-                                <span class="price float-right">
+                        
+                            <li class="d-flex justify-content-between fw-bold">
+                                <span>Total</span>
+                                <span class="price">
                                     <span class="currency">₹</span>
                                     <span id="total">{{order.total}}</span>
                                 </span>
