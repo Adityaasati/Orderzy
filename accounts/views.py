@@ -15,6 +15,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.urls import reverse
+from django.http import JsonResponse
 from django.contrib.auth.tokens import default_token_generator
 from restaurant.models import Restaurant
 from django.template.defaultfilters import slugify
@@ -294,28 +295,6 @@ def r_contact_us(request):
 
     return render(request, 'accounts/r_contactUs.html', {'form': form, 'form_submitted': False})
 
-@login_required(login_url='login')
-def c_contact_us(request):
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            message = form.cleaned_data['message']
-
-            ContactMessage.objects.create(
-                user=request.user,
-                name=name,
-                message=message
-            )
-
-            messages.success(request, 'Thank you for reaching out! Your message has been sent successfully.')
-            return render(request, 'accounts/c_contactUs.html', {'form_submitted': True})
-
-    else:
-        form = ContactForm()
-
-    return render(request, 'accounts/c_contactUs.html', {'form': form, 'form_submitted': False})
-
 
 
 
@@ -429,17 +408,19 @@ def reset_password(request):
 
 
 
+
+    
 def newsletter_signup(request):
-    if request.method == 'POST':
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         email = request.POST.get('email')
         if email:
             if not Newsletter.objects.filter(email=email).exists():
                 Newsletter.objects.create(email=email)
-                print("Thank you for signing up for the newsletter!")
-                messages.success(request, "Thank you for signing up for the newsletter!")
+                return JsonResponse({'message': 'Done', 'status': 'success'})
+            else:
+                return JsonResponse({'message': 'This email is already subscribed.', 'status': 'error'})
         else:
-            messages.error(request, "Please enter a valid email address.")
-        return redirect('newsletter_signup')
+            return JsonResponse({'message': 'Please enter a valid email address.', 'status': 'error'})
 
-    return redirect('home')
-    
+    return JsonResponse({'message': 'Invalid request', 'status': 'error'})
+

@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Terms and Conditions | {% endblock %}
+
+{% block content %}
+{% include 'includes/alerts.html' %}
+<style>
+  h3, strong
+      {
+          font-family: 'Gowun Batang', serif !important;
+      }
+     
+h1{
+                
+            font-family: "Caveat", cursive !important;
+            font-optical-sizing: auto;
+            font-weight: 1200 !important;
+            font-style: bold;
+    }
+   
+</style>
+<div class="main-section mt-5">
+    <div class="page-section terms-conditions">
+        <div class="container">
+            <div class="row">
+                <!-- Sidebar (Only for authenticated users) -->
+                {% if user.is_authenticated %} {% if user.role == 1 %}
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                {% include 'includes/r_sidebar.html' %}
+                </div>
+                {% else %}
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                {% include 'includes/c_sidebar.html' %}
+                </div>
+                {% endif %} {% endif %}
+                
+                <!-- Main Content -->
+                <div class="{% if user.is_authenticated %}col-lg-9 col-md-8{% else %}col-lg-12 col-md-12{% endif %} col-sm-12 col-xs-12">
+                    <div class="bg-light rounded-lg shadow-sm p-4">
+                        <div class="text-center mb-4">
+                            <h1 class="display-4 font-weight-bold text-primary">Terms and Conditions</h1>
+                            <p class="lead text-muted">Last updated: September 23, 2024</p>
+                        </div>
+                        
+                        
+                        <div class="terms-content">
+                            <!-- Section 1 -->
+                            <h3>1. Acceptance of Terms</h3>
+                            <p>
+                              By creating an account, making a purchase, or otherwise using
+                              the Services, you acknowledge that you have read, understood,
+                              and agree to be bound by these Terms and our Privacy Policy.
+                            </p>
+              
+                            <!-- Section 2 -->
+                            <h3>2. Account Registration</h3>
+                            <ul>
+                              <li>
+                                <strong>Accurate Information:</strong> You agree to provide
+                                accurate, current, and complete information during the
+                                registration process.
+                              </li>
+                              <li>
+                                <strong>Confidentiality:</strong> You are responsible for
+                                maintaining the confidentiality of your account credentials
+                                and for all activities that occur under your account.
+                              </li>
+                              <li>
+                                <strong>Unauthorized Access:</strong> Notify us immediately of
+                                any unauthorized use of your account.
+                              </li>
+                            </ul>
+              
+                            <!-- Section 3 -->
+                            <h3>3. Use of Services</h3>
+                            <ul>
+                              <li>
+                                <strong>Lawful Use:</strong> You agree to use the Services
+                                only for lawful purposes and in accordance with these Terms.
+                              </li>
+                              <li>
+                                <strong>Prohibited Activities:</strong> You shall not engage
+                                in activities that could harm the Services or impair anyone
+                                else's use of them.
+                              </li>
+                              <li>
+                                <strong>User Content:</strong> Any content you upload must not
+                                violate any laws or infringe on any third-party rights.
+                              </li>
+                            </ul>
+              
+                            <!-- Section 4 -->
+                            <h3>4. Orders and Payment</h3>
+                            <ul>
+                              <li>
+                                <strong>Order Acceptance:</strong> All orders are subject to
+                                acceptance by Orderzy. We reserve the right to refuse or
+                                cancel any order.
+                              </li>
+                              <li>
+                                <strong>Pricing:</strong> Prices are subject to change without
+                                notice. We strive for accuracy but are not responsible for
+                                typographical errors.
+                              </li>
+                              <li>
+                                <strong>Payment Methods:</strong> We accept various payment
+                                methods as indicated on our website. Payment must be received
+                                before your order is processed.
+                              </li>
+                              <li>
+                                <strong>Taxes:</strong> Applicable taxes will be added to your
+                                order total.
+                              </li>
+                            </ul>
+              
+                            <!-- Section 5 -->
+                            <h3>5. Intellectual Property Rights</h3>
+                            <ul>
+                              <li>
+                                <strong>Ownership:</strong> All content, features, and
+                                functionality on the Services are the exclusive property of
+                                Orderzy and its licensors.
+                              </li>
+                              <li>
+                                <strong>License:</strong> You are granted a limited,
+                                non-exclusive, non-transferable license to access and use the
+                                Services for personal use.
+                              </li>
+                            </ul>
+              
+                            <!-- Section 6 -->
+                            <h3>6. Refunds</h3>
+                            <ul>
+                              <li>
+                                <strong>Refund Process:</strong> Refunds will be issued to the
+                                original payment method after we receive and process your
+                                return.
+                              </li>
+                            </ul>
+              
+                            <!-- Section 7 -->
+                            <h3>7. Privacy Policy</h3>
+                            <p>
+                              Your use of the Services is also governed by our Privacy Policy,
+                              which is incorporated into these Terms by reference.
+                            </p>
+              
+                            <!-- Section 8 -->
+                            <h3>8. Limitation of Liability</h3>
+                            <p>
+                              In no event shall Orderzy be liable for any indirect,
+                              incidental, special, consequential, or punitive damages arising
+                              out of or relating to your use of the Services.
+                            </p>
+              
+                            <!-- Section 9 -->
+                            <h3>9. Indemnification</h3>
+                            <p>
+                              You agree to indemnify, defend, and hold harmless Orderzy, its
+                              affiliates, and their respective officers and employees from any
+                              claims arising out of your use of the Services or violation of
+                              these Terms.
+                            </p>
+              
+                            <!-- Section 10 -->
+                            <h3>10. Termination</h3>
+                            <p>
+                              We reserve the right to terminate or suspend your access to the
+                              Services, without notice, for conduct that we believe violates
+                              these Terms or is harmful to other users or us.
+                            </p>
+              
+                            <!-- Section 11 -->
+                            <h3>11. Governing Law</h3>
+                            <p>
+                              These Terms shall be governed by and construed in accordance
+                              with the laws of [Insert Jurisdiction], without regard to its
+                              conflict of law principles.
+                            </p>
+              
+                            <!-- Section 12 -->
+                            <h3>12. Dispute Resolution</h3>
+                            <p>
+                              Any disputes arising under these Terms shall be resolved through
+                              binding arbitration in accordance with the rules of [Insert
+                              Arbitration Association].
+                            </p>
+              
+                            <!-- Section 13 -->
+                            <h3>13. Changes to Terms</h3>
+                            <p>
+                              We may update these Terms from time to time. Changes will be
+                              effective immediately upon posting. Your continued use of the
+                              Services after changes are posted constitutes your acceptance of
+                              the new Terms.
+                            </p>
+              
+                            <!-- Section 14 -->
+                            <h3>14. Contact Information</h3>
+                            <p>
+                              For questions or concerns about these Terms, please contact us
+                              at:
+                            </p>
+                            <ul>
+                              <li><strong>Email:</strong>aditya@orderzy.in</li>
+                            </ul>
+                          </div>
+                        
+                        <!-- Contact Section -->
+                        <h3>Contact Us</h3>
+                        <p>
+                            If you have any questions about these Terms and Conditions, you can contact us:
+                        </p>
+                        <ul>
+                            <li>By email: <a href="mailto:aditya@orderzy.in">aditya@orderzy.in</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

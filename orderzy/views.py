@@ -3,7 +3,9 @@ from restaurant.models import Restaurant
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
-
+from accounts.models import ContactMessage
+from accounts.forms import ContactForm
+from django.contrib import messages
 
 def is_valid_coordinate(value):
     try:
@@ -57,3 +59,40 @@ def home(request):
 
 def base(request):
     return render(request, 'base.html')
+
+
+def about_us(request):
+    return render(request, 'includes/about_us.html')
+
+def blog(request):
+    return render(request, 'includes/blog.html')
+
+
+
+def contact_us(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            message = form.cleaned_data['message']
+
+            ContactMessage.objects.create(
+                user=request.user,
+                name=name,
+                message=message
+            )
+            messages.success(request, 'Thank you for reaching out! Your message has been sent successfully.')
+            return render(request,'includes/contact_us.html', {'form_submitted': True})
+
+    else:
+        form = ContactForm()
+
+    return render(request,'includes/contact_us.html', {'form': form, 'form_submitted': False})
+
+
+
+def privacy_policy(request):
+    return render(request, 'includes/privacy_policy.html')
+
+def terms_and_conditions(request):
+    return render(request, 'includes/terms_and_conditions.html')

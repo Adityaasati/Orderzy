@@ -1,19 +1,37 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block title %} Contact Us | {% endblock %} 
 {% block content %}
 {% include 'includes/alerts.html' %}
-
+<style>
+    h4{
+            
+        font-family: "Caveat", cursive !important;
+        font-optical-sizing: auto;
+        font-weight: 1200 !important;
+        font-style: bold;
+}
+</style>
 <div class="main-section">
     <div class="page-section account-header buyer-logged-in">
         <div class="container">
             <div class="row">
                 <!-- Sidebar -->
-                <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
-                    {% include 'includes/r_sidebar.html' %}
+                {% if user.is_authenticated %} {% if user.role == 1 %}
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                {% include 'includes/r_sidebar.html' %}
                 </div>
+                {% else %}
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                {% include 'includes/c_sidebar.html' %}
+                </div>
+                {% endif %} {% endif %}
                 
                 <!-- Main Content -->
-                <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
+                <div
+          class="{% if user.is_authenticated %}col-lg-9 col-md-8{% else %}col-lg-12 col-md-12{% endif %} col-sm-12 col-xs-12"
+        >
                     <div class="bg-light rounded-lg shadow-sm p-4">
                         <div class="text-center mb-4">
                             <h4 class="display-4 font-weight-bold text-primary">Contact Us</h4>
@@ -25,7 +43,7 @@
                                 <p>Your message has been sent successfully.</p>
                             </div>
                         {% else %}
-                            <form action="{% url 'r_contact_us' %}" method="post">
+                            <form action="{% url 'contact_us' %}" method="post">
                                 {% csrf_token %}
                                 <div class="form-group">
                                     <label for="id_name" class="font-weight-bold">Name</label>
@@ -36,7 +54,7 @@
                                     <textarea name="message" id="id_message" class="form-control" rows="4" placeholder="Enter your message" required></textarea>
                                 </div>
                                 <input type="hidden" name="user_type" value="{{ user_type }}">
-                                <button type="submit" class="subscribe btn btn-primary w-100 rounded-pill shadow-sm mt-3 ">
+                                <button type="submit" class="subscribe btn btn-primary w-100 rounded-pill shadow-sm mt-3">
                                     Send Message
                                 </button>
                                 {% if form.errors %}

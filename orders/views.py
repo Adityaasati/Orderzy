@@ -200,7 +200,7 @@ def payments(request):
             )
             ordered_food.save()
 
-        # Send order confirmation email to the customer
+        # # Send order confirmation email to the customer
         mail_subject = 'Thank you for Ordering with us!'
         mail_template = 'orders/order_confirmation_email.html'
 

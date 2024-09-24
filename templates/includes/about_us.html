@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us | {% endblock %}
+
+{% block content %}
+{% include 'includes/alerts.html' %}
+<style>
+    h2,h3
+        {
+            font-family: 'Gowun Batang', serif !important;
+        }
+        h1{
+            
+                font-family: "Caveat", cursive !important;
+                font-optical-sizing: auto;
+                font-weight: 1200 !important;
+                font-style: bold;
+        }
+        
+</style>
+<div class="main-section mt-5">
+    <div class="page-section about-us">
+        <div class="container">
+            <div class="row">
+                <!-- Sidebar (Only for authenticated users) -->
+                {% if user.is_authenticated %}
+                    {% if user.role == 1 %}
+                        <!-- Restaurant Sidebar -->
+                        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                            {% include 'includes/r_sidebar.html' %}
+                        </div>
+                    {% else %}
+                        <!-- Customer Sidebar -->
+                        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                            {% include 'includes/c_sidebar.html' %}
+                        </div>
+                    {% endif %}
+                    <!-- Main Content -->
+                    <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
+                {% else %}
+                    <!-- Main Content Full Width for Unauthenticated Users -->
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                {% endif %}
+                        <div class="bg-light rounded-lg shadow-sm p-4">
+                            <div class="text-center mb-4">
+                                <h1 class="display-4 font-weight-bold text-primary">About Us</h1>
+                            </div>
+
+                            <!-- About Us Content -->
+                            <div class="about-us-content">
+                                <h2 class="font-weight-bold">Welcome to Orderzy</h2>
+                                <p>
+                                    At Orderzy, we believe that dining should be an enjoyable and effortless experience. We are a unique marketplace connecting food lovers with a diverse array of nearby restaurants, allowing you to order your favorite meals in advance and dine in at the restaurant—without the wait.
+                                </p>
+
+                                <h3 class="mt-4">Our Mission</h3>
+                                <p>
+                                    Our mission is to revolutionize the dining experience by bridging the gap between customers and restaurants. We aim to:
+                                </p>
+                                <ul>
+                                    <li><strong>Simplify Dining Out:</strong> By enabling you to browse menus and place orders, we make dining out as convenient as possible.</li>
+                                    <li><strong>Support Local Restaurants:</strong> We partner with a wide range of eateries to bring you diverse culinary options, helping local businesses thrive.</li>
+                                    <li><strong>Enhance Customer Experience:</strong> With Orderzy, say goodbye to long waits and enjoy a seamless dining experience tailored to your schedule.</li>
+                                </ul>
+
+                                <h3 class="mt-4">For Restaurant Owners</h3>
+                                <p>
+                                    We offer a service where restaurant owners can manage all orders and preorders made by customers simultaneously without any problem. We also provide a seating plan feature so that restaurants can enter their table availability, allowing customers to know the seating areas available.
+                                </p>
+
+                                <h3 class="mt-4">What We Offer</h3>
+                                <ul>
+                                    <li><strong>Advance Ordering:</strong> Browse menus and place your order ahead of time, so your meal is ready shortly after you arrive.</li>
+                                    <li><strong>Discover New Restaurants:</strong> Explore a curated selection of restaurants offering a variety of cuisines to satisfy any craving.</li>
+                                    <li><strong>User-Friendly Platform:</strong> Our website is designed for ease of use, making it simple to plan your dining experience.</li>
+                                </ul>
+
+                                <h3 class="mt-4">Why Choose Orderzy</h3>
+                                <ul>
+                                    <li><strong>Save Time:</strong> Skip the wait and enjoy your meal on your schedule.</li>
+                                    <li><strong>Personalized Experience:</strong> Customize your orders and dining preferences.</li>
+                                    <li><strong>Secure Payments:</strong> Enjoy peace of mind with our secure payment processing.</li>
+                                </ul>
+
+                                <h3 class="mt-4">Get in Touch</h3>
+                                <p>
+                                    We love hearing from our users! Whether you have feedback, suggestions, or need assistance, feel free to reach out.
+                                </p>
+                                <ul>
+                                    <li><strong>Email:</strong> <a href="mailto:aditya@orderzy.in">aditya@orderzy.in</a></li>
+                                    <li><strong>WhatsApp:</strong> <a href="https://wa.me/9238008672" target="_blank">9238008672</a></li>
+                                </ul>
+
+                                <hr>
+
+                                <p class="text-center font-italic">
+                                    Join us on our journey. We're excited to have you as part of the Orderzy community. Together, let's redefine the way we dine out and make every meal a memorable one.
+                                </p>
+                            </div>
+                        </div>
+                    </div> <!-- End of Main Content Column -->
+            </div> <!-- End of Row -->
+        </div> <!-- End of Container -->
+    </div>
+</div>
+
+{% endblock content %}
