@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %} Receipt | {% endblock %} 
+{% block title %} Receipt  {% endblock %} 
 
 {% block content %}
 
@@ -85,7 +85,7 @@
                             {% for key, value in service_charge_data.items %}
                             {% for i, j in value.items %}
                                     <li class="d-flex justify-content-between">
-                                        <span>{{key}} <small>({{i}}%)</small></span>
+                                        <span>{{key}} </span>
                                         <span class="price">
                                             <span class="currency">₹</span>
                                             <span id="tax-{{key}}">{{j}}</span>

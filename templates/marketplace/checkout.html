@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
-{% block title %} Checkout | {% endblock %} 
+{% block title %} Checkout  {% endblock %} 
 {% block content %}
 
 <div class="main-section pt-5">
@@ -170,7 +170,7 @@
                                                 {% for key, value in service_charge_dict.items %}
                                                     {% for i, j in value.items %}
                                                         <li class="d-flex justify-content-between">
-                                                            <span>{{key}} <small>({{i}}%)</small></span>
+                                                            <span>{{key}} </span>
                                                             <span class="price">
                                                                 <span class="currency">₹</span>
                                                                 <span id="tax-{{key}}">{{j}}</span>

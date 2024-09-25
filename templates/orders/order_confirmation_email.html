@@ -1,5 +1,5 @@
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office"
     xmlns:v="urn:schemas-microsoft-com:vml" lang="en">
 
@@ -11,123 +11,214 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F5F8FA;
+            font-family: Lato, sans-serif;
+            font-size: 16px;
+            color: #33475B;
+        }
+
         #email {
-            margin: auto;
-            width: 600px;
+            max-width: 600px;
+            margin: 0 auto;
             background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        p {
+            margin: 0;
+            font-size: 16px;
+            color: #666;
+        }
+
+        a {
+            text-decoration: none;
+            color: #0066cc;
+        }
+
+        table {
+            width: 100%;
+            padding: 20px;
+            border-spacing: 0;
+            border-collapse: collapse;
+            background-color: #EAF0F6;
+        }
+
+        th, td {
+            padding: 10px 0;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        th {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .summary-table td {
+            padding: 8px 0;
         }
 
         .activate-btn {
-            font: inherit;
-            background-color: #0000ff;
-            border: none;
-            padding: 10px;
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 900;
-            border-radius: 5px;
+            text-align: center;
+            letter-spacing: 1px;
+            border-radius: 4px;
             text-decoration: none;
+            margin: 20px 0;
+        }
+
+        .footer {
+            background-color:  #007bff;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        @media screen and (max-width: 600px) {
+            body, #email {
+                width: 100%;
+                margin: 0;
+            }
+
+            table {
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            th, td {
+                font-size: 14px;
+            }
+
+            .activate-btn {
+                width: 100%;
+                padding: 10px 0;
+            }
         }
     </style>
 </head>
 
-<body bgcolor="#F5F8FA"
-    style="width: 100%; margin: auto 0; padding:0; font-family:Lato, sans-serif; font-size:16px; color:#33475B; word-break:break-word">
-
+<body>
     <div id="email">
-       
-
-        <table bgcolor="#EAF0F6" width="100%" role="presentation" border="0" cellpadding="0" cellspacing="10px"
-            style="padding: 30px 30px 60px 60px;">
+        <table bgcolor="#EAF0F6" width="100%" role="presentation" border="0" cellpadding="0" cellspacing="0">
             <tr>
-                <td>
-                    <h2 style="text-align: center;">
-                        Thankyou for your order
-                    </h2>
-                    <p>Review your order information below.</p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Order Date: {{order.created_at}}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Order Number: {{order.order_number}}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Payment Method: {{order.payment_method}}
+                <td style="padding: 30px;">
+                    <h2 style="text-align: center;">Thank You for Your Order</h2>
+                    <p style="text-align: center;">Review your order details below:</p>
                 </td>
             </tr>
         </table>
-        <table bgcolor="#EAF0F6" width="100%" role="presentation" border="0" cellpadding="0" cellspacing="10px"
-            style="padding: 30px 30px 60px 60px;">
-            <tbody>
-                <tr>
-                    <th>
-                        Image
-                    </th>
-                    <th>Food Item</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                </tr>
 
+        <table bgcolor="#ffffff" width="100%" role="presentation" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td style="padding: 20px 30px;">
+                    <p><strong>Order Date:</strong> {{order.created_at}}</p>
+                    <p><strong>Order Number:</strong> {{order.order_number}}</p>
+                    <p><strong>Payment Method:</strong> {{order.payment_method}}</p>
+                </td>
+            </tr>
+        </table>
+
+
+        <table bgcolor="#ffffff" width="100%" role="presentation" border="0" cellpadding="0" cellspacing="0">
+            <thead style="background-color: #EAF0F6;">
+                <tr>
+                    <th style="padding: 10px 20px; font-size: 16px;">Image</th>
+                    <th style="padding: 10px 20px; font-size: 16px;">Food Item</th>
+                    <th style="padding: 10px 20px; font-size: 16px;">Qty</th>
+                    <th style="padding: 10px 20px; font-size: 16px;">Price</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for food in ordered_food %}
                 <tr>
-                    <td>
-                        <img src="http://{{domain}}{{food.fooditem.image.url}}" alt="Food Image" width="60">
-                        <img src="http://{{domain2}}{{food.fooditem.image.url}}" alt="Food Image" width="60">
-
+                    <td style="padding: 10px 20px;"></td>
+                        <img src="http://{{domain}}{{food.fooditem.image.url}}" alt="Food Image" width="60" style="border-radius: 8px;">
                     </td>
-                    <td>
-                        <p style="margin: 0;">{{food.fooditem}}</p>
-                        <small><a
-                                href="https://{{domain}}{% url 'restaurant_detail' food.fooditem.restaurant.restaurant_slug   %}"
-                                style="color: #ccc;">{{food.fooditem.restaurant.restaurant_name}}</a></small>
-                                <small><a
-                                    href="https://{{domain2}}{% url 'restaurant_detail' food.fooditem.restaurant.restaurant_slug   %}"
-                                    style="color: #ccc;">{{food.fooditem.restaurant.restaurant_name}}</a></small>
+                    <td style="padding: 10px 20px;">
+                        <p style="margin: 0; font-size: 16px;">{{food.fooditem}}</p>
+                        <small>
+                            <a href="https://{{domain}}{% url 'restaurant_detail' food.fooditem.restaurant.restaurant_slug %}" 
+                               style="font-size: 16px; color: #0066cc;">{{food.fooditem.restaurant.restaurant_name}}</a>
+                        </small>
                     </td>
-                    <td>₹{{food.quantity}}</td>
-                    <td>{{food.price}}</td>
-
+                    <td style="padding: 10px 20px; font-size: 16px;">{{food.quantity}}</td>
+                    <td style="padding: 10px 20px; font-size: 16px;">₹{{food.price}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <table bgcolor="#EAF0F6" width="100%" role="presentation" border="0" cellpadding="0" cellspacing="10px"
-            style="padding: 30px 30px 60px 60px;">
+        
+        <table bgcolor="#ffffff" width="100%" role="presentation" border="0" cellpadding="0" cellspacing="0">
             <tbody>
                 <tr>
-                    Subtotal : ₹{{customer_subtotal}}
-                </tr>
-                {% for key, val in service_charge_data.items %}
-                {% for i, j in val.items %}
-                <tr>
-                    <td>
-                        {{key}} <small> ({{ i }}%)</small> : <span>₹</span> <span> {{j}} </span>
+                    <td style="padding: 10px 20px; font-size: 16px;">Subtotal</td>
+                    <td style="padding: 10px 20px; text-align: right; font-size: 16px;">
+                        <span class="currency">₹</span><span id="subtotal">{{customer_subtotal}}</span>
                     </td>
                 </tr>
+        
+                <!-- Service Charges -->
+                {% for key, val in service_charge_data.items %}
+                    {% for i, j in val.items %}
+                    <tr>
+                        <td style="padding: 10px 20px; font-size: 16px;">{{key}} <small>({{ i }}%)</small></td>
+                        <td style="padding: 10px 20px; text-align: right; font-size: 16px;">
+                            <span class="currency">₹</span><span id="tax-{{key}}">{{j}}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
                 {% endfor %}
-
-                {% endfor %}
-
-                <tr> Grand Total: ₹{{order.total}}</tr>
+        
+                <!-- Total -->
+                <tr>
+                    <td colspan="2" style="border-top: 2px solid #EAF0F6; padding-top: 10px;"></td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 20px; font-size: 18px; font-weight: bold;">Total</td>
+                    <td style="padding: 10px 20px; text-align: right; font-size: 18px; font-weight: bold;">
+                        <span class="currency">₹</span><span id="total">{{order.total}}</span>
+                    </td>
+                </tr>
             </tbody>
         </table>
 
-        <table role="presentation" bgcolor="#C33332" width="100%">
+        
+        <table role="presentation" bgcolor="#007bff;" width="100%">
             <tr>
                 <td align="center" style="padding: 15px 15px; color: #fff;">
                     <p>© {% now "Y" %} Orderzy Marketplace, All Rights Reserved.</p>
-                    <a href="https://www.orderzy.in" style="color:#fff;">Visit Website</a>
+                    <a href="https://orderzy.in" style="color: #F28500">Visit Website</a>
                 </td>
             </tr>
         </table>
     </div>
 </body>
 
-</html>
+</html> 
+

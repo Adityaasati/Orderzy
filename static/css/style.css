@@ -2911,7 +2911,7 @@ a.slicknav_btn.slicknav_open .slicknav_icon-bar:first-child { position: absolute
 .footer-widget .widget-newsletter .fieldset form .field-holder { width: 77%; display: inline-block; }
 .footer-widget .widget-newsletter .fieldset form .field-holder input[type="text"] { color: #b4b4b4; height: 47px; padding: 0 0 0 20px; background: #fff; border: none; border-radius: 4px; font-size: 14px; font-family: 'Open Sans', sans-serif; font-weight: 400; -webkit-box-shadow: none; box-shadow: none; }
 .footer-widget .widget-newsletter .fieldset form .field-holder.btn-holder { display: inline-block; width: 20%; margin-left: 15px; }
-.footer-widget .widget-newsletter .fieldset form .field-holder.btn-holder input[type="submit"] { border: 1px solid #c33332; color: #fff; font-size: 12px; font-weight: bold; height: 47px; padding: 0 29px; text-transform: uppercase; background: none; border-radius: 4px; line-height: 45px; background-color: #c33332; }
+.footer-widget .widget-newsletter .fieldset form .field-holder.btn-holder input[type="submit"] { border: 1px solid #c33332; color: #fff; font-size: 12px; font-weight: bold; height: 47px; padding: 0 29px; text-transform: uppercase; background: none; border-radius: 4px; line-height: 45px; background-color: #ffffff; }
 .footer-widget .widget-newsletter form .field-holder label i { display: none; }
 /* News Letter style  */
 #footer .widget-title { margin-bottom: 30px; padding: 0; }
