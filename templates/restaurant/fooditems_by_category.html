@@ -36,7 +36,7 @@
                                     {% for food in fooditems %}
                                     <tr>
                                         <td class="text-left">{{forloop.counter}}</td>
-                                        <td class="text-left"><img src="{{food.image.url}}" alt="Food Image" width="40">
+                                        <td class="text-left"><img data-src="{{food.image.url}}" alt="Food Image" width="40" class="lazyload" loading="lazy">
                                         </td>
                                         <td class="text-left">
                                             <a href=""><p class="mb-0 font-weight-bold">{{food}}</p> <small

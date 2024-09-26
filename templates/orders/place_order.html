@@ -80,9 +80,11 @@
                         <tr>
                           <td>
                             <img
-                              src="{{cart_item.item.fooditem.image.url}}"
+                              data-src="{{cart_item.item.fooditem.image.url}}"
                               width="40"
                               alt="Food Image"
+                              class="lazyload"
+                              loading="lazy"
                             />
                           </td>
                           <td>

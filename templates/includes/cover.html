@@ -21,11 +21,11 @@
               <figure>
                 {% if restaurant.user_profile.profile_picture %}
                 <img
-                  src="{% static 'images/chef_logo.png' %}"
-                  alt="Profile Picture"
+                  data-src="{% static 'images/chef_logo.png' %}"
+                  alt="Profile Picture" class="lazyload"  loading="lazy"
                 />
                 {% else %}
-                <img src="{% static 'images/chef_logo.png' %}" alt="Profile Picture" />
+                <img data-src="{% static 'images/chef_logo.png' %}" alt="Profile Picture" class="lazyload"  loading="lazy"/>
                 {% endif %}
               </figure>
             </div>

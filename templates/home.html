@@ -83,20 +83,20 @@
                   <a
                     href="{% url 'restaurant_detail' restaurant.restaurant_slug %}"
                     ><img
-                      src="{{ restaurant.user_profile.profile_picture.url }}"
+                      data-src="{{ restaurant.user_profile.profile_picture.url }}"
                       height="125"
-                      class="attachment-full size-full wp-post-image home-restaurant-img"
-                      alt="Profile Picture"
+                      class="attachment-full size-full wp-post-image home-restaurant-img lazyload"
+                      alt="Profile Picture" loading="lazy"
                   /></a>
                   {% else %}
                   <a
                     href="{% url 'restaurant_detail' restaurant.restaurant_slug %}"
                     ><img
-                      src="{% static 'images/default-profile.png' %}"
+                      data-src="{% static 'images/default-profile.png' %}"
                       height="125"
-                      class="attachment-full size-full wp-post-image home-restaurant-img"
-                      alt="Profile Picture"
-                  /></a>
+                      class="lazyload attachment-full size-full wp-post-image home-restaurant-img"
+                      alt="Profile Picture" loading="lazy"
+                  /></a> 
                   {% endif %}
                 </figure>
               </li>
@@ -138,15 +138,15 @@
                       >
                         {% if restaurant.user_profile.profile_picture %}
                         <img
-                          src="{{ restaurant.user_profile.profile_picture.url }}"
-                          class="img-thumb wp-post-image"
-                          alt="Profile Picture"
+                          data-src="{{ restaurant.user_profile.profile_picture.url }}"
+                          class="lazyload img-thumb wp-post-image"
+                          alt="Profile Picture" loading="lazy"
                         />
                         {% else %}
                         <img
-                          src="{% static 'images/default-profile.png' %}"
-                          class="img-thumb wp-post-image"
-                          alt="Profile Picture"
+                          data-src="{% static 'images/default-profile.png' %}"
+                          class="lazyload img-thumb wp-post-image"
+                          alt="Profile Picture" loading="lazy"
                         />
                         {% endif %}
                       </a>

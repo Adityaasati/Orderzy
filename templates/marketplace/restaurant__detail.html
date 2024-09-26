@@ -17,9 +17,9 @@
                             <div class="img-holder">
                                 <figure>
                                     {% if restaurant.user_profile.profile_picture %}
-                                    <img src="{{restaurant.user_profile.profile_picture.url}}" alt="Profile Picture">
+                                    <img data-src="{{restaurant.user_profile.profile_picture.url}}" alt="Profile Picture" class="lazyload" loading="lazy">
                                     {% else %}
-                                    <img src="{% static 'images/default-profile.png' %}" alt="Profile Picture">
+                                    <img data-src="{% static 'images/default-profile.png' %}" alt="Profile Picture" class="lazyload" loading="lazy">
 
                                     {% endif %}
                                 </figure>
@@ -93,8 +93,8 @@
 
                                     <div class="col mb-5">
                                         <div class="card h-100 border border-dark rounded">
-                                            <img class="card-img-top" src="{{food.image.url}}"
-                                                alt="Food Image" />
+                                            <img class="lazyload card-img-top" data-src="{{food.image.url}}"
+                                                alt="Food Image"  loading="lazy" />
                                             <div class="card-body p-4">
                                                 <div class="text-center">
                                                     <h5 class="fw-bolder">{{food}}</h5>

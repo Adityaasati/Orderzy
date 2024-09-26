@@ -135,8 +135,8 @@
 
                                                 <li id="cart-item-{{cart_item.item.id }}">
                                                 
-                                                    <div class="image-holder"> <img src="{{cart_item.item.fooditem.image.url}}"
-                                                            alt="Food Image"></div>
+                                                    <div class="image-holder"> <img data-src="{{cart_item.item.fooditem.image.url}}"
+                                                            alt="Food Image" class="lazyload"  loading="lazy"></div>
                                                             <div class="text-holder">
                                                                 <h6>{{cart_item.item.fooditem}}</h6>
                                                                 <span>{{cart_item.item.fooditem.description}}</span>
@@ -190,15 +190,15 @@
                                                 <div class="payment-method">
                                                     <label>
                                                         <input type="radio" name="payment_method" value="PayPal" >
-                                                        <img src="{% static 'images/PayPal.png' %}" alt="PayPal"
+                                                        <img data-src="{% static 'images/PayPal.png' %}" alt="PayPal" class="lazyload"  loading="lazy"
                                                             width="100">
                                                     </label>
                                                     &nbsp;
                                                     {% if user.is_authenticated and user.role == 1 %}
                                                     <label>
                                                         <input type="radio" name="payment_method" value="Cash" >
-                                                        <img src="{% static 'images/Cash.png' %}" alt="Cash"
-                                                        width="100">
+                                                        <img data-src="{% static 'images/Cash.png' %}" alt="Cash"
+                                                        width="100" class="lazyload"  loading="lazy">
                                                     </label>
                                                     {% endif %}
 

@@ -54,7 +54,7 @@
                         {% for item in ordered_food_details %}
                         <tr>
                             <td>
-                                <img src="{{item.image_url}}" width="60" class="img-fluid" alt="Food Image">
+                                <img data-src="{{item.image_url}}" width="60" class="lazyload img-fluid" alt="Food Image" loading="lazy">
                             </td>
                             <td>
                                 <p class="mb-0"><b>{{item.fooditem}}</b></p>
@@ -69,7 +69,7 @@
                 </table>
                 <div class="row mt-5">
                     <div class="col-md-6 col-12 d-flex justify-content-center mb-3 mb-md-0">
-                        <img src="{% static 'images/paid.png' %}" alt="Paid" width="200" class="img-fluid">
+                        <img data-src="{% static 'images/paid.png' %}" alt="Paid" width="200" class="lazyload img-fluid"  loading="lazy">
                     </div>
                     <div class="col-md-6 col-12">
                         <ul style="list-style-type: none; padding-left: 0;">

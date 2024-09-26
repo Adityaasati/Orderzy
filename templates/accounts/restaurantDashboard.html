@@ -66,7 +66,7 @@
                                     <p>Download the QR code for your restaurant menu.</p>
                                     <p>QR Code Image Path: {% static 'qr_codes/'|add:restaurant.qr_code_path %}</p>
 
-                                    <img src="{% static 'qr_codes/'|add:restaurant.qr_code_path %}" alt="QR code for menu" id="qr-code-img">
+                                    <img data-src="{% static 'qr_codes/'|add:restaurant.qr_code_path %}" alt="QR code for menu" id="qr-code-img" class="lazyload" loading="lazy">
                                     <a href="{% static 'qr_codes/'|add:restaurant.qr_code_path %}" download="{{ restaurant.id }}_menu_qr.png" class="btn btn-primary mt-2">
                                         Download QR Code
                                     </a>

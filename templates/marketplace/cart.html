@@ -30,8 +30,8 @@
                                             {% for item in cart_items %}
                                             {% if item.fooditem.restaurant.is_open %}
                                             <li id="cart-item-{{item.id}}">
-                                                <div class="image-holder"> <img src="{{item.fooditem.image.url}}"
-                                                        alt="Food Image"></div>
+                                                <div class="image-holder"> <img data-src="{{item.fooditem.image.url}}"
+                                                        alt="Food Image" class="lazyload"  loading="lazy"></div>
                                                 <div class="text-holder">
                                                     <h6>{{item.fooditem}}</h6>
                                                     <span>{{item.fooditem.description}}</span>

@@ -62,9 +62,9 @@
                                             <figure>
                                                 <a href="{% url 'restaurant_detail' restaurant.restaurant_slug %}">
                                                 {% if restaurant.user_profile.profile_picture %}
-                                                <img src="{{ restaurant.user_profile.profile_picture.url }}" class="img-list wp-post-image" alt="Profile Picture">
+                                                <img data-src="{{ restaurant.user_profile.profile_picture.url }}" class="lazyload img-list wp-post-image" alt="Profile Picture" loading="lazy">
                                                 {% else %}
-                                                <img src="{% static 'images/default-profile.png' %}" class="img-list wp-post-image" alt="Profile Picture">
+                                                <img data-src="{% static 'images/default-profile.png' %}" class="lazyload img-list wp-post-image" alt="Profile Picture"  loading="lazy">
                                                 {% endif %}
                                                 </a>
                                             </figure>
