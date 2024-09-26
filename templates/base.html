@@ -26,8 +26,8 @@
 	<meta property="og:description" content="Preorder from nearby restaurants with Orderzy. Save time and enhance your dining experience by discovering new spots near you.">
 	<!-- <meta property="og:image" content="{% static 'images/Orderzy_og_600.png' %}">
 	<meta name="twitter:image" content="{% static 'images/orderzy_twitter.png' %}"> -->
-	<meta property="og:image" content="{{ request.build_absolute_uri }}{% static 'images/Orderzy_og_600.png' %}">
-	<meta name="twitter:image" content="{{ request.build_absolute_uri }}{% static 'images/orderzy_twitter.png' %}">
+	<meta property="og:image" content="https://orderzy.in/static/images/Orderzy_og_600.png">
+	<meta name="twitter:image" content="https://orderzy.in/static/images/orderzy_twitter.png">
 
 
 	<link rel="icon" href="{% static 'favicon/favicon.ico' %}" type="image/x-icon">
@@ -43,17 +43,12 @@
 	<meta name="msapplication-TileImage" content="{% static 'favicon/mstile-150x150.png' %}">
 	<meta name="theme-color" content="#ffffff">
 	<link rel="canonical" href="https://orderzy.in">
-	<link rel="canonical" href="https://orderzy.in/search/" />
 
 	<link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
 
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
 	<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Montserrat:wght@400;700&family=Noto+Serif+Old+Uyghur&family=Open+Sans:wght@400;700;800&family=Sansita:wght@400;700&display=swap" rel="stylesheet">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Gowun+Batang:wght@400;700&family=Noto+Serif+Old+Uyghur&display=swap" rel="stylesheet">
 
 
 	<link href="{% static 'css/iconmoon.css' %}" rel="stylesheet">
@@ -91,6 +86,27 @@
 			let table = new DataTable('#myOrdersTable');
 		});
 	</script>
+	<script type="application/ld+json">
+		{
+		  "@context": "https://schema.org",
+		  "@type": "Organization",
+		  "name": "Orderzy",
+		  "url": "https://orderzy.in",
+		  "logo": "https://orderzy.in/static/images/Orderzy_og_600.png",
+		  "contactPoint": {
+			"@type": "ContactPoint",
+			"telephone": "9238008672",
+			"contactType": "Customer Service",
+			"areaServed": "IN",
+			"availableLanguage": "English"
+		  },
+		  "sameAs": [
+			"https://www.facebook.com/orderzy",
+			"https://www.instagram.com/orderzy"
+		  ]
+		}
+		</script>
+		
 
 	<style>
 		body,
@@ -109,9 +125,12 @@
 			margin-left: 10px; /* Adjust the value as needed */
 		  }
 	</style>
+
 </head>
 
 <body>
+	{{ request.build_absolute_uri }}
+	<meta name="twitter:image" content="{{ request.build_absolute_uri }}{% static 'images/orderzy_twitter.png' %}">
 
 	{% include 'includes/navbar.html' %}
 
