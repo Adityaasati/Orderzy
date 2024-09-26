@@ -93,6 +93,8 @@ def contact_us(request):
 
 def privacy_policy(request):
     return render(request, 'includes/privacy_policy.html')
+def refund_policy(request):
+    return render(request, 'includes/refund_policy.html')
 
 def terms_and_conditions(request):
     return render(request, 'includes/terms_and_conditions.html')

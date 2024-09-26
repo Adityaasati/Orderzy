@@ -1,0 +1,85 @@
+{% extends 'base.html' %} {% load static %} {% block title %}
+Refund Policy {% endblock %} {% block content %} {% include 'includes/alerts.html' %}
+<style>
+    h2,h3,h4, strong
+        {
+            font-family: 'Gowun Batang', serif !important;
+        }
+        h1{
+            font-family: "Caveat", cursive !important;
+            font-optical-sizing: auto;
+            font-weight: 1200 !important;
+            font-style: bold;
+        }
+</style>
+<div class="main-section mt-5">
+  <div class="page-section terms-conditions">
+    <div class="container">
+      <div class="row">
+        {% if user.is_authenticated %} {% if user.role == 1 %}
+        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+          {% include 'includes/r_sidebar.html' %}
+        </div>
+        {% else %}
+        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+          {% include 'includes/c_sidebar.html' %}
+        </div>
+        {% endif %} {% endif %}
+
+        <div
+          class="{% if user.is_authenticated %}col-lg-9 col-md-8{% else %}col-lg-12 col-md-12{% endif %} col-sm-12 col-xs-12"
+        >
+          <div class="bg-light rounded-lg shadow-sm p-4">
+            <div class="text-center mb-4">
+              <h1 class="display-4 font-weight-bold text-primary">
+                Refund Policy
+              </h1>
+              <p class="lead text-muted">Last updated: September 23, 2024</p>
+            </div>
+
+            <div class="refund-policy-content">
+              <h2>1. Refund Eligibility</h2>
+              <p>Refunds may be provided in the following cases:</p>
+              <ul>
+                <li><strong>Order Cancellations by the Restaurant:</strong> If a restaurant cancels an order due to unavailability of food or other reasons, a full refund will be issued to the customer.</li>
+                <li><strong>Order Cancellations by the Customer:</strong> Customers can cancel their order within a specified time window after placing the order. If canceled within the allowed time, a refund may be provided.</li>
+                <li><strong>Incorrect or Missing Items:</strong> Customers are eligible for a partial or full refund, depending on the issue.</li>
+              </ul>
+
+              <h2>2. Order Cancellation Policy</h2>
+              <ul>
+                <li><strong>Pre-order Cancellations:</strong> Can be canceled up to 15 minutes before the scheduled time.</li>
+                <li><strong>How to Cancel:</strong> Orders can be canceled through the "My Orders" section of the Orderzy platform.</li>
+              </ul>
+
+              <h2>3. Refund Process</h2>
+              <p>
+                Once a refund is approved, it will be processed within 7-10 business days. Refunds will be credited back to the original payment method used at the time of purchase.
+              </p>
+
+              <h2>4. Non-refundable Situations</h2>
+              <p>Refunds will not be issued under the following circumstances:</p>
+              <ul>
+                <li><strong>Order Not Canceled in Time:</strong> No refund for late cancellations.</li>
+                <li><strong>Customer Changes Mind:</strong> No refund if the customer decides not to proceed after preparation.</li>
+              </ul>
+
+              <h2>5. Dispute Resolution</h2>
+              <p>
+                If an issue arises, contact Orderzy support immediately. We will work with the restaurant to resolve the issue and determine if a refund is appropriate.
+              </p>
+
+              <h2>6. Contact Us</h2>
+              <ul>
+                <li>Email: <a href="mailto:aditya@orderzy.in">aditya@orderzy.in</a></li>
+                <li>Phone: +91 9238 000 123</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
