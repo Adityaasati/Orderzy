@@ -17,7 +17,7 @@ class UserForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(UserForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.update({
-            'placeholder': 'Please enter your email or phone number'
+            'placeholder': 'Please enter your email...'
         })
     def clean(self):
         cleaned_data = super().clean()

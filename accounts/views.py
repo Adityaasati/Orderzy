@@ -314,7 +314,7 @@ def forgot_password(request):
                 user_filter = {'username': identifier}  # Assuming username stores the phone number
             else:
                 print(f"Invalid identifier: {identifier}")
-                messages.error(request, 'Please enter a valid email address or phone number.')
+                messages.error(request, 'Please enter a valid email address')
                 return redirect('forgot_password')
 
         if User.objects.filter(**user_filter).exists():

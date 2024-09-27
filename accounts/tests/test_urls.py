@@ -223,7 +223,7 @@ class UrlsTestCase(TestCase):
         # Ensure the error message is displayed
         self.assertRedirects(response, reverse('forgot_password'))
         messages = list(response.wsgi_request._messages)
-        self.assertEqual(str(messages[0]), 'Please enter a valid email address or phone number.')
+        self.assertEqual(str(messages[0]), 'Please enter a valid email address')
 
         # Ensure no email is sent
         self.assertEqual(len(mail.outbox), 0)
@@ -257,7 +257,7 @@ class UrlsTestCase(TestCase):
         # Ensure the error message is displayed
         self.assertRedirects(response, reverse('forgot_password'))
         messages = list(response.wsgi_request._messages)
-        self.assertEqual(str(messages[0]), 'Please enter a valid email address or phone number.')
+        self.assertEqual(str(messages[0]), 'Please enter a valid email address.')
 
     def test_valid_reset_password(self):
         """Test a valid password reset process."""
