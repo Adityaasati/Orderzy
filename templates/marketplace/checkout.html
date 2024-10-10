@@ -135,8 +135,14 @@
 
                                                 <li id="cart-item-{{cart_item.item.id }}">
                                                 
-                                                    <div class="image-holder"> <img data-src="{{cart_item.item.fooditem.image.url}}"
-                                                            alt="Food Image" class="lazyload"  loading="lazy"></div>
+                                                    <div class="image-holder"> 
+                                                            {% if cart_item.item.fooditem.image %}
+                                                            <img data-src="{{cart_item.item.fooditem.image.url}}"
+                                                            alt="Food Image" class="lazyload"  loading="lazy">
+                                                            {% else %}
+                                                            <img src="{% static 'images/bg3.png' %}" alt="Default Image" />
+                                                            {% endif %}
+                                                        </div>
                                                             <div class="text-holder">
                                                                 <h6>{{cart_item.item.fooditem}}</h6>
                                                                 <span>{{cart_item.item.fooditem.description}}</span>
@@ -188,9 +194,15 @@
                                                 </li>
                                                 <h5>SELECT PAYMENT METHOD</h5>
                                                 <div class="payment-method">
+
                                                     <label>
                                                         <input type="radio" name="payment_method" value="PayPal" >
                                                         <img data-src="{% static 'images/PayPal.png' %}" alt="PayPal" class="lazyload"  loading="lazy"
+                                                            width="100">
+                                                    </label>
+                                                    <label>
+                                                        <input type="radio" name="payment_method" value="Cashfree" >
+                                                        <img data-src="{% static 'images/Cashfree_P.png' %}" alt="Cashfree" class="lazyload"  loading="lazy"
                                                             width="100">
                                                     </label>
                                                     &nbsp;
@@ -273,6 +285,7 @@
             }}
     
         var payMethod = $("input[name= 'payment_method']:checked").val()
+        console.log(payMethod)
 
         if (!payMethod) {
             $('#payment-method-error').html("Select Payment Method!")

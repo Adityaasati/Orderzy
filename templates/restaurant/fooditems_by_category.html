@@ -36,7 +36,12 @@
                                     {% for food in fooditems %}
                                     <tr>
                                         <td class="text-left">{{forloop.counter}}</td>
-                                        <td class="text-left"><img data-src="{{food.image.url}}" alt="Food Image" width="40" class="lazyload" loading="lazy">
+                                        <td class="text-left">
+                                            {% if food.image %}
+                                                <img data-src="{{ food.image.url }}" alt="Food Image" width="40" class="lazyload" loading="lazy">
+                                            {% else %}
+                                                <img src="/path/to/default-image.jpg" alt="Default Image" width="40" class="lazyload" loading="lazy">
+                                            {% endif %}
                                         </td>
                                         <td class="text-left">
                                             <a href=""><p class="mb-0 font-weight-bold">{{food}}</p> <small

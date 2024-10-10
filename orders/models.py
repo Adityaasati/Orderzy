@@ -10,11 +10,10 @@ request_object = ''
 
 class Payment(models.Model):
     PAYMENT_METHOD = (
-        ('PayPal', 'PayPal'),
-        # ('RazorPay', 'RazorPay'), 
+        ('PayPal', 'Cashfree'),
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    transaction_id = models.CharField(max_length=100)
+    transaction_id = models.CharField(max_length=100, unique=True)
     payment_method = models.CharField(choices=PAYMENT_METHOD, max_length=100)
     amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.00'))])
     status = models.CharField(max_length=100)
@@ -51,6 +50,7 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     pre_order_time = models.FloatField(default=0) 
     num_of_people = models.IntegerField(null=True, blank=True) 
+    transaction_id = models.CharField(max_length=255, blank=True, null=True)
     
 
 

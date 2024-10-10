@@ -1,7 +1,7 @@
 from django.db import models
 from accounts.models import User, UserProfile
 from accounts.utils import send_notification
-from datetime import time, date, datetime
+from datetime import  date, datetime
 from django.db import models
 from django.contrib.gis.db import models as gismodels
 from django.contrib.gis.geos import Point
@@ -43,33 +43,37 @@ class Restaurant(models.Model):
     
     def __str__(self):
         return self.restaurant_name
-    
+
 
     def is_open(self):
-        today = date.today().isoweekday()  
-    
+        today = date.today().isoweekday()
+
         current_opening_hours = OpeningHour.objects.filter(restaurant=self, day=today)
-    
-        now = datetime.now().time()  
+
+        now = datetime.now().time()
         for opening_hour in current_opening_hours:
             if not opening_hour.is_closed:
-                start = datetime.strptime(opening_hour.from_hour, "%I:%M %p").time()
-                end = datetime.strptime(opening_hour.to_hour, "%I:%M %p").time()
-            
-                if start <= now <= end:
-                    return True 
-        return False  
-    
+                start = opening_hour.from_hour
+                end = opening_hour.to_hour
+
+                if start < end:
+                    if start <= now <= end:
+                        return True
+                else:
+                    if now >= start or now <= end:
+                        return True
+
+        return False
+
+
     
     
     def save(self, *args, **kwargs):
-        if not self.pk:  # If the restaurant is being created
+        if not self.pk: 
             self.restaurant_slug = slugify(self.restaurant_name) + '-' + str(self.user.id)
         
-        # Get the current site domain
         current_site = Site.objects.get_current()
         
-        # Create the menu_url dynamically based on the site's domain
         self.menu_url = f"{current_site.domain}/marketplace/{self.restaurant_slug}/"
         
         if self.pk is not None:
@@ -110,14 +114,12 @@ DAYS = [
     (7,("Sunday")),
 
 ]
-HOURS_OF_DAY_24 =  [(time(h,m).strftime('%I:%M %p'),time(h,m).strftime('%I:%M %p')) for h in range(0,24) for m in (0,30)]
-
 
 class OpeningHour(models.Model):
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     day=models.IntegerField(choices=DAYS)
-    from_hour = models.CharField(choices=HOURS_OF_DAY_24, max_length=10, blank=True)
-    to_hour = models.CharField(choices=HOURS_OF_DAY_24, max_length=10, blank=True)
+    from_hour = models.TimeField(blank=True, null=True)
+    to_hour = models.TimeField(blank=True, null=True)
     is_closed = models.BooleanField(default=False)
     
     class Meta:

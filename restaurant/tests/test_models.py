@@ -66,11 +66,14 @@ class RestaurantModelTest(TestCase):
         self.assertEqual(self.restaurant.food_hub, self.food_hub)
         self.assertFalse(self.restaurant.is_approved)
 
+
     def test_restaurant_slug_creation(self):
         """Test if the slug is created properly when the Restaurant is saved"""
+        print(self.restaurant.menu_url, "self.restaurant.menu_url")  # Print the actual menu_url of the restaurant
         self.restaurant.save()
         expected_slug = f"test-restaurant-{self.user.id}"
         self.assertEqual(self.restaurant.restaurant_slug, expected_slug)
+
 
     @patch('restaurant.models.send_notification')
     def test_restaurant_approval_notification(self, mock_send_notification):

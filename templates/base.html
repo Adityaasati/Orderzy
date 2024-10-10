@@ -71,8 +71,18 @@
 	<script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency=USD"></script>
+	<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+	<script>
+    let cashfree;  // Declare cashfree globally
+    document.addEventListener('DOMContentLoaded', function () {
+        cashfree = Cashfree({
+            mode: "sandbox"  // Change to "production" when going live
+        });
+    });
+	</script>
+
 	
-	
+
 	<script src="{% static 'js/modernizr.js' %}"></script>
 	<script src="{% static 'js/custom.js' %}"></script>
 	<script src="{% static 'js/bootstrap.js' %}"></script>
@@ -129,7 +139,6 @@
 </head>
 
 <body>
-	<meta name="twitter:image" content="{{ request.build_absolute_uri }}{% static 'images/orderzy_twitter.png' %}">
 
 	{% include 'includes/navbar.html' %}
 

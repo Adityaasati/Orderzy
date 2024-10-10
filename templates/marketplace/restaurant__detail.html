@@ -93,8 +93,12 @@
 
                                     <div class="col mb-5">
                                         <div class="card h-100 border border-dark rounded">
-                                            <img class="lazyload card-img-top" data-src="{{food.image.url}}"
-                                                alt="Food Image"  loading="lazy" />
+                                                {% if food.image %}
+                                                    <img class="lazyload card-img-top" data-src="{{ food.image.url }}" alt="Food Image" loading="lazy" >
+                                                    {% else %}
+                                                     <img class="card-img-top" src="/path/to/default-image.jpg" alt="Default Image" loading="lazy" > 
+                                                    {% endif %}
+
                                             <div class="card-body p-4">
                                                 <div class="text-center">
                                                     <h5 class="fw-bolder">{{food}}</h5>

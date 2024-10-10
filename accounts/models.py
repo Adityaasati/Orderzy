@@ -46,6 +46,7 @@ class UserManager(BaseUserManager):
         user.is_active = True
         user.is_staff = True
         user.is_superadmin = True
+        user.is_superuser = True
         user.save(using=self._db)
         return user
 
@@ -79,6 +80,7 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_superadmin = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False) 
 
  
     USERNAME_FIELD = 'username' 
@@ -90,7 +92,6 @@ class User(AbstractBaseUser):
         return self.username
     
     def save(self, *args, **kwargs):
-        # Validate if username is an email or phone number
         if '@' in self.username:
             self.email = self.username
             self.phone_number = None
@@ -112,6 +113,8 @@ class User(AbstractBaseUser):
         elif self.role == 2:
             user_role = 'Customer'
         return user_role
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}".strip()
     
 
 
@@ -147,7 +150,7 @@ class UserProfile(models.Model):
 
 
 class ContactMessage(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # link to the user
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=100)
     message = models.TextField()
     sent_at = models.DateTimeField(auto_now_add=True)

@@ -1,6 +1,6 @@
 import datetime
 import simplejson as json
-
+from decimal import Decimal
 
 def generate_order_number(pk):
     current_datetime = datetime.datetime.now().strftime('%Y%m%d%H%M')
@@ -32,3 +32,11 @@ def order_total_by_restaurant(order, restaurant_id):
         'grand_total':grand_total,
         }    
     return context
+
+
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super(DecimalEncoder, self).default(obj)

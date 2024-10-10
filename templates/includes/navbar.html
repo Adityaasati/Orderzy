@@ -1,41 +1,10 @@
-
-{% load static %}
-
-
-
-<style>
-    .navbar-toggler {
-        z-index: 1;
-    }
-
-
-.main-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000; 
-    background-color: white; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.wrapper {
-    padding-top: 70px; 
-}
-
-@media (max-width: 767px) {
-    .wrapper {
-        padding-top: 90px; 
-    }
-}
-
-</style>
-
+ {% load static %}
 <div class="wrapper">
     <header id="header">
         <div class="main-header">
             <div class="container-fluid">
                 <div class="row align-items-center">
+                    <!-- Logo Section -->
                     <div class="col-lg-6 col-md-8 col-sm-12 col-xs-12 text-center text-md-start">
                         <div class="header-content d-flex flex-column flex-md-row align-items-center justify-content-between">
                             <div class="logo">
@@ -47,7 +16,8 @@
                                     </a>
                                 </figure>
                             </div>
-                          
+
+                            <!-- Location Input -->
                             <div class="main-location mt-2 mt-md-0 w-100 w-md-auto">
                                 <ul class="list-unstyled">
                                     <li class="location-has-children choose-location">
@@ -61,19 +31,17 @@
                                     </li>
                                 </ul>
                             </div>
-                          
                         </div>
                     </div>
+
                     <div class="col-lg-6 col-md-4 col-sm-12 col-xs-12 mt-3 mt-md-0 text-center text-md-end">
-                         <nav class="navbar navbar-expand-md">
-                            <div class="container-fluid">
-                              
-                               
+                        <nav class="navbar navbar-expand-md">
+                            <div class="container-fluid d-flex align-items-center justify-content-end">
                                 {% if user.is_authenticated %}
                                 <a href="{% url 'cart' %}" class="me-3 mb-2 mb-md-0" style="text-decoration: none;">
                                 <i class="fas fa-cart-shopping" style="font-size: 20px;"></i>
                                 <span class="badge" id="cart_counter" style="border-radius: 50px; position: relative; bottom: 10px; left: -5px; background-color: #ffc107; color: black;">
-                                {{ cart_count }}
+                                    {{ cart_count|default:"0" }}
                                 </span>
                                 </a>
                                 {% endif %}
@@ -81,12 +49,10 @@
                                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenuContent" aria-controls="navbarMenuContent" aria-expanded="false" aria-label="Toggle navigation">
                                     <span class="navbar-toggler-icon"></span>
                                 </button>
-                                
-                              
+
                                 <div class="collapse navbar-collapse" id="navbarMenuContent">
                                     <div class="login-option d-lg-block d-md-block d-sm-flex d-xs-flex flex-wrap justify-content-center justify-content-md-end align-items-center">
-                                        <a id="marketplace-link" href="javascript:void(0);" class="btn btn-outline-primary text-uppercase font-weight-bold me-2 mb-2 mb-md-0">MarketPlace</a>
-                                
+                                        <a id="marketplace-link" href="javascript:void(0);" class="btn btn-outline-primary text-uppercase font-weight-bold me-2 mb-2 mb-md-0">MarketPlace</a>                  
                                         {% if user.is_authenticated %}
                                         <a class="cs-color cs-popup-joinus-btn login-popup me-2 mb-2 mb-md-0" href="{% url 'myAccount' %}">My Account</a>
                                         <a class="cs-color cs-popup-joinus-btn login-popup text-danger mb-2 mb-md-0" href="{% url 'logout' %}">Logout</a>
@@ -97,53 +63,63 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                                
                             </div>
-                        </nav> 
-                   
-                        
-
+                        </nav>
                     </div>
                 </div>
             </div>
         </div>
     </header>
-    
+
     <script>
-        document.querySelector('.navbar-toggler').addEventListener('click', function() {
-            console.log('Hamburger clicked');
-        });
-        
         var x = document.getElementById("location");
         var current_location = sessionStorage.getItem("current_location");
         var current_lat_lng = sessionStorage.getItem("current_lat_lng");
         var searched_location = "{{ request.GET.address|default:'' }}";
-        
+
         window.onload = function() {
-            if (searched_location) {
-                x.value = searched_location;
-                sessionStorage.setItem("current_location", searched_location);
-            } else if (current_location && current_lat_lng) {
-                x.value = current_location;
-            } else {
-                getLocation();
+            if (!document.getElementById("order-complete-page")) {
+                if (searched_location) {
+                    x.value = searched_location;
+                    sessionStorage.setItem("current_location", searched_location);
+                } else if (current_location && current_lat_lng) {
+                    x.value = current_location;
+                } else {
+                    getLocation();
+                }
             }
         };
-        
+
         function getLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
+                navigator.geolocation.getCurrentPosition(showPosition,showError);
             } else { 
                 console.log("Geolocation is not supported by this browser.");
             }
         }
-        
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+
         function showPosition(position) {
             var lat = position.coords.latitude;
             var lng = position.coords.longitude;
             var GOOGLE_API_KEY = "{{ GOOGLE_API_KEY }}";
             var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + encodeURIComponent(lat) + "," + encodeURIComponent(lng) + "&key=" + encodeURIComponent(GOOGLE_API_KEY);
-        
+
             $.ajax({
                 url: url,
                 type: "GET",
@@ -151,10 +127,9 @@
                     if (response.results.length > 0) {
                         var current_location = response.results[0].formatted_address;
                         x.value = current_location;
-        
                         sessionStorage.setItem("current_location", current_location);
                         sessionStorage.setItem("current_lat_lng", JSON.stringify({ lat: lat, lng: lng }));
-                        
+
                         window.location = '?lat=' + lat + '&lng=' + lng + '&location=' + encodeURIComponent(current_location);
                     } else {
                         console.log("No location found for the coordinates.");
@@ -165,17 +140,18 @@
                 }
             });
         }
-        
+
+        // Function to handle marketplace link click
         function handleMarketplaceLinkClick() {
             var stored_lat_lng = sessionStorage.getItem("current_lat_lng");
-        
+
             if (stored_lat_lng) {
                 try {
                     var searchUrl = '{% url "search" %}';
                     var latLngData = JSON.parse(stored_lat_lng);
                     var lat = latLngData.lat;
                     var lng = latLngData.lng;
-        
+
                     window.location.href = searchUrl + '?lat=' + lat + '&lng=' + lng;
                 } catch (e) {
                     console.error("Error parsing stored coordinates:", e);
@@ -184,10 +160,7 @@
                 getLocation();
             }
         }
-        
-        document.getElementById("marketplace-link").addEventListener("click", handleMarketplaceLinkClick);
-        </script>
-        
-    
-    
 
+        document.getElementById("marketplace-link").addEventListener("click", handleMarketplaceLinkClick);
+    </script>
+</div>

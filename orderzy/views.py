@@ -76,19 +76,20 @@ def contact_us(request):
             name = form.cleaned_data['name']
             message = form.cleaned_data['message']
 
+            user = request.user if request.user.is_authenticated else None
+
             ContactMessage.objects.create(
-                user=request.user,
+                user=user,
                 name=name,
                 message=message
             )
-            messages.success(request, 'Thank you for reaching out! Your message has been sent successfully.')
-            return render(request,'includes/contact_us.html', {'form_submitted': True})
 
+            messages.success(request, 'Thank you for reaching out! Your message has been sent successfully.')
+            return render(request, 'includes/contact_us.html', {'form_submitted': True})
     else:
         form = ContactForm()
 
-    return render(request,'includes/contact_us.html', {'form': form, 'form_submitted': False})
-
+    return render(request, 'includes/contact_us.html', {'form': form, 'form_submitted': False})
 
 
 def privacy_policy(request):

@@ -46,7 +46,6 @@ def registerUser(request):
         return redirect('custDashboard')
     elif request.method == 'POST':
         form = UserForm(request.POST)
-        print(f"Form data: {request.POST}")
         if form.is_valid():  
             print("Form is valid")
             first_name = form.cleaned_data['first_name']
@@ -98,8 +97,7 @@ def registerRestaurant(request):
                 username=form.cleaned_data['username'], 
                 email=email, phone_number=phone_number, password=password)
             user.role = User.RESTAURANT
-            user.save()
-            user.is_active = False
+            # user.is_active = True
             user.save()
             restaurant = r_form.save(commit=False)
             restaurant.user = user
@@ -140,33 +138,79 @@ def registerRestaurant(request):
     }
     return render(request, 'accounts/registerRestaurant.html', context)
 
+# def login(request):
+#     if request.user.is_authenticated:
+#         messages.warning(request, "You are already logged in")
+#         return redirect('myAccount')
+#     if request.method == 'POST':
+#         form = LoginForm(request.POST)
+#         if form.is_valid():
+#             username = form.cleaned_data['identifier'].lower()
+#             password = form.cleaned_data['password']
+#             user = auth.authenticate(request, username=username, password=password)
+#             if user is not None :
+#                 if user.is_active:
+#                     auth.login(request, user)
+#                     messages.success(request, 'You are logged in')
+#                     return redirect('marketplace')
+                
+#                 else:
+#                     messages.error(request, 'Kindly wait until you receive approval before proceeding.')
+#             else:
+#                 messages.error(request, 'Invalid credentials')
+            
+#         else: 
+            
+#             print(form.errors) 
+#     else:
+        
+#         form = LoginForm()
+#     return render(request, 'accounts/login.html', {'form': form})
+
 def login(request):
     if request.user.is_authenticated:
         messages.warning(request, "You are already logged in")
         return redirect('myAccount')
+    
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['identifier']
+            username = form.cleaned_data['identifier'].lower()
             password = form.cleaned_data['password']
             user = auth.authenticate(request, username=username, password=password)
-            if user is not None :
+            
+            if user is not None:
                 if user.is_active:
+                    if user.role == user.RESTAURANT:
+                        try:
+                            restaurant = Restaurant.objects.get(user=user)
+                            if not restaurant.is_approved:
+                                messages.error(request, 'Your restaurant account is not approved yet.')
+                                return redirect('login')
+                        except Restaurant.DoesNotExist:
+                            messages.error(request, 'Restaurant details not found.')
+                            return redirect('login')
+                    
+                   
+                    elif user.role == user.CUSTOMER:
+                        # Log them in without checking for approval
+                        auth.login(request, user)
+                        messages.success(request, 'You are logged in as a customer')
+                        return redirect('marketplace')
+
                     auth.login(request, user)
                     messages.success(request, 'You are logged in')
                     return redirect('marketplace')
-                
+
                 else:
-                    messages.error(request, 'Kindly wait until you receive approval before proceeding.')
+                    messages.error(request, 'Your account is not active. Please activate it using the link sent to your email.')
             else:
                 messages.error(request, 'Invalid credentials')
-            
-        else: 
-            
-            print(form.errors) 
+        else:
+            print(form.errors)
     else:
-        
         form = LoginForm()
+    
     return render(request, 'accounts/login.html', {'form': form})
 
 

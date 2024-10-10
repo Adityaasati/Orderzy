@@ -222,7 +222,7 @@ $(document).ready(function () {
     }
   }
 
-  // ADD OPENING HOUR
+
   $(".add_hour").on("click", function (e) {
     e.preventDefault();
     var day = document.getElementById("id_day").value;
@@ -231,18 +231,12 @@ $(document).ready(function () {
     var is_closed = document.getElementById("id_is_closed").checked;
     var csrf_token = $("input[name=csrfmiddlewaretoken]").val();
     var url = document.getElementById("add_hour_url").value;
-
-    console.log(day, from_hour, to_hour, is_closed, csrf_token);
-
-    if (is_closed) {
-      is_closed = "True";
-      condition = "day != ''";
-    } else {
-      is_closed = "False";
-      condition = "day != '' && from_hour != '' && to_hour != ''";
-    }
-
-    if (eval(condition)) {
+  
+    console.log("day", day, from_hour, to_hour, is_closed, csrf_token, url);
+  
+    var is_closed_value = is_closed ? "True" : "False";
+  
+    if (is_closed && day !== "" || (!is_closed && day !== "" && from_hour !== "" && to_hour !== "")) {
       $.ajax({
         type: "POST",
         url: url,
@@ -250,37 +244,29 @@ $(document).ready(function () {
           day: day,
           from_hour: from_hour,
           to_hour: to_hour,
-          is_closed: is_closed,
+          is_closed: is_closed_value,
           csrfmiddlewaretoken: csrf_token,
         },
         success: function (response) {
           if (response.status == "success") {
+            var html = '';
             if (response.is_closed == "Closed") {
-              html =
-                '<tr id="hour-' +
-                response.id +
-                '"><td><b>' +
-                response.day +
-                '</b></td><td>Closed</td><td><a href="#" class="remove_hour" data-url="/restaurant/opening-hours/remove/' +
-                response.id +
-                '/">Remove</a></td></tr>';
+              html = `
+                <tr id="hour-${response.id}">
+                  <td><b>${response.day}</b></td>
+                  <td>Closed</td>
+                  <td><a href="#" class="remove_hour" data-url="/restaurant/opening-hours/remove/${response.id}/">Remove</a></td>
+                </tr>`;
             } else {
-              html =
-                '<tr id="hour-' +
-                response.id +
-                '"><td><b>' +
-                response.day +
-                "</b></td><td>" +
-                response.from_hour +
-                " - " +
-                response.to_hour +
-                '</td><td><a href="#" class="remove_hour" data-url="/restaurant/opening-hours/remove/' +
-                response.id +
-                '/">Remove</a></td></tr>';
+              html = `
+                <tr id="hour-${response.id}">
+                  <td><b>${response.day}</b></td>
+                  <td>${response.from_hour} - ${response.to_hour}</td>
+                  <td><a href="#" class="remove_hour" data-url="/restaurant/opening-hours/remove/${response.id}/">Remove</a></td>
+                </tr>`;
             }
-
             $(".opening_hours").append(html);
-            document.getElementById("opening_hours").reset();
+            document.getElementById("add_opening_hour_form").reset();
           } else {
             swal(response.message, "", "error");
           }
@@ -290,12 +276,12 @@ $(document).ready(function () {
       swal("Please fill all fields", "", "info");
     }
   });
-
+  
   // REMOVE OPENING HOUR
   $(document).on("click", ".remove_hour", function (e) {
     e.preventDefault();
-    url = $(this).attr("data-url");
-
+    var url = $(this).attr("data-url");
+  
     $.ajax({
       type: "GET",
       url: url,
@@ -306,6 +292,7 @@ $(document).ready(function () {
       },
     });
   });
+  
 
 
 });

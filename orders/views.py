@@ -1,18 +1,62 @@
-from django.shortcuts import render, redirect, HttpResponse
-from django.http import  JsonResponse
-from marketplace.models import Cart
-from marketplace.context_processors import get_cart_amounts
-from .forms import OrderForm
+# Standard Library Imports
+import json
+import uuid
+
+# Third-Party Imports
+import requests
 import simplejson as json
-from .utils import generate_order_number,order_total_by_restaurant
-from .models import Payment,OrderedFood,Order, PendingOrders
-from accounts.utils import send_notification
-from django.contrib.auth.decorators import login_required
-from menu.models import FoodItem
-from marketplace.models import Service_Charge
-from django.contrib.sites.shortcuts import get_current_site
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.sites.shortcuts import get_current_site
+from django.conf import settings
 from django.db import transaction
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, redirect
+from django.urls import reverse
+
+# Local Application Imports
+from accounts.models import User
+from accounts.utils import send_notification
+from cashfree_pg.api_client import Cashfree
+from cashfree_pg.models.create_order_request import CreateOrderRequest
+from cashfree_pg.models.customer_details import CustomerDetails
+from cashfree_pg.models.order_meta import OrderMeta
+from .forms import OrderForm
+from .models import Payment, OrderedFood, Order, PendingOrders
+from .utils import DecimalEncoder, generate_order_number, order_total_by_restaurant
+from marketplace.context_processors import get_cart_amounts
+from marketplace.models import Cart, Service_Charge
+from menu.models import FoodItem
+import base64
+import hashlib
+import hmac
+from django.contrib.auth import login
+import threading
+import logging
+from hmac import compare_digest
+from django.db import transaction
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.core import signing
+from django.utils.http import urlencode
+
+logging.basicConfig(level=logging.INFO)  
+
+
+
+logger = logging.getLogger(__name__)
+
+
+Cashfree.XClientId = settings.CASHFREE_X_CLIENT_ID
+Cashfree.XClientSecret = settings.CASHFREE_X_CLIENT_SECRET
+x_api_version = settings.X_API_VERSION
+if settings.CASHFREE_X_ENVIRONMENT.upper() == 'SANDBOX':
+    Cashfree.XEnvironment = Cashfree.SANDBOX
+elif settings.CASHFREE_X_ENVIRONMENT.upper() == 'PRODUCTION':
+    Cashfree.XEnvironment = Cashfree.PRODUCTION
+else:
+    raise ValueError("Invalid value for CASHFREE_X_ENVIRONMENT in settings")
 
 
 
@@ -20,6 +64,9 @@ from django.db import transaction
 def place_order(request):
     cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
     cart_count = cart_items.count()
+    print("request.user.id",request.user.id)
+    print(request.user,"user")
+    
     if cart_count <=0:
         return redirect('marketplace')
     
@@ -69,8 +116,13 @@ def place_order(request):
             order.email = form.cleaned_data['email']
             order.user = request.user
             order.total = grand_total
-            order.service_charge_data = json.dumps(service_charge_data)
-            order.total_data = json.dumps(total_data)
+            try:
+                order.service_charge_data = json.dumps(service_charge_data, cls=DecimalEncoder)
+                order.total_data = json.dumps(total_data, cls=DecimalEncoder)
+            except TypeError as e:
+                print(f"Error serializing data: {e}")
+                return JsonResponse({'error': 'Unable to serialize data.'}, status=500)
+            
             order.total_charge = total_charge
             order.payment_method = request.POST['payment_method']
             print("order.payment_method ",order.payment_method )
@@ -122,6 +174,7 @@ def place_order(request):
                     away_restaurant_order = (current_restaurant_order - preparing_restaurant_order) + 1
                 
                     context = {
+                        'user':order.user,
                         'order':order,
                         'cart_items_with_totals':cart_items_with_totals,
                         'restaurant_ids':restaurant_ids,
@@ -131,11 +184,13 @@ def place_order(request):
                             }
                 else:
                     context = {
+                    'user':order.user,
                     'order':order,
                     'cart_items_with_totals':cart_items_with_totals,
                     'restaurant_ids':restaurant_ids,}
             else:
                 context = {
+                    'user':order.user,
                     'order':order,
                     'cart_items_with_totals':cart_items_with_totals,
                     'restaurant_ids':restaurant_ids,}
@@ -152,183 +207,184 @@ def place_order(request):
     return render(request, 'orders/place_order.html')
 
 
-@login_required(login_url='login')
-def payments(request):
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest' and request.method == 'POST':
-        order_number = request.POST.get('order_number')
-        transaction_id = request.POST.get('transaction_id')
-        payment_method = request.POST.get('payment_method')
-        status = request.POST.get('status')
-
-        try:
-            order = Order.objects.get(user=request.user, order_number=order_number)
-            
-            service_charge_data = order.service_charge_data
-            if isinstance(service_charge_data, bytes):
-                service_charge_data = service_charge_data.decode('utf-8')
-
-            service_charge_data = json.loads(service_charge_data)
-
-        except Order.DoesNotExist:
-            return JsonResponse({'error': 'Order does not exist'}, status=400)
-
-        payment = Payment(
-            user=request.user,
-            transaction_id=transaction_id,
-            payment_method=payment_method,
-            amount=order.total,
-            status=status
-        )
-        payment.save()
-
-        print("order.payment",order.payment)
-        order.payment = payment
-        order.is_ordered = True
-        order.save()
-
-        # Add ordered food items
-        cart_items = Cart.objects.filter(user=request.user)
-        for item in cart_items:
-            ordered_food = OrderedFood(
-                order=order,
-                payment=payment,
-                user=request.user,
-                fooditem=item.fooditem,
-                quantity=item.quantity,
-                price=item.fooditem.price,
-                amount=item.fooditem.price * item.quantity
-            )
-            ordered_food.save()
-
-        # # Send order confirmation email to the customer
-        mail_subject = 'Thank you for Ordering with us!'
-        mail_template = 'orders/order_confirmation_email.html'
-
-        ordered_food = OrderedFood.objects.filter(order=order)
-        customer_subtotal = sum(item.price * item.quantity for item in ordered_food)
-
-        context = {
-            'user': request.user,
-            'order': order,
-            'to_email': order.email,
-            'ordered_food': ordered_food,
-            'domain': get_current_site(request),
-            'customer_subtotal': customer_subtotal,
-            'service_charge_data': service_charge_data,
-        }
-        send_notification(mail_subject, mail_template, context)
-
-        # Notify the restaurants about the new order
-        mail_subject = "You have received a new order!"
-        mail_template = "orders/new_order_received.html"
-        to_emails = []
-
-        for i in cart_items:
-            if i.fooditem.restaurant.user.email not in to_emails:
-                to_emails.append(i.fooditem.restaurant.user.email)
-
-                ordered_food_to_restaurant = OrderedFood.objects.filter(
-                    order=order,
-                    fooditem__restaurant=i.fooditem.restaurant
-                )
-
-                restaurant_context = {
-                    'order': order,
-                    'to_email': i.fooditem.restaurant.user.email,
-                    'ordered_food_to_restaurant': ordered_food_to_restaurant,
-                    'restaurant_subtotal': order_total_by_restaurant(order, i.fooditem.restaurant.id)['subtotal'],
-                    'service_charge_data': order_total_by_restaurant(order, i.fooditem.restaurant.id)['service_charge_dict'],
-                    'restaurant_grand_total': order_total_by_restaurant(order, i.fooditem.restaurant.id)['grand_total'],
-                }
-
-                send_notification(mail_subject, mail_template, restaurant_context)
-
-        # Return success response
-        response = {
-            'order_number': order_number,
-            'transaction_id': transaction_id,
-        }
-
-        return JsonResponse(response)
-
-    return HttpResponse('Payments view')
 
 
-
-def fetch_order(order_number, transaction_id):
+def fetch_order(order_number, transaction_id=None):
     """
-    Fetches the Order based on order_number and transaction_id.
+    Fetches the Order based on order_number.
+    
     """
-    if transaction_id == 'RESTAURANTORDER':
-        return Order.objects.select_related('user').prefetch_related('orderedfood_set__fooditem__restaurant').get(order_number=order_number, is_ordered=True)
-    else:
-        return Order.objects.select_related('user').prefetch_related('orderedfood_set__fooditem__restaurant').get(
-            order_number=order_number,
-            payment__transaction_id=transaction_id,
-            is_ordered=True
-        )
+    return Order.objects.select_related('user').prefetch_related('orderedfood_set__fooditem__restaurant').get(
+        order_number=order_number,
+        is_ordered=True
+    )
+
 
 
 def create_pending_order(order, restaurant):
     """
     Creates a PendingOrders instance for a given order and restaurant.
     """
+    logging.info("Entered create_pending_order for order: %s, restaurant: %s", order.order_number, restaurant.restaurant_name)
     
     current_ordered_food_details = []
-    ordered_food = OrderedFood.objects.filter(
-        fooditem__restaurant=restaurant,
-        order=order
-    ).select_related('fooditem__restaurant')
+    try:
+        ordered_food = OrderedFood.objects.filter(
+            fooditem__restaurant=restaurant,
+            order=order
+        ).select_related('fooditem__restaurant')
+        logging.info("Fetched ordered_food for restaurant: %s, count: %d", restaurant.restaurant_name, ordered_food.count())
 
-    if not ordered_food.exists():
-        return 0, []
+        if not ordered_food.exists():
+            logging.warning("No ordered food items found for order: %s, restaurant: %s", order.order_number, restaurant.restaurant_name)
+            return 0, []
 
-    subtotal = sum(item.price * item.quantity for item in ordered_food)
+        subtotal = sum(item.price * item.quantity for item in ordered_food)
+        logging.info("Subtotal calculated for restaurant: %s is %s", restaurant.restaurant_name, subtotal)
 
-   
-    current_ordered_food_details.extend([
+        current_ordered_food_details.extend([
             {
                 'fooditem': item.fooditem.food_title,
                 'quantity': item.quantity,
                 'price': item.price,
                 'item_sum_price': item.price * item.quantity,
-                'image_url': item.fooditem.image.url,
+                'image_url': item.fooditem.image.url if item.fooditem.image else '/static/default_image.png',
                 'restaurant_slug': item.fooditem.restaurant.restaurant_slug,
                 'restaurant_name': item.fooditem.restaurant.restaurant_name,
             } for item in ordered_food
         ])
+        logging.info("current_ordered_food_details created for order: %s, count: %d", order.order_number, len(current_ordered_food_details))
+
+        order_type = "Preorder" if order.pre_order_time > 0 else "Immediate"
+
+        pending_order = PendingOrders(
+            po_order_number=order.order_number,
+            po_is_ordered=order.is_ordered,
+            po_created_at=order.created_at,
+            po_pre_order_time=order.pre_order_time,
+            po_ordered_food_details=current_ordered_food_details, 
+            po_name=order.name,
+            po_total=subtotal,
+            po_status=order.status,
+            po_order_type=order_type,
+            po_total_data=order.total_data,
+            po_restaurant_id=restaurant.id,
+            po_num_of_people=order.num_of_people,
+            original_order=order  # Link to the original order
+        )
+        pending_order.save()
+        logging.info("Pending order saved successfully for order number: %s, restaurant: %s", order.order_number, restaurant.restaurant_name)
+
+        pending_order.po_restaurants.add(restaurant)
+        logging.info("Restaurant added to pending order's po_restaurants for order number: %s", order.order_number)
+
+        return subtotal, current_ordered_food_details
+
+    except Exception as e:
+        logging.error("Error in create_pending_order for order number: %s, restaurant: %s. Error: %s", order.order_number, restaurant.restaurant_name, str(e))
+        return 0, []
+
+   
+
+@csrf_exempt
+def create_order_api(request):
+    print(f"Received request with method in create order: {request.method}")
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            customer_id = data['customer_details']['customer_id']
+            customer_phone = data['customer_details']['customer_phone']
+            order_id = data['order_id']
+            order_amount = float(data['order_amount'])
+            customer_details = CustomerDetails(customer_id=customer_id,
+                                               customer_phone=customer_phone)
+            
+            auth_token = generate_auth_token(request.user)
+            
+            if settings.DEBUG:
+                BASE_URL = 'https://2c47-2402-e280-21c6-748-68d9-5295-106c-fa95.ngrok-free.app'
+            else:
+                BASE_URL = 'https://orderzy.in'
+
+            return_url = reverse('order_complete')
+            query_params = urlencode({'order_no': order_id, 'trans_id': 'CASHFREE', 'auth_token': auth_token})
+            return_url = f"{BASE_URL}{return_url}?{query_params}"
+
+            notify_url = reverse('payment_webhook')
+            notify_url = f"{BASE_URL}{notify_url}"
+            
+            order_meta = OrderMeta(return_url=return_url,notify_url=notify_url)
+     
+
+            create_order_request = CreateOrderRequest(
+            order_id=order_id,  
+            order_amount=order_amount,
+            order_currency="INR",
+            customer_details=customer_details,
+            order_meta=order_meta)
+
+            response = Cashfree().PGCreateOrder(x_api_version,
+                                                create_order_request, None, None)
+            
+            order_entity = response.data
+            
+            if order_entity.order_status == 'ACTIVE':
+                return JsonResponse({'payment_session_id': order_entity.payment_session_id}, status = 200)
+            else:
+                return JsonResponse({'error': 'Order creation failed.'})
+        except Exception as e:
+            return JsonResponse({'error':str(e)}, status=500)
+    return JsonResponse({'error':'Invalid request method'},status=405)
+
+
+def process_order_in_background(order, restaurants_pendings):
+    logging.info("Started processing order in the background for order number: %s", order.order_number)
+
+    """Process order items in the background to avoid delaying user response."""
+    print("Entered in process_order_in_background")
+    ordered_food_details = []
+    grand_total = 0
+    try:
+        with transaction.atomic():
+            for restaurant in restaurants_pendings:
+                subtotal, current_ordered_food_details = create_pending_order(order, restaurant)
+                logging.info("Processed restaurant: %s for order number: %s", restaurant.restaurant_name, order.order_number)
+                
+                ordered_food_details.extend(current_ordered_food_details)
+                grand_total += subtotal
+
+        order.is_ordered = True
+        order.save()
+        logging.info("Order number %s successfully processed", order.order_number)
+        
+    except Exception as e:
+        logging.error("Error while processing order number %s: %s", order.order_number, str(e))
+        
     
-    
-    order_type = "Preorder" if order.pre_order_time > 0 else "Immediate"
-
-    pending_order = PendingOrders(
-        po_order_number=order.order_number,
-        po_is_ordered=order.is_ordered,
-        po_created_at=order.created_at,
-        po_pre_order_time=order.pre_order_time,
-        po_ordered_food_details=current_ordered_food_details, 
-        po_name=order.name,
-        po_total=subtotal,
-        po_status=order.status,
-        po_order_type=order_type,
-        po_total_data=order.total_data,
-        po_restaurant_id=restaurant.id,
-        po_num_of_people=order.num_of_people,
-        original_order=order  # Link to the original order
-    )
-    pending_order.save()
-    pending_order.po_restaurants.add(restaurant)
-
-    return subtotal, current_ordered_food_details
 
 
-@login_required(login_url='login')
 def order_complete(request):
-    order_number = request.GET.get('order_no')
-    transaction_id = request.GET.get('trans_id')
+    order_number = request.GET.get('order_no') or request.POST.get('order_no')
+    transaction_id = request.GET.get('trans_id') or request.POST.get('trans_id')
+    auth_token = request.GET.get('auth_token') or request.POST.get('auth_token')
+    
 
-    if not order_number or not transaction_id:
-        messages.error(request, "Invalid order information.")
+    if not request.user.is_authenticated:
+        if auth_token:
+            user = verify_auth_token(auth_token)
+            if user:
+                user.backend = 'accounts.auth_backends.EmailOrPhoneAuthBackend'
+                login(request, user)
+            else:
+                messages.error(request, "Invalid authentication token.")
+                return redirect('home')
+        else:
+            messages.error(request, "You must be logged in to complete the order.")
+            return redirect('login')
+
+    # Order validation
+    if not order_number:
+        messages.error(request, "Invalid order number.")
         return redirect('home')
 
     try:
@@ -337,44 +393,241 @@ def order_complete(request):
         messages.error(request, "Order does not exist.")
         return redirect('home')
 
-    if order.user != request.user:
-        messages.error(request, "You do not have permission to access this order.")
-        return redirect('home')
+    # Render the order details page if the order is already processed
+    if order.is_ordered:
+        ordered_food = OrderedFood.objects.filter(order=order)
+        subtotal = 0
+        ordered_food_details = []
 
-    if not order.restaurants.exists():
-        messages.error(request, "No restaurants found for this order.")
-        return redirect('home')
+        for item in ordered_food:
+            item_sum_price = item.price * item.quantity
+            subtotal += item_sum_price
+            image_url = item.fooditem.image.url if item.fooditem.image else '/static/default_image.png'
+
+            ordered_food_details.append({
+                'fooditem': item.fooditem.food_title,
+                'quantity': item.quantity,
+                'price': item.price,
+                'item_sum_price': item_sum_price,
+                'image_url': image_url,
+                'restaurant_slug': item.fooditem.restaurant.restaurant_slug,
+                'restaurant_name': item.fooditem.restaurant.restaurant_name,
+            })
+
+        try:
+            service_charge_data = json.loads(order.service_charge_data)
+        except (json.JSONDecodeError, TypeError):
+            service_charge_data = {}
+
+        # Delete the cart items after rendering order details
+        Cart.objects.filter(user=order.user).delete()
+
+        context = {
+            'order': order,
+            'ordered_food_details': ordered_food_details,
+            'subtotal': subtotal,
+            'service_charge_data': service_charge_data,
+        }
+
+        # Trigger Pending Order Creation in a Background Thread if not already created
+        if not PendingOrders.objects.filter(po_order_number=order.order_number).exists():
+            # Start processing pending orders for the completed order
+            restaurants_pendings = order.restaurants.all()
+            logging.info("Starting background thread for pending order processing for order number: %s", order.order_number)
+            thread = threading.Thread(target=process_order_in_background, args=(order, restaurants_pendings))
+            thread.daemon = False
+            thread.start()
+            
+       
+            if restaurants_pendings.count() == 1 and transaction_id == 'RESTAURANTORDER':
+                restaurant = restaurants_pendings.first()
+                return redirect('restaurant_detail', restaurant_slug=restaurant.restaurant_slug)
+
+        
+        
+        return render(request, 'orders/order_complete.html', context)
+
+    # Process the order for the first time if it hasn't been processed
+    if transaction_id and not order.is_ordered:
+        # Only process if OrderedFood does not already exist
+        if not OrderedFood.objects.filter(order=order).exists():
+            restaurants_pendings = order.restaurants.all()
+            logging.info("Starting background thread for order number: %s", order.order_number)
+
+            # Start processing the order in the background
+            thread = threading.Thread(target=process_order_in_background, args=(order, restaurants_pendings))
+            thread.daemon = False
+            thread.start()
+
+            # Provide the user with a "Processing" message or intermediate response
+            messages.info(request, "Your order is being processed. You will receive a confirmation shortly.")
+            return redirect('order_processing_status_page')  # Redirect to a status page or confirmation page
+
+    # # Additional logic to handle RESTAURANTORDER transaction
+    # if 'RESTAURANTORDER' in request.POST or 'RESTAURANTORDER' in request.GET:
+    #     logging.info("RESTAURANTORDER transaction detected for order number: %s", order_number)
+
+    #     # Trigger Pending Order Creation if not already created
+    #     if not PendingOrders.objects.filter(po_order_number=order.order_number).exists():
+    #         restaurants_pendings = order.restaurants.all()
+    #         logging.info("Starting background thread for pending order processing for order number: %s", order.order_number)
+    #         thread = threading.Thread(target=process_order_in_background, args=(order, restaurants_pendings))
+    #         thread.daemon = False
+    #         thread.start()
+
+    # Fallback in case no valid condition was met
+    messages.error(request, "You must be logged in to complete the order.")
+    return redirect('home')
 
 
-    service_charge_data = json.loads(order.service_charge_data)
 
-    restaurants_pendings = order.restaurants.all()
-    ordered_food_details = []
-    grand_total = 0
+def generate_auth_token(user):
+    return signing.dumps({'user_id': user.pk}, salt='orderzy-auth')
 
-    with transaction.atomic():
-        for restaurant in restaurants_pendings:
+
+def verify_auth_token(token):
+    try:
+        data = signing.loads(token, salt='orderzy-auth', max_age=3600)  
+        return User.objects.get(pk=data['user_id'])
+    except (signing.BadSignature, signing.SignatureExpired, User.DoesNotExist):
+        return None
+
+
+
+@csrf_exempt
+@transaction.atomic
+def payment_webhook(request):
+    if request.method == 'POST':
+        try:
+            raw_body = request.body
+            timestamp = request.headers.get('x-webhook-timestamp')
+            signature = request.headers.get('x-webhook-signature')
+
+            if not raw_body or not timestamp or not signature:
+                return JsonResponse({'error': 'Missing required headers or payload'}, status=400)
+            
+            payload = raw_body.decode('utf-8')
+            secret_key = bytes(settings.CASHFREE_X_CLIENT_SECRET, 'utf-8')
+            signature_data = f"{timestamp}{payload}"
+            message = bytes(signature_data, 'utf-8')
+            computed_signature = base64.b64encode(hmac.new(secret_key, message, digestmod=hashlib.sha256).digest())
+            computed_signature_str = computed_signature.decode('utf-8')
+
+            if not compare_digest(computed_signature_str, signature):
+                return JsonResponse({'error': 'Invalid signature'}, status=403)
+
+            body = json.loads(request.body)
+            data = body.get("data", {})
+            order_data = data.get("order", {})
+            payment_data = data.get("payment", {})
+
+            order_number = order_data.get("order_id")
+            transaction_status = payment_data.get("payment_status")
+            transaction_id = payment_data.get("cf_payment_id")
+
+            if not order_number or not transaction_id or not transaction_status:
+                return JsonResponse({'error': 'Missing required payment details'}, status=400)
+
             try:
-                subtotal, current_ordered_food_details = create_pending_order(order, restaurant)
+                order = Order.objects.select_for_update().get(order_number=order_number)
+            except Order.DoesNotExist:
+                logger.error("Order with number %s does not exist.", order_number)
+                return JsonResponse({'error': 'Order does not exist'}, status=400)
+
+            if Payment.objects.filter(transaction_id=transaction_id).exists() or order.is_ordered:
+                return JsonResponse({'status': 'Order already processed.'}, status=200)
+            
+            try:
+                payment = Payment.objects.get(transaction_id=transaction_id)
+                if payment.status.lower() != transaction_status.lower():
+                    payment.status = transaction_status
+                    payment.save()
+                    created = False
+
+            except Payment.DoesNotExist:
+                payment = Payment.objects.create(
+                user=order.user,
+                transaction_id=transaction_id,
+                payment_method='Cashfree',
+                amount=order.total,
+                status=transaction_status,
+                )
+                created = True
+           
+            if not created and payment.status.lower() != transaction_status.lower():
+                payment.status = transaction_status
+                payment.save()
+
+            if transaction_status.lower() == 'success':
                 
-                ordered_food_details.extend(current_ordered_food_details)
-                
-                grand_total += subtotal
-            except Exception as e:
-                messages.error(request, "There was an error processing your order. Please try again.")
-                return redirect('home')
+                order.payment = payment
+                order.is_ordered = True
+                order.transaction_id = transaction_id
+                order.save()
 
-    context = {
-        'order': order,
-        'ordered_food_details': ordered_food_details,
-        'subtotal': grand_total,
-        'service_charge_data': service_charge_data
-    }
+                cart_items = list(Cart.objects.filter(user=order.user))
+                ordered_food_items = [
+                    OrderedFood(
+                        order=order,
+                        payment=payment,
+                        user=order.user,
+                        fooditem=item.fooditem,
+                        quantity=item.quantity,
+                        price=item.fooditem.price,
+                        amount=item.fooditem.price * item.quantity
+                    )
+                    for item in cart_items
+                ]
+                OrderedFood.objects.bulk_create(ordered_food_items)
 
-    Cart.objects.filter(user=request.user).delete()
+                mail_subject = 'Thank you for Ordering with us!'
+                mail_template = 'orders/order_confirmation_email.html'
 
-    if restaurants_pendings.count() == 1 and transaction_id == 'RESTAURANTORDER':
-        restaurant = restaurants_pendings.first()
-        return redirect('restaurant_detail', restaurant_slug=restaurant.restaurant_slug)
+                ordered_food_items = OrderedFood.objects.filter(order=order)
+                customer_subtotal = sum(item.price * item.quantity for item in ordered_food_items)
 
-    return render(request, 'orders/order_complete.html', context)
+                context = {
+                    'user': order.user,
+                    'order': order,
+                    'to_email': order.email,
+                    'ordered_food': ordered_food_items,
+                    'domain': get_current_site(request),
+                    'customer_subtotal': customer_subtotal,
+                    'service_charge_data': json.loads(order.service_charge_data) if order.service_charge_data else {},
+                }
+                send_notification(mail_subject, mail_template, context)
+
+                mail_subject = "You have received a new order!"
+                mail_template = "orders/new_order_received.html"
+                to_emails = set()
+
+                for i in cart_items:
+                    if i.fooditem.restaurant.user.email not in to_emails:
+                        to_emails.add(i.fooditem.restaurant.user.email)
+
+                        ordered_food_to_restaurant = OrderedFood.objects.filter(
+                            order=order,
+                            fooditem__restaurant=i.fooditem.restaurant
+                        )
+
+                        restaurant_context = {
+                            'order': order,
+                            'to_email': i.fooditem.restaurant.user.email,
+                            'ordered_food_to_restaurant': ordered_food_to_restaurant,
+                            'restaurant_subtotal': order_total_by_restaurant(order, i.fooditem.restaurant.id)['subtotal'],
+                            'service_charge_data': order_total_by_restaurant(order, i.fooditem.restaurant.id)['service_charge_dict'],
+                            'restaurant_grand_total': order_total_by_restaurant(order, i.fooditem.restaurant.id)['grand_total'],
+                        }
+
+                        send_notification(mail_subject, mail_template, restaurant_context)
+
+            return JsonResponse({'status': 'Payment processed successfully.'}, status=200)
+
+        except json.JSONDecodeError:
+            logger.error("Invalid JSON data in webhook request.")
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            logger.exception("Unexpected error in payment_webhook:")
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)

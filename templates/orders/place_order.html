@@ -1,4 +1,5 @@
 {% extends 'base.html' %} {% load custom_filters %}
+{% load static %}
 {% block title %} Confirmation  {% endblock %} 
  {% block content %}
 
@@ -79,6 +80,8 @@
                         {% for cart_item in cart_items_with_totals %}
                         <tr>
                           <td>
+                            
+                            {% if cart_item.item.fooditem.image %}
                             <img
                               data-src="{{cart_item.item.fooditem.image.url}}"
                               width="40"
@@ -86,6 +89,9 @@
                               class="lazyload"
                               loading="lazy"
                             />
+                            {% else %}
+                            <img src="{% static 'images/bg3.png' %}" alt="Default Image" />
+                            {% endif %}
                           </td>
                           <td>
                             <b>{{cart_item.item.fooditem}}</b>
@@ -102,6 +108,8 @@
                           <span class="price">
                               <span class="currency">₹</span>
                               <span id="subtotal">{{subtotal}}</span>
+                             
+
                           </span>
                       </li>
                   
@@ -135,22 +143,16 @@
                       {% else %}
                       {% if order.payment_method == 'Paypal' %}
                       <div id="paypal-button-container"></div>
-
-                      {% elif order.payment_method == 'RazorPay' %}
-                        <button class="btn btn-danger w-100">
-                      Pay with RazorPay
-                      </button>
-
+                      <div id="loader" style="display:none;">Loading...</div>
+                      <div id="error-message" style="color: red;"></div>
                       {% else %}
-                      <div id="paypal-button-container"></div>
-        
+                      <button id="payNowButton" class ="btn btn-primary w-100 p-2 mt-3" onclick="submitOrder()">Pay Now</button>
+                     
+                      <div id="loader" style="display: none;">Loading...</div>
+                      <div id="error-message" style="color: red;"></div>
                         {% endif %}
                       {% endif %}
-                      <!-- <a
-                        href="{% url 'checkout' %}"
-                        class="btn btn-danger w-100 p-2 mt-3"
-                        >Proceed to Pay!</a
-                      > -->
+                      
                     </ul>
                   </div>
                 </div>
@@ -163,82 +165,74 @@
   </div>
 </div>
 
+
 <script>
   function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === name + "=") {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
       }
-    }
-    return cookieValue;
+      return cookieValue;
   }
-  var grandTotal = "{{ grand_total }}";
-  var url = "{% url 'payments' %}";
-  var order_number = "{{order.order_number}}";
-  const csrftoken = getCookie("csrftoken");
-  var order_complete = "{% url 'order_complete' %}";
-  console.log("csrf:", csrftoken);
-  paypal
-    .Buttons({
-      createOrder: function (data, actions) {
-        return actions.order.create({
-          purchase_units: [
-            {
-              amount: {
-                value: grandTotal,
-              },
-            },
-          ],
-        });
+  function submitOrder(){
+
+    const grandTotal = "{{ grand_total }}";
+    const url = "{% url 'create_order_api' %}";
+    const order_number = "{{order.order_number}}";
+    const csrftoken = getCookie("csrftoken");
+    const customer_name = "{{user.get_full_name}}";
+    const customer_id = "{{ user.id }}".padStart(3, '0');
+    const customer_email = "{{user.username}}";
+    const customer_phone = '9238008672';
+    console.log("customer_id",customer_id)
+
+
+
+    const orderData = {
+      customer_details: {
+        customer_id:customer_id,
+        customer_phone : customer_phone
       },
-      onApprove: function (data, actions) {
-        return actions.order.capture().then(function (orderData) {
-          var transaction = orderData.purchase_units[0].payments.captures[0];
-          var transaction_id = transaction.id;
-          var status = orderData.status;
-          var payment_method = "PayPal";
+      order_id : order_number,
+      order_amount : grandTotal,
+      order_currency:"INR"
+    };
 
-          sendTransaction(transaction_id, payment_method, status);
+    document.getElementById('loader').style.display = 'block';
 
-          const element = document.getElementById("paypal-button-container");
-          element.innerHTML = "";
-          element.innerHTML =
-            '<h4 class="text-center"><i class="fa fa-spinner fa-spin"></i> Please wait ... </h4>';
-
-          // Display a success message or perform additional actions
-          // Example: alert('Transaction completed by ' + orderData.payer.name.given_name);
-        });
+    fetch (url,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'X-CSRFToken' : csrftoken
       },
+      body: JSON.stringify(orderData)
     })
-    .render("#paypal-button-container");
+    .then(response => response.json() )
+    .then(data => {
+      document.getElementById('loader').style.display = 'none';
+      if (data.payment_session_id){
+        cashfree.checkout({
+          paymentSessionId:data.payment_session_id,
+          redirectTarget: "_self"
+        });
+      } else {
+        alert ('Order creation failed');
+      }
+    })
+    .catch(error => {
+      document.getElementById('loader').style.display = 'none';
+      console.log('Error:',error);
+    })
 
-  function sendTransaction(transaction_id, payment_method, status) {
-    $.ajax({
-      type: "POST",
-      url: url,
-      data: {
-        order_number: order_number,
-        transaction_id: transaction_id,
-        payment_method: payment_method,
-        status: status,
-        csrfmiddlewaretoken: csrftoken,
-      },
-      success: function (response) {
-        console.log("response++", response);
-        window.location.href =
-          order_complete +
-          "?order_no=" +
-          response.order_number +
-          "&trans_id=" +
-          response.transaction_id;
-      },
-    });
   }
+
 </script>
 {% endblock content %}
