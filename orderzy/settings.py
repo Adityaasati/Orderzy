@@ -139,7 +139,7 @@ STATICFILES_DIRS = [
 
 
 
-SITE_ID = 2 
+SITE_ID = 1 
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR/'media'
@@ -185,11 +185,9 @@ X_API_VERSION = config('X_API_VERSION')
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
 
-SESSION_COOKIE_AGE = 3600 * 24  # Session lasts for 24 hours
+SESSION_COOKIE_AGE = 3600 * 24  
 SESSION_SAVE_EVERY_REQUEST = True 
 
-
-# Production
 SESSION_COOKIE_DOMAIN = ".orderzy.in"
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
