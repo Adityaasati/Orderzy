@@ -23,6 +23,12 @@ class Category(models.Model):
         
 
 class FoodItem(models.Model):
+    
+    FOOD_TYPE_CHOICES = [
+        ('veg', 'Vegetarian'),
+        ('non-veg', 'Non-Vegetarian'),
+    ]
+    food_type = models.CharField(max_length=10, choices=FOOD_TYPE_CHOICES, null=True, blank=True)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='fooditems')
     food_title = models.CharField(max_length=50)
@@ -30,6 +36,7 @@ class FoodItem(models.Model):
     description = models.TextField(max_length=250, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='foodimages')
+    quantity = models.FloatField(null=True, blank=True)
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

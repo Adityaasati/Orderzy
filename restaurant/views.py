@@ -66,9 +66,6 @@ def menu_builder(request):
     context = {
         'categories' : categories,
     }
-    for cat in categories:
-        print("VFVFVFVFV",cat)
-        print("bbgbghnhnh",cat.id)
     return render (request, 'restaurant/menu_builder.html', context)
 
 

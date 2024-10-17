@@ -43,6 +43,17 @@
                                                 <label> Description</label>
                                                 {{form.description}}
                                             </div>
+                                        </div><div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="field-holder">
+                                                <label> Food Type *</label>
+                                                {{form.food_type}}
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="field-holder">
+                                                <label> Quantity </label>
+                                                {{form.quantity}}
+                                            </div>
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-12">
                                             <div class="field-holder">
@@ -54,8 +65,11 @@
                                             <div class="field-holder">
                                                 <label>Image </label>
                                                 {{form.image}}
-                                        <img data-src="{{food.image.url}}" alt="Food Image" width="100" class="lazyload mt-2" loading="lazy">
-
+                                        {% if form.image and form.image.value %}
+                                        <img data-src="{{ form.image.value.url }}" alt="Food Image" width="100" class="lazyload mt-2" loading="lazy">
+                                    {% else %}
+                                        <p>No image available</p>
+                                    {% endif %}
                                             </div>
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-12">

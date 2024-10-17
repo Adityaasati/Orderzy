@@ -1,5 +1,18 @@
-{% extends 'base.html' %} 
-{% load static %}{% block title %} Cart {% endblock %} {% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %} Cart {% endblock %} {% block extra_css %}
+<style>
+  .more-link {
+    color: blue;
+    text-decoration: none; /* Removes underline */
+    cursor: pointer;
+  }
+
+  .more-link:hover,
+  .more-link:focus {
+    color: blue;
+    text-decoration: none;
+  }
+</style>
+{% endblock extra_css %} {% block content %}
 
 <div class="main-section pt-5">
   <div class="page-section">
@@ -16,108 +29,86 @@
             </ul>
             <div class="tab-content">
               <div id="home" class="tab-pane in active">
-                <div class="menu-itam-holder">
-                  <div
-                    class="text-center p-5"
+                <div class="menu-item-holder container">
+                  
+
+                  <div id="menu-item-list-6272" class="menu-item-list row">
+                   
+                    <ul class="list-unstyled w-100">
+                        {% if cart_items %} 
+                            {% for item in cart_items %}
+                          
+                            <li id="cart-item-{{item.id}}" class="d-flex align-items-center mb-3 row">
+                                <!-- Image holder -->
+                                <div class="image-holder col-4 col-sm-2">
+                                    <img data-src="{{item.fooditem.image.url}}" alt="Food Image" class="lazyload img-fluid rounded" loading="lazy" />
+                                </div>
+                    
+                                <!-- Text holder -->
+                                <div class="text-holder col-8 col-sm-4">
+                                    <h6>
+                                        {{item.fooditem}} 
+                                        {% if item.fooditem.food_type == 'veg' %}
+                                        <img src="{% static 'images/veg-icon.png' %}" alt="Veg" width="20" height="20" style="cursor: default" />
+                                        {% else %}
+                                        <img src="{% static 'images/non-veg-icon.png' %}" alt="Non-Veg" width="20" height="20" style="cursor: default" />
+                                        {% endif %}
+                                    </h6>
+                    
+                                    {% if item.fooditem.description %}
+                                        {% if item.fooditem.description|length > 50 %}
+                                        <span class="food-description" id="desc-{{item.fooditem.id}}">
+                                            {{ item.fooditem.description|slice:":50" }}
+                                            <span class="dots">...</span>
+                                            <span class="more-text" style="display: none">{{ item.fooditem.description|slice:"50:" }}</span>
+                                        </span>
+                                        <a href="javascript:void(0);" class="more-link" onclick="toggleDescription('{{item.fooditem.id}}')">more</a>
+                                        {% else %}
+                                        <span class="food-description" id="desc-{{item.fooditem.id}}">
+                                            {{ item.fooditem.description }}
+                                        </span>
+                                        {% endif %}
+                                    {% else %}
+                                    <span class="food-description" id="desc-{{item.fooditem.id}}"></span>
+                                    {% endif %}
+                                </div>
+                    
+                                <!-- Price and Quantity/Controls -->
+                                <div class="price-holder col-12 col-sm-6 d-flex justify-content-between align-items-center mt-2 mt-sm-0">
+                                    <span class="price cart-above-mobile">₹{{item.fooditem.price}}</span>
+                    
+                                    <div class="d-flex align-items-center">
+                                        {% if item.fooditem.restaurant.is_open %}
+                                        <a href="#" class="decrease_cart btn btn-outline-secondary btn-sm mx-1" data-id="{{item.fooditem.id}}" id="{{item.id}}" data-url="{% url 'decrease_cart' item.fooditem.id %}">
+                                            <i class="icon-minus text-color"></i>
+                                        </a>
+                                        <label id="qty-{{item.fooditem.id}}" class="mx-2">{{ item.quantity }}</label>
+                                        <a href="#" class="add_to_cart btn btn-outline-secondary btn-sm mx-1" data-id="{{item.fooditem.id}}" data-url="{% url 'add_to_cart' item.fooditem.id %}">
+                                            <i class="icon-plus4 text-color"></i>
+                                        </a>
+                                        {% elif item.fooditem.quantity == 0 %}
+                                        <button class="btn btn-danger btn-sm mx-1" disabled>Out of Stock</button>
+                                        {% else %}
+                                        <button class="btn btn-danger btn-sm mx-1" disabled>Closed</button>
+                                        {% endif %}
+                                    </div>
+                    
+                                    <a href="#" class="delete_cart btn btn-outline-secondary btn-sm mx-1" data-id="{{item.id}}" data-url="{% url 'delete_cart' item.id %}">
+                                        <i class="icon-delete text-color"></i>
+                                    </a>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        {% else %}
+                        <div class="text-center p-5"
                     id="empty-cart"
-                    style="display: none"
-                  >
+                    >
                     <h3>Your Cart is Empty</h3>
                   </div>
-
-                  <div id="menu-item-list-6272" class="menu-itam-list">
-                    <ul>
-                      {% if cart_items %} {% for item in cart_items %}
-                      <li id="cart-item-{{ item.id }}">
-                        <div class="image-holder">
-                            {% if item.fooditem.image %}
-                            <img src="{{ item.fooditem.image.url }}" alt="Food Image" class="lazyload" loading="lazy" />
-                            {% else %}
-                            <img src="{% static 'images/bg3.png' %}" alt="Default Image" />
-                            {% endif %}
-                        </div>
-                        
-                        <div class="text-holder">
-                          <h6>{{ item.fooditem }}</h6>
-                          <span>{{ item.fooditem.description }}</span>
-                          <a href="{% url 'restaurant_detail' item.fooditem.restaurant.restaurant_slug %}"
-                            class="badge badge-warning"
-                            >{{ item.fooditem.restaurant }}</a>
-                        </div>
-                        <div class="price-holder">
-                          <span class="price cart-above-mobile">₹{{ item.fooditem.price }}</span>
-
-                          {% if item.fooditem.restaurant.is_open %}
-                          <!-- Quantity control buttons if the restaurant is open -->
-                          <a
-                            href="#"
-                            class="decrease_cart"
-                            data-id="{{ item.fooditem.id }}"
-                            id="{{ item.id }}"
-                            data-url="{% url 'decrease_cart' item.fooditem.id %}"
-                          >
-                            <i
-                              class="icon-minus text-color"
-                              style="margin: 28px"
-                            ></i>
-                          </a>
-                          <label id="qty-{{ item.fooditem.id }}"
-                            >{{ item.quantity }}</label>
-                          <div
-                            class="quantity"
-                            style="
-                              display: inline-block;
-                              position: absolute;
-                              top: 50%;
-                              transform: translateY(-50%);
-                              margin-top: -10px;
-                            "
-                          >
-                            <span class="price cart-mobile-only"
-                              >₹{{ item.fooditem.price }}</span
-                            >
-                          </div>
-                          <a
-                            href="#"
-                            class="add_to_cart"
-                            data-id="{{ item.fooditem.id }}"
-                            data-url="{% url 'add_to_cart' item.fooditem.id %}"
-                          >
-                            <i class="icon-plus4 text-color"></i>
-                          </a>
-                          {% else %}
-                          <!-- Closed/Out of Stock indicator if the restaurant is closed -->
-                          <button class="btn btn-danger" disabled>
-                            Closed
-                          </button>
-                          {% endif %}
-                          <!-- Delete button available regardless of restaurant status -->
-                          <a
-                            href="#"
-                            class="delete_cart"
-                            data-id="{{ item.id }}"
-                            data-url="{% url 'delete_cart' item.id %}"
-                          >
-                            <i class="icon-delete text-color"></i>
-                          </a>
-                        </div>
-                      </li>
-                      {% endfor %} {% else %}
-                      <div class="text-center p-5">
-                        <h3>Your Cart is Empty</h3>
-                      </div>
-                      {% endif %}
+                        {% endif %}
                     </ul>
+                    
                   </div>
-
-                  {% for item in cart_items %}
-                  <span
-                    id="qty-{{ item.fooditem.id }}"
-                    class="item_qty d-none"
-                    data-qty="{{ item.quantity }}"
-                    >{{ item.quantity }}</span
-                  >
-                  {% endfor %}
                 </div>
               </div>
             </div>
@@ -141,25 +132,28 @@
                         <span>Subtotal</span>
                         <span class="price">
                           <span class="currency">₹</span>
-                          <span id="subtotal">{{ subtotal }}</span>
+                          <span id="subtotal">{{subtotal}}</span>
                         </span>
                       </li>
+
                       {% for key, value in service_charge_dict.items %} {% for i, j in value.items %}
                       <li class="d-flex justify-content-between">
-                        <span>{{ key }}</span>
+                        <span>{{key}}</span>
                         <span class="price">
                           <span class="currency">₹</span>
-                          <span id="tax-{{ key }}">{{ j }}</span>
+                          <span id="tax-{{key}}">{{j}}</span>
                         </span>
                       </li>
                       {% endfor %} {% endfor %}
+
                       <li class="d-flex justify-content-between fw-bold">
                         <span>Total</span>
                         <span class="price">
                           <span class="currency">₹</span>
-                          <span id="total">{{ grand_total }}</span>
+                          <span id="total">{{grand_total}}</span>
                         </span>
                       </li>
+
                       <a
                         href="{% url 'checkout' %}"
                         class="btn btn-danger w-100 p-2 mt-3"
@@ -176,5 +170,22 @@
     </div>
   </div>
 </div>
+{% endblock content %} {% block extra_js %}
+<script>
+  function toggleDescription(id) {
+    var dots = document.querySelector("#desc-" + id + " .dots");
+    var moreText = document.querySelector("#desc-" + id + " .more-text");
+    var moreLink = document.querySelector("#desc-" + id).nextElementSibling;
 
-{% endblock content %}
+    if (dots.style.display === "none") {
+      dots.style.display = "inline";
+      moreText.style.display = "none";
+      moreLink.innerHTML = "more";
+    } else {
+      dots.style.display = "none";
+      moreText.style.display = "inline";
+      moreLink.innerHTML = "less";
+    }
+  }
+</script>
+{% endblock extra_js %}

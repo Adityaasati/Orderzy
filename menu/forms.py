@@ -14,7 +14,7 @@ class FoodItemForm(forms.ModelForm):
         ('non-veg', 'Non-Vegetarian'),
     ]
     food_type = forms.ChoiceField(choices=FOOD_TYPE_CHOICES, required=True, label="Food Type")
-    quantity = forms.IntegerField( label="Quantity", required=False)
+    quantity = forms.FloatField( label="Quantity", required=False)
 
     image = forms.FileField(
         widget=forms.FileInput(attrs={'class': 'btn btn-info w-100'}),

@@ -12,7 +12,7 @@ class CategoryAdmin(admin.ModelAdmin):
     
 class FoodItemAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('food_title',)}
-    list_display = ('food_title', 'category','restaurant','price','is_available','updated_at')
+    list_display = ('food_title', 'category','restaurant','price','is_available','updated_at','food_type','quantity')
     search_fields = ('food_title','category__category_name', 'restaurant__restaurant_name','price')
     list_filter = ('is_available',)
     

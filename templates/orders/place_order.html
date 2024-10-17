@@ -12,7 +12,8 @@
             <ul class="stickynav-tabs nav nav-tabs">
               <li class="active">
                 <a data-bs-toggle="tab" href="#home"
-                  ><i class="fa fa-shopping-cart text-danger"></i>Review Your
+                  >
+                  <i class="fa fa-shopping-cart text-danger"></i>Review Your
                   Billing Address</a
                 >
               </li>
@@ -97,7 +98,7 @@
                             <b>{{cart_item.item.fooditem}}</b>
                           </td>
                           <td>{{cart_item.item.quantity}}</td>
-                          <td>{{cart_item.total_price}}</td>
+                          <td>₹{{cart_item.total_price}}</td>
                         </tr>
                         {% endfor %}
                       </tbody>

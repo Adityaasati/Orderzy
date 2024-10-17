@@ -3,11 +3,15 @@
   .no-overlay:before {
     background: none; /* This removes the dark overlay */
 }
+.restaurant-detail-image-section:before { 
+  display: none; 
+}
+
 
 </style>
  <div
   class="page-section restaurant-detail-image-section"
-  style=" background: url({% if restaurant.user_profile.cover_photo %} {{ restaurant.user_profile.cover_photo.url }} {% else %} {% static 'images/default-cover.png' %}{% endif %}) no-repeat scroll 0 0 / cover;"
+  style=" background: url({% if restaurant.user_profile.cover_photo %} {{ restaurant.user_profile.cover_photo.url }} {% else %} {% static 'images/default_cover_img.jpg' %}{% endif %}) no-repeat scroll 0 0 / cover;"
 >
   <!-- Container Start -->
   <div class="container">
@@ -31,17 +35,17 @@
             </div>
 
             <div class="text-holder">
-              <span class="restaurant-title no-overlay"  style="color: #ffffff"
-                >{{restaurant.restaurant_name}}
+              <span class="restaurant-title no-overlay"  style="color: #c41111"
+                >{{restaurant.restaurant_name}} 
                 </span
               >
               <div class="text">
                 {% if restaurant.user_profile.address%}
-                <i class="icon-location"></i>
-                <p>{{restaurant.user_profile.address}}</p>
+                <i class="icon-location" style="color: rgb(0,123,255) !important;"></i>
+                <p style="color: rgb(0,0,0) !important;">{{restaurant.user_profile.address}}</p>
                 {% endif %}
-                <i class="icon-envelope"></i>
-                <p>{{restaurant.user.email}}</p>
+                <i class="icon-envelope" style="color: rgb(0,123,255) !important;"></i>
+                <p style="color: rgb(0,0,0) !important;">{{restaurant.user.email}}</p>
               </div>
             </div>
           </div>

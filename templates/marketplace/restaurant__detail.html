@@ -1,156 +1,280 @@
-{% extends 'base.html' %}
-{% load custom_filters %}
-{% load static %}
-{% block title %} {{user.first_name}}  {% endblock %} 
+{% extends 'base.html' %} {% load custom_filters %} {% load static %} {% block title %} {{user.first_name}} {% endblock %} 
+{% block extra_css %}
+<style>
+  .no-overlay:before {
+    background: none; /* This removes the dark overlay */
+  }
+  .restaurant-detail-image-section:before {
+    display: none;
+  }
+</style>
+{% endblock extra_css %}
 {% block content %}
-
-    
 <div class="main-section">
-    <div class="page-section restaurant-detail-image-section"
-        style=" background: url({% if restaurant.user_profile.cover_photo %} {{restaurant.user_profile.cover_photo.url}} {% else %} {% static 'images/default-cover.png' %}{% endif %}) no-repeat scroll 0 0 / cover;">
+  <div class="page-section restaurant-detail-image-section"
+    style=" background: url({% if restaurant.user_profile.cover_photo %} {{restaurant.user_profile.cover_photo.url}} {% else %} {% static 'images/default-cover.png' %}{% endif %}) no-repeat scroll 0 0 / cover;">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <div class="company-info-detail">
+            <div class="company-info">
+              <div class="img-holder">
+                <figure>
+                  {% if restaurant.user_profile.profile_picture %}
+                  <img
+                    data-src="{{restaurant.user_profile.profile_picture.url}}"
+                    alt="Profile Picture"
+                    class="lazyload"
+                    loading="lazy"
+                  />
+                  {% else %}
+                  <img
+                    data-src="{% static 'images/default-profile.png' %}"
+                    alt="Profile Picture"
+                    class="lazyload"
+                    loading="lazy"
+                  />
 
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <div class="company-info-detail">
-                        <div class="company-info">
-                            <div class="img-holder">
-                                <figure>
-                                    {% if restaurant.user_profile.profile_picture %}
-                                    <img data-src="{{restaurant.user_profile.profile_picture.url}}" alt="Profile Picture" class="lazyload" loading="lazy">
-                                    {% else %}
-                                    <img data-src="{% static 'images/default-profile.png' %}" alt="Profile Picture" class="lazyload" loading="lazy">
-
-                                    {% endif %}
-                                </figure>
-                            </div>
-                            <div class="text-holder">
-                                <span class="restaurant-title">{{restaurant.restaurant_name}} {% if not restaurant.is_open %} Closed {%endif %}</span>
-                                
-                                <div class="text">
-                                    {% if restaurant.user_profile.address %}
-                                    <i class="icon-location"></i>
-                                    <p>{{restaurant.user_profile.address}}</p>
-                                    {% endif %}
-                                </div>
-                                
-                            </div>
-                        </div>
-                        {% if opening_hours %}
-                        <div class="delivery-timing reviews-sortby">
-
-                            <ul>
-                                <li>
-                                    <a href="#" class="reviews-sortby-active">
-                                        <span>Today :</span>
-                                        {% for i in current_opening_hours %}
-                                        <span>{% if i.is_closed%} Closed{%else%} {{i.from_hour}} - {{i.to_hour}} {%endif%}</span>
-                                        {% endfor %}
-                                        <i class="icon-chevron-small-down"></i>
-
-                                    </a>
-                                    <ul class="delivery-dropdown">
-                                        {% for hour in opening_hours %}
-                                        <li><a href="#"><span class="opend-day">{{hour}}</span> <span class="opend-time"><small>:</small> {% if hour.is_closed %} Closed
-                                                    {% else %} {{hour.from_hour}} - {{hour.to_hour}} {% endif%}
-                                                </span></a></li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                        {% endif %}
-                    </div>
+                  {% endif %}
+                </figure>
+              </div>
+              <div class="text-holder">
+                <span class="restaurant-title" style="color: #c41111"
+                  >{{restaurant.restaurant_name}} {% if not restaurant.is_open %} Closed {%endif %}</span
+                >
+                <div class="text">
+                  {% if restaurant.user_profile.address %}
+                  <i
+                    class="icon-location"
+                    style="color: rgb(0, 123, 255) !important"
+                  ></i>
+                  <p style="color: rgb(0, 0, 0) !important">
+                    {{restaurant.user_profile.address}}
+                  </p>
+                  {% endif %}
                 </div>
+              </div>
             </div>
+            {% if opening_hours %}
+            <div class="delivery-timing reviews-sortby">
+              <ul>
+                <li>
+                  <a href="#" class="reviews-sortby-active">
+                    <span>Today :</span>
+                    {% for i in current_opening_hours %}
+                    <span
+                      >{% if i.is_closed%} Closed{%else%} {{i.from_hour}} -
+                      {{i.to_hour}} {%endif%}</span
+                    >
+                    {% endfor %}
+                    <i class="icon-chevron-small-down"></i>
+                  </a>
+                  <ul class="delivery-dropdown">
+                    {% for hour in opening_hours %}
+                    <li>
+                      <a href="#"
+                        ><span class="opend-day">{{hour}}</span>
+                        <span class="opend-time"
+                          ><small>:</small> {% if hour.is_closed %} Closed {% else %} {{hour.from_hour}} - {{hour.to_hour}} {% endif%}
+                        </span></a
+                      >
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            {% endif %}
+          </div>
         </div>
+      </div>
     </div>
-    
-    <section class="product spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-9 col-md-7">
-                    <div class="row">
-                        {% if seating_available == 0 %}
-    <p style="color: #ff6347 !important; font-style: italic; font-size: 0.9em; text-align: center; margin-top: 20px;">
-        We’re currently at full capacity. You can place your order now, and feel free to check back later for table availability.
-    </p>
-    
-    {% endif %}
-                       
-                        {% for category in categories %}
-                        
-                        <button class="btn btn-primary mb-3 mt-2  mx-md-3  catName" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false"
-                            aria-controls="collapse{{ forloop.counter }}" >
-                            {{category}}
-                        </button>
-                        <div class="collapse  {% if forloop.first %}show{% endif %}" id="collapse{{ forloop.counter }}">
-                            <div class="container px-4 px-lg-5 mt-5">
-                                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                                   
-                                    {% for food in category.fooditems.all %}
+  </div>
 
-                                    <div class="col mb-5">
-                                        <div class="card h-100 border border-dark rounded">
-                                                {% if food.image %}
-                                                    <img class="lazyload card-img-top" data-src="{{ food.image.url }}" alt="Food Image" loading="lazy" >
-                                                    {% else %}
-                                                     <img class="card-img-top" src="/path/to/default-image.jpg" alt="Default Image" loading="lazy" > 
-                                                    {% endif %}
-
-                                            <div class="card-body p-4">
-                                                <div class="text-center">
-                                                    <h5 class="fw-bolder">{{food}}</h5>
-                                                    <div class="price-holder">
-                                                        <span class="price">₹{{food.price}}</span>
-                                                        </div>
-                                                </div>
-                                            </div>
-                                            {% if restaurant.is_open %}
-                                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent price-holder">
-                                                <div class="text-center d-flex justify-content-center align-items-center">
-                                                    <a href="#" class="decrease_cart btn btn-outline-secondary" data-id="{{food.id}}" data-url="{% url 'decrease_cart' food.id %}">
-                                                        <i class="icon-minus text-color"></i>
-                                                    </a>
-                                                    
-                                                    <label id="qty-{{ food.id }}" class="mx-3">
-                                                        {% if cart_item_quantities %}
-                                                            {{ cart_item_quantities|get_item:food.id|default:0 }}
-                                                        {% else %}
-                                                            0  <!-- For anonymous users, show 0 -->
-                                                        {% endif %}
-                                                    </label>
-                                                    
-                                                    <a href="#" class="add_to_cart btn btn-outline-primary" data-id="{{food.id}}" data-url="{% url 'add_to_cart' food.id %}">
-                                                        <i class="icon-plus4 text-color"></i>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            {% else %}
-                                            <button class="btn closed" disabled>Closed</button>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                  
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
+  <section class="product spad">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-9 col-md-7">
+          <div class="row">
+            <div class="container">
+              <div
+                class="filter-buttons mb-3 d-flex justify-content-center flex-wrap mt-3 mt-lg-2"
+              >
+                <button
+                  class="btn btn-outline-success mx-2 mb-2"
+                  onclick="filterFood('veg')"
+                >
+                  Veg
+                </button>
+                <button
+                  class="btn btn-outline-danger mx-2 mb-2"
+                  onclick="filterFood('non-veg')"
+                >
+                  Non-Veg
+                </button>
+                <button
+                  class="btn btn-outline-secondary mx-2 mb-2"
+                  onclick="filterFood('all')"
+                >
+                  Show All
+                </button>
+              </div>
             </div>
+
+            {% if seating_available == 0 %}
+            <p
+              style="
+                color: #ff6347 !important;
+                font-style: italic;
+                font-size: 0.9em;
+                text-align: center;
+                margin-top: 20px;
+              "
+            >
+              We’re currently at full capacity. You can place your order now,
+              and feel free to check back later for table availability.
+            </p>
+
+            {% endif %} {% for category in categories %}
+
+            <button
+              class="btn btn-primary mb-3 mt-2 mx-md-3 catName"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapse{{ forloop.counter }}"
+              aria-expanded="false"
+              aria-controls="collapse{{ forloop.counter }}"
+            >
+              {{category}}
+            </button>
+            <div
+              class="collapse {% if forloop.first %}show{% endif %}"
+              id="collapse{{ forloop.counter }}"
+            >
+              <div class="container px-4 px-lg-5 mt-5">
+                <div
+                  class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center"
+                >
+                  {% for food in category.fooditems.all %}
+
+                  <div
+                    class="col mb-5 food-card"
+                    data-food-type="{{ food.food_type }}"
+                  >
+                    <div class="card h-100 border border-dark rounded">
+                      {% if food.image %}
+                      <img
+                        class="lazyload card-img-top"
+                        data-src="{{ food.image.url }}"
+                        alt="Food Image"
+                        loading="lazy"
+                      />
+                      {% else %}
+                      <img
+                        class="card-img-top"
+                        src="/path/to/default-image.jpg"
+                        alt="Default Image"
+                        loading="lazy"
+                      />
+                      {% endif %}
+
+                      <div class="card-body p-4">
+                        <div class="text-center">
+                          <h5 class="fw-bolder">{{food}}</h5>
+                          <div class="price-holder">
+                            <span class="price">₹{{food.price}}</span>
+                            <span class="veg-nonveg-btn">
+                              {% if food.food_type == 'veg' %}
+                              <img
+                                src="{% static 'images/veg-icon.png' %}"
+                                alt="Veg"
+                                width="20"
+                                height="20"
+                                style="cursor: default"
+                              />
+                              {% else %}
+                              <img
+                                src="{% static 'images/non-veg-icon.png' %}"
+                                alt="Non-Veg"
+                                width="20"
+                                height="20"
+                                style="cursor: default"
+                              />
+                              {% endif %}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      {% if restaurant.is_open %}
+                      <div
+                        class="card-footer p-4 pt-0 border-top-0 bg-transparent price-holder"
+                      >
+                        <div
+                          class="text-center d-flex justify-content-center align-items-center"
+                        >
+                          <a
+                            href="#"
+                            class="decrease_cart btn btn-outline-secondary"
+                            data-id="{{food.id}}"
+                            data-url="{% url 'decrease_cart' food.id %}"
+                          >
+                            <i class="icon-minus text-color"></i>
+                          </a>
+
+                          <label id="qty-{{ food.id }}" class="mx-3">
+                            {% if cart_item_quantities %} {{ cart_item_quantities|get_item:food.id|default:0 }}
+                            {% else %} 0
+                            {% endif %}
+                          </label>
+
+                          <a
+                            href="#"
+                            class="add_to_cart btn btn-outline-primary"
+                            data-id="{{food.id}}"
+                            data-url="{% url 'add_to_cart' food.id %}"
+                          >
+                            <i class="icon-plus4 text-color"></i>
+                          </a>
+                        </div>
+                      </div>
+                      {% else %}
+                      <button class="btn closed" disabled>Closed</button>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 </div>
 
 
 
 {% endblock content %}
-
-
-<script type="application/ld+json">
+{% block extra_js %}
+<script>
+    function filterFood(type) {
+      console.log("type", type);
+      const foodCards = document.querySelectorAll(".food-card");
+      console.log("foodCards", foodCards);
+      foodCards.forEach((card) => {
+        const foodType = card.dataset.foodType;
+        if (type === "all" || foodType === type) {
+          card.style.display = "block";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    }
+  </script>
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Restaurant",
@@ -202,5 +326,6 @@
         {% endfor %}
       ]
     }
-</script>
-    
+  </script>
+{% endblock extra_js %}
+

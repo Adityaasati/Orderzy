@@ -121,48 +121,48 @@
                             <ul class="stickynav-tabs nav nav-tabs">
                                 <li class="active"><a data-bs-toggle="tab" href="#home"><i
                                             class="icon- icon-room_service"></i>Your Order</a></li>
+                                            
 
                             </ul>
                             <div class="tab-content">
                                 <div id="home" class="tab-pane in active">
                                     <div class="menu-itam-holder">
-                                        <div id="menu-item-list-6272" class="menu-itam-list">
-
-
-                                            <ul>
-
+                                       
+                                        <div id="menu-item-list-6272" class="menu-item-list row">
+                   
+                                            <ul class="list-unstyled w-100">
                                                 {% for cart_item in cart_items_with_totals %}
-
-                                                <li id="cart-item-{{cart_item.item.id }}">
-                                                
-                                                    <div class="image-holder"> 
-                                                            {% if cart_item.item.fooditem.image %}
-                                                            <img data-src="{{cart_item.item.fooditem.image.url}}"
-                                                            alt="Food Image" class="lazyload"  loading="lazy">
-                                                            {% else %}
-                                                            <img src="{% static 'images/bg3.png' %}" alt="Default Image" />
-                                                            {% endif %}
-                                                        </div>
-                                                            <div class="text-holder">
-                                                                <h6>{{cart_item.item.fooditem}}</h6>
-                                                                <span>{{cart_item.item.fooditem.description}}</span>
-                                                                <a href="{% url 'restaurant_detail' cart_item.item.fooditem.restaurant.restaurant_slug %}"
-                                                                    class="badge badge-warning">{{cart_item.item.fooditem.restaurant}}</a>
-                                                            </div>
-                                                            <div class="quantity"
-                                                                style="display: inline-block; position:absolute; top:50%; transform:translateY(-50%); margin-top:-10px;">
-                                                                <span>{{cart_item.item.quantity}} Qty</span>
-                                                            </div>
-                                                            <div class="price-holder">
-                                                                <span class="price">₹{{cart_item.total_price}}</span>
-                                                            </div>
-                                                        </li>
-            
-                                                        {% endfor %}
-
-
+                                                <li id="cart-item-{{cart_item.item.id }}" class="d-flex align-items-center mb-3 row">
+                                                    <!-- Image holder -->
+                                                    {% if cart_item.item.fooditem.image %}
+                                                    <div class="image-holder col-4 col-sm-2">
+                                                        <img data-src="{{cart_item.item.fooditem.image.url}}" alt="Food Image" class="lazyload img-fluid rounded" loading="lazy" />
+                                                    </div>
+                                                    {% else %}
+                                                    <img src="{% static 'images/bg3.png' %}" alt="Default Image" />
+                                                    {% endif %}
+                                                    
+                                                    <!-- Text holder -->
+                                                    <div class="text-holder col-8 col-sm-4">
+                                                        <h6>{{cart_item.item.fooditem}}</h6>
+                                                    </div>
+                                            
+                                                    <!-- Quantity Display -->
+                                                    <div class="quantity-holder col-12 col-sm-3 d-flex align-items-center justify-content-center mt-2 mt-sm-0">
+                                                        <span>{{cart_item.item.quantity}} Qty</span>
+                                                    </div>
+                                            
+                                                    <!-- Price -->
+                                                    <div class="price-holder col-12 col-sm-3 d-flex align-items-center justify-content-end mt-2 mt-sm-0">
+                                                        <span class="price cart-above-mobile">₹{{cart_item.total_price}}</span>
+                                                    </div>
+                                                </li>
+                                                {% endfor %}
                                             </ul>
-                                        </div>
+                                            
+                                            
+                                          </div>
+                                        
                                         <div>
                                             <ul class="list-unstyled">
                                                 <li class="d-flex justify-content-between">

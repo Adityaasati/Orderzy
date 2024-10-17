@@ -264,7 +264,6 @@ def checkout(request):
     context = {
         'form':form,
         'cart_items_with_totals':cart_items_with_totals,
-        'cart_count':cart_count,
         'num_of_restaurants':num_of_restaurants,
         'seating_plan_available':seating_plan_available,
     }

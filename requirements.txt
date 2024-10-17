@@ -10,7 +10,7 @@ colorama==0.4.6
 config==0.5.1
 Django==5.0.6
 Flask==3.0.3
-backports.zoneinfo==0.2.1;python_version<"3.9"
+GDAL @ file:///C:/Users/asati/OneDrive/Desktop/Work_New/Orderzy/GDAL-3.8.4-cp311-cp311-win_amd64.whl#sha256=13115dae539ab85b7b4b5bf8b7eb13abf2026d95313cec0837bff034a8c25c58
 geos==0.2.3
 h11==0.14.0
 httpcore==1.0.5
@@ -22,7 +22,7 @@ lxml==5.3.0
 MarkupSafe==2.1.5
 olamaps==0.5.2
 pillow==10.3.0
-psycopg2-binary
+psycopg2==2.9.9
 pydantic==1.10.18
 pypng==0.20220715.0
 python-dateutil==2.9.0.post0
@@ -38,4 +38,3 @@ typing_extensions==4.12.2
 tzdata==2024.1
 urllib3==2.0.7
 Werkzeug==3.0.3
-gunicorn
