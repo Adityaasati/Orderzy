@@ -5,12 +5,15 @@
 {% block title %} Dashboard  {% endblock %} 
 
 {% block content %}
+
+{% block extra_css %}
 <style>
     a {
         text-decoration: none;
     }
     
 </style>
+{% endblock extra_css %}
 {% include 'includes/alerts.html' %}
 
 <div class="main-section">

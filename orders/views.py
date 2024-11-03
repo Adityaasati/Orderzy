@@ -47,16 +47,17 @@ logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
+cashfree_logger = logging.getLogger('cashfree')
+
+
 
 Cashfree.XClientId = settings.CASHFREE_X_CLIENT_ID
 Cashfree.XClientSecret = settings.CASHFREE_X_CLIENT_SECRET
 x_api_version = settings.X_API_VERSION
-if settings.CASHFREE_X_ENVIRONMENT.upper() == 'SANDBOX':
+if settings.DEBUG == True:
     Cashfree.XEnvironment = Cashfree.SANDBOX
-elif settings.CASHFREE_X_ENVIRONMENT.upper() == 'PRODUCTION':
-    Cashfree.XEnvironment = Cashfree.PRODUCTION
 else:
-    raise ValueError("Invalid value for CASHFREE_X_ENVIRONMENT in settings")
+    Cashfree.XEnvironment = Cashfree.PRODUCTION
 
 
 
@@ -291,20 +292,32 @@ def create_order_api(request):
     print(f"Received request with method in create order: {request.method}")
     if request.method == 'POST':
         try:
+            print(request.body) 
             data = json.loads(request.body)
+            print("Data loaded:", data)
             customer_id = data['customer_details']['customer_id']
             customer_phone = data['customer_details']['customer_phone']
             order_id = data['order_id']
             order_amount = float(data['order_amount'])
             customer_details = CustomerDetails(customer_id=customer_id,
                                                customer_phone=customer_phone)
+            logger.debug("Customer ID: %s", customer_id)
+            logger.debug("Order ID: %s", order_id)
+        
             
             auth_token = generate_auth_token(request.user)
+            print(auth_token,"auth_token")
+            logger.debug("Auth Token: %s", auth_token)
+            
             
             if settings.DEBUG:
-                BASE_URL = 'https://2c47-2402-e280-21c6-748-68d9-5295-106c-fa95.ngrok-free.app'
+                BASE_URL = 'https://c797-2409-40c4-276-ab4d-8ca3-d050-65e8-f7b7.ngrok-free.app'
             else:
                 BASE_URL = 'https://orderzy.in'
+            
+            print(BASE_URL,"BASE_URL")
+            logger.debug("BASE_URL: %s", BASE_URL)
+            
 
             return_url = reverse('order_complete')
             query_params = urlencode({'order_no': order_id, 'trans_id': 'CASHFREE', 'auth_token': auth_token})
@@ -314,6 +327,9 @@ def create_order_api(request):
             notify_url = f"{BASE_URL}{notify_url}"
             
             order_meta = OrderMeta(return_url=return_url,notify_url=notify_url)
+            print("order_meta",order_meta)
+            logger.debug("Notify URL: %s", notify_url)
+            logger.debug("Return URL: %s", return_url)
      
 
             create_order_request = CreateOrderRequest(
@@ -322,19 +338,104 @@ def create_order_api(request):
             order_currency="INR",
             customer_details=customer_details,
             order_meta=order_meta)
+            
+            print("create_order_request",create_order_request)
+            logger.debug("Create Order Request: %s", create_order_request)
+            
 
             response = Cashfree().PGCreateOrder(x_api_version,
                                                 create_order_request, None, None)
+            logger.debug("Response: %s", response.__dict__)
+            print(response, "response")
+            print(response.__dict__, "Full response content")
+            print("x_api_version",x_api_version)
+            print("Cashfree.XClientId",Cashfree.XClientId)
+            print("Cashfree.XClientSecret",Cashfree.XClientSecret)
+            print("Cashfree.XEnvironment",Cashfree.XEnvironment)
             
-            order_entity = response.data
             
-            if order_entity.order_status == 'ACTIVE':
-                return JsonResponse({'payment_session_id': order_entity.payment_session_id}, status = 200)
-            else:
-                return JsonResponse({'error': 'Order creation failed.'})
+            try:
+                order_entity = response.data  # Retrieve the main data object
+                print("order_entity",order_entity)
+
+                if order_entity is not None and order_entity.order_status == 'ACTIVE':
+                    print("order_entity.order_status",order_entity.order_status)
+                    print("payment_session_id",order_entity.payment_session_id)
+                    return JsonResponse({'payment_session_id': order_entity.payment_session_id}, status=200)
+                else:
+        # Provide more specific error information
+                    return JsonResponse({'error': 'Order creation failed or status is not ACTIVE.'}, status=400)
+
+            except json.JSONDecodeError as e:
+                print(f"JSON Decode Error: {e}")
+                return JsonResponse({'error': 'Failed to decode JSON response from Cashfree'}, status=500)
+
+            except KeyError as e:
+                print(f"KeyError: {e}")
+                return JsonResponse({'error': f'Missing key in response: {e}'}, status=500)
+
+            except AttributeError as e:
+                print(f"AttributeError: {e}")
+                return JsonResponse({'error': f'Missing attribute in order entity: {e}'}, status=500)
+
+            except Exception as e:
+                print(f"Other Exception: {e}")
+                return JsonResponse({'error': f'Unexpected error: {e}'}, status=500)
+        except json.JSONDecodeError as e:
+            print(f"Outer JSON Decode Error: {e}")
+            return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+
+        except KeyError as e:
+            print(f"KeyError in request data: {e}")
+            return JsonResponse({'error': f'Missing key in request data: {e}'}, status=400)
+
         except Exception as e:
-            return JsonResponse({'error':str(e)}, status=500)
-    return JsonResponse({'error':'Invalid request method'},status=405)
+            print(f"Unexpected error in request processing: {e}")
+            logger.error("Unexpected error in request processing: %s", e)
+            return JsonResponse({'error': f'Unexpected error: {e}'}, status=500)
+
+    # Fallback for incorrect request method
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+         
+
+    #         try:
+    #             print(getattr(response, 'status', 'No status'), "Status code")
+    #             print(getattr(response, 'message', 'No message'), "Response message")
+    #             print(response.data, "Data content")  # This should be safe based on your full response output
+
+    #             print(response.status, "Status code")
+    #             print(response.message, "Response message")
+    #             print(response.data, "Data content")
+    #             print(create_order_request.__dict__, "CreateOrderRequest content")
+
+    #         except Exception as e:
+    #             print(f"Exception encountered: {e}")
+
+
+    #         if response.data is not None:
+    #             order_entity = response.data
+    #             print(order_entity, "order.entity")
+            
+
+
+            
+    #         order_entity = response.data
+    #         print(order_entity,"order.entity")
+            
+            
+    #         if order_entity.order_status == 'ACTIVE':
+    #             return JsonResponse({'payment_session_id': order_entity.payment_session_id}, status = 200)
+    #         else:
+    #             return JsonResponse({'error': 'Order creation failed.'})
+    #     except json.JSONDecodeError as e:
+    #         print(f"JSON Decode Error: {e}")
+    #     except KeyError as e:
+    #         print(f"KeyError: {e}")
+    #     except Exception as e:
+    #         print(f"Other Exception: {e}")
+    # return JsonResponse({'error':'Invalid request method'},status=405)
+
 
 
 def process_order_in_background(order, restaurants_pendings):

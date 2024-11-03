@@ -14,8 +14,11 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = ['139.59.2.143','127.0.0.1','orderzy.in','www.orderzy.in', '2c47-2402-e280-21c6-748-68d9-5295-106c-fa95.ngrok-free.app']
+ALLOWED_HOSTS = ['139.59.2.143','127.0.0.1','orderzy.in','www.orderzy.in', 'c797-2409-40c4-276-ab4d-8ca3-d050-65e8-f7b7.ngrok-free.app']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://c797-2409-40c4-276-ab4d-8ca3-d050-65e8-f7b7.ngrok-free.app'
+]
 
 # Application definition
 
@@ -180,7 +183,7 @@ if DEBUG == True:
 PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID')
 CASHFREE_X_CLIENT_ID = config('CASHFREE_XCLIENTID')
 CASHFREE_X_CLIENT_SECRET = config('CASHFREE_XCLIENTSECRET')
-CASHFREE_X_ENVIRONMENT = config('CASHFREE_XENVIRONMENT', default='TEST')  # Default to 'TEST' if not set
+CASHFREE_X_ENVIRONMENT = config('CASHFREE_XENVIRONMENT', default='SANDBOX')  # Default to 'TEST' if not set
 X_API_VERSION = config('X_API_VERSION')
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
@@ -188,14 +191,37 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 SESSION_COOKIE_AGE = 3600 * 24  
 SESSION_SAVE_EVERY_REQUEST = True 
 
-# SESSION_COOKIE_DOMAIN = ".orderzy.in"
-# SESSION_COOKIE_SECURE = True
-# SESSION_COOKIE_SAMESITE = 'Lax'
-# SESSION_COOKIE_HTTPONLY = True
-
-
-SESSION_COOKIE_DOMAIN = None  # Use the domain of the request (localhost)
-SESSION_COOKIE_SECURE = False
-SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_DOMAIN = ".orderzy.in"
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_HTTPONLY = True
 
+
+# SESSION_COOKIE_DOMAIN = None  # Use the domain of the request (localhost)
+# SESSION_COOKIE_SECURE = False
+# SESSION_COOKIE_SAMESITE = None
+# SESSION_COOKIE_HTTPONLY = True
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/orderzy.log',  # Adjust path as needed
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'cashfree': {  # Custom logger for Cashfree
+            'handlers': ['file'],
+            'level': 'DEBUG',  # Use DEBUG for more detailed logs
+            'propagate': False,
+        },
+    },
+}
