@@ -289,12 +289,17 @@ def create_pending_order(order, restaurant):
 
 @csrf_exempt
 def create_order_api(request):
-    print(f"Received request with method in create order: {request.method}")
+    logger.info("Received request with method in create order: %s", request.method)
+
     if request.method == 'POST':
         try:
             print(request.body) 
             data = json.loads(request.body)
+            logger.debug("Request body: %s", request.body)
+
             print("Data loaded:", data)
+            logger.debug("Data loaded: %s", data)
+
             customer_id = data['customer_details']['customer_id']
             customer_phone = data['customer_details']['customer_phone']
             order_id = data['order_id']
@@ -361,6 +366,10 @@ def create_order_api(request):
                 if order_entity is not None and order_entity.order_status == 'ACTIVE':
                     print("order_entity.order_status",order_entity.order_status)
                     print("payment_session_id",order_entity.payment_session_id)
+                    logger.debug("Order entity: %s", order_entity)
+
+                    logger.info("Payment session ID: %s", order_entity.payment_session_id)
+
                     return JsonResponse({'payment_session_id': order_entity.payment_session_id}, status=200)
                 else:
         # Provide more specific error information
