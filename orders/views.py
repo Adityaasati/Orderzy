@@ -303,6 +303,11 @@ def create_order_api(request):
             print("Data loaded:", data)
             logger.debug("Data loaded: %s", data)
 
+            # 2. Write Values to a Temporary File
+            with open('/tmp/debug_info.txt', 'a') as f:
+                f.write(f"x_api_version: {x_api_version}\n")
+                f.write(f"XEnvironment: {Cashfree.XEnvironment}\n")
+
             customer_id = data['customer_details']['customer_id']
             customer_phone = data['customer_details']['customer_phone']
             order_id = data['order_id']
