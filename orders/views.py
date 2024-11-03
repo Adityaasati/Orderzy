@@ -63,9 +63,12 @@ else:
 
 @login_required(login_url='login')
 def place_order(request):
+    
     cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
     cart_count = cart_items.count()
     print("request.user.id",request.user.id)
+    logger.info("User ID: %s", request.user.id)
+
     print(request.user,"user")
     
     if cart_count <=0:
