@@ -304,9 +304,11 @@ def create_order_api(request):
             logger.debug("Data loaded: %s", data)
 
             # 2. Write Values to a Temporary File
-            with open('/tmp/debug_info.txt', 'a') as f:
+         
+            with open('/home/orderzy/orderzy-dir/debug_info.txt', 'a') as f:
                 f.write(f"x_api_version: {x_api_version}\n")
                 f.write(f"XEnvironment: {Cashfree.XEnvironment}\n")
+
 
             customer_id = data['customer_details']['customer_id']
             customer_phone = data['customer_details']['customer_phone']
