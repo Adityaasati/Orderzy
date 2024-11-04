@@ -308,6 +308,13 @@ def create_order_api(request):
             with open('/home/orderzy/orderzy-dir/debug_info.txt', 'a') as f:
                 f.write(f"x_api_version: {x_api_version}\n")
                 f.write(f"XEnvironment: {Cashfree.XEnvironment}\n")
+                
+            with open('/home/orderzy/orderzy-dir/debug_info.txt', 'a') as f:
+                f.write(f"x_api_version: {x_api_version}\n")
+                f.write(f"XEnvironment: {Cashfree.XEnvironment}\n")
+
+                return JsonResponse({'status': 'Debug file written'})
+
 
 
             customer_id = data['customer_details']['customer_id']
