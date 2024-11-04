@@ -363,20 +363,22 @@ def create_order_api(request):
             print("Cashfree.XClientSecret",Cashfree.XClientSecret)
             print("Cashfree.XEnvironment",Cashfree.XEnvironment)
             
-            
-            try:
-                order_entity = response.data  # Retrieve the main data object
-                print("order_entity",order_entity)
-                
-                with open('/home/orderzy/orderzy-dir/debug_info.txt', 'a') as f:
-                    f.write(f"x_api_version: {x_api_version}\n")
+            with open('/home/orderzy/orderzy-dir/debug_info.txt', 'a') as f:
                     f.write(f"XEnvironment: {Cashfree.XEnvironment}\n")
                     f.write(f"XClientId: {Cashfree.XClientId}\n")
                     f.write(f"XClientSecret: {Cashfree.XClientSecret}\n")
                     f.write(f"Order entity: {order_entity}\n")
                     f.write(f"Payment session ID: {getattr(order_entity, 'payment_session_id', 'Not found')}\n")
-
+                    f.write(f"Request URL: {getattr(response, 'request', 'Not available')}\n")
+                    
                     return JsonResponse({'status': 'Debug file written'})
+            
+            
+            try:
+                order_entity = response.data  # Retrieve the main data object
+                print("order_entity",order_entity)
+                
+                
 
                 if order_entity is not None and order_entity.order_status == 'ACTIVE':
                     print("order_entity.order_status",order_entity.order_status)
