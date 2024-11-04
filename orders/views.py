@@ -303,19 +303,7 @@ def create_order_api(request):
             print("Data loaded:", data)
             logger.debug("Data loaded: %s", data)
 
-            # 2. Write Values to a Temporary File
-         
-            with open('/home/orderzy/orderzy-dir/debug_info.txt', 'a') as f:
-                f.write(f"x_api_version: {x_api_version}\n")
-                f.write(f"XEnvironment: {Cashfree.XEnvironment}\n")
-                
-            with open('/home/orderzy/orderzy-dir/debug_info.txt', 'a') as f:
-                f.write(f"x_api_version: {x_api_version}\n")
-                f.write(f"XEnvironment: {Cashfree.XEnvironment}\n")
-
-                return JsonResponse({'status': 'Debug file written'})
-
-
+            
 
             customer_id = data['customer_details']['customer_id']
             customer_phone = data['customer_details']['customer_phone']
@@ -379,6 +367,16 @@ def create_order_api(request):
             try:
                 order_entity = response.data  # Retrieve the main data object
                 print("order_entity",order_entity)
+                
+                with open('/home/orderzy/orderzy-dir/debug_info.txt', 'a') as f:
+                    f.write(f"x_api_version: {x_api_version}\n")
+                    f.write(f"XEnvironment: {Cashfree.XEnvironment}\n")
+                    f.write(f"XClientId: {Cashfree.XClientId}\n")
+                    f.write(f"XClientSecret: {Cashfree.XClientSecret}\n")
+                    f.write(f"Order entity: {order_entity}\n")
+                    f.write(f"Payment session ID: {getattr(order_entity, 'payment_session_id', 'Not found')}\n")
+
+                    return JsonResponse({'status': 'Debug file written'})
 
                 if order_entity is not None and order_entity.order_status == 'ACTIVE':
                     print("order_entity.order_status",order_entity.order_status)
