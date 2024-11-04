@@ -194,8 +194,6 @@
     const customer_phone = '9238008672';
     console.log("customer_id",customer_id)
 
-
-
     const orderData = {
       customer_details: {
         customer_id:customer_id,
@@ -216,8 +214,12 @@
       },
       body: JSON.stringify(orderData)
     })
-    .then(response => response.json() )
+    .then(response => {
+      console.log('Response status:', response.status);
+      return response.json();
+  })
     .then(data => {
+      console.log('Response data:', data);
       document.getElementById('loader').style.display = 'none';
       if (data.payment_session_id){
         cashfree.checkout({
@@ -226,11 +228,14 @@
         });
       } else {
         alert ('Order creation failed');
+        console.log('Error: payment_session_id not found in response');
+
       }
     })
     .catch(error => {
       document.getElementById('loader').style.display = 'none';
-      console.log('Error:',error);
+      alert('Order creation failed due to network or server error');
+      console.log('Error:', error);
     })
 
   }
