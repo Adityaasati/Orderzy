@@ -215,12 +215,17 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['file'],
-            'level': 'INFO',
+            'level': 'INFO',  # Keep INFO to avoid too verbose logs for django
             'propagate': True,
+        },
+        'django.request': {  # Add this for error-level logs on requests
+            'handlers': ['file'],
+            'level': 'ERROR',  # Capture 500 errors and tracebacks
+            'propagate': False,
         },
         'cashfree': {  # Custom logger for Cashfree
             'handlers': ['file'],
-            'level': 'DEBUG',  # Use DEBUG for more detailed logs
+            'level': 'DEBUG',  # Keep DEBUG for detailed Cashfree logging
             'propagate': False,
         },
     },
