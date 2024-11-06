@@ -191,16 +191,19 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 SESSION_COOKIE_AGE = 3600 * 24  
 SESSION_SAVE_EVERY_REQUEST = True 
 
-SESSION_COOKIE_DOMAIN = ".orderzy.in"
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_HTTPONLY = True
 
 
-# SESSION_COOKIE_DOMAIN = None  # Use the domain of the request (localhost)
-# SESSION_COOKIE_SECURE = False
-# SESSION_COOKIE_SAMESITE = None
-# SESSION_COOKIE_HTTPONLY = True
+if DEBUG:
+    SESSION_COOKIE_DOMAIN = None  # Use the domain of the request (localhost)
+    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_SAMESITE = None
+    SESSION_COOKIE_HTTPONLY = True
+else:
+    SESSION_COOKIE_DOMAIN = ".orderzy.in"
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_HTTPONLY = True
+
 
 LOGGING = {
     'version': 1,
@@ -208,25 +211,35 @@ LOGGING = {
     'handlers': {
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/var/log/orderzy.log',  # Adjust path as needed
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': '/var/log/orderzy.log',
+            'when': 'midnight',
+            'backupCount': 7,
+            'formatter': 'verbose',  # Use the verbose format for detailed logs
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message} {exc_info}',  # Include exc_info for exceptions
+            'style': '{',
         },
     },
     'loggers': {
         'django': {
             'handlers': ['file'],
-            'level': 'INFO',  # Keep INFO to avoid too verbose logs for django
+            'level': 'INFO',
             'propagate': True,
         },
-        'django.request': {  # Add this for error-level logs on requests
+        'django.request': {  # Error-level logs for requests, with full stack trace on exceptions
             'handlers': ['file'],
-            'level': 'ERROR',  # Capture 500 errors and tracebacks
+            'level': 'ERROR',
             'propagate': False,
         },
         'cashfree': {  # Custom logger for Cashfree
             'handlers': ['file'],
-            'level': 'DEBUG',  # Keep DEBUG for detailed Cashfree logging
+            'level': 'DEBUG',
             'propagate': False,
         },
     },
 }
+
