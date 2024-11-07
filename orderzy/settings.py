@@ -210,11 +210,10 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'file': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': '/var/log/orderzy.log',
-            'when': 'midnight',
-            'backupCount': 7,
+           'class': 'logging.handlers.TimedRotatingFileHandler',
+        'filename': '/var/log/orderzy.log',  # Adjust the path to a suitable location
+        'when': 'midnight',  # Rotate logs daily at midnight
+        'backupCount': 7, 
             'formatter': 'verbose',  # Use the verbose format for detailed logs
         },
     },
