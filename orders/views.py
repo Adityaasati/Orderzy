@@ -41,14 +41,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.core import signing
 from django.utils.http import urlencode
-
-logging.basicConfig(level=logging.INFO)  
-
+ 
 
 
-logger = logging.getLogger(__name__)
-
-cashfree_logger = logging.getLogger('django')
+logger = logging.getLogger('django')
 
 
 
