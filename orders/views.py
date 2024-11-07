@@ -48,7 +48,7 @@ logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
-cashfree_logger = logging.getLogger('cashfree')
+cashfree_logger = logging.getLogger('django')
 
 
 
