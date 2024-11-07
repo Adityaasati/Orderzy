@@ -17,7 +17,7 @@ DEBUG = config('DEBUG', cast=bool)
 ALLOWED_HOSTS = ['139.59.2.143','127.0.0.1','orderzy.in','www.orderzy.in', 'c797-2409-40c4-276-ab4d-8ca3-d050-65e8-f7b7.ngrok-free.app']
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://c797-2409-40c4-276-ab4d-8ca3-d050-65e8-f7b7.ngrok-free.app'
+    'https://c797-2409-40c4-276-ab4d-8ca3-d050-65e8-f7b7.ngrok-free.app', 'https://www.orderzy.in','https://orderzy.in'
 ]
 
 # Application definition
@@ -227,7 +227,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['file'],
-            'level': 'INFO',
+            'level': 'ERROR',
             'propagate': True,
         },
         'django.request': {

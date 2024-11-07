@@ -376,7 +376,7 @@ def create_order_api(request):
                     f.write(f"Payment session ID: {getattr(order_entity, 'payment_session_id', 'Not found')}\n")
                     f.write(f"Request URL: {getattr(response, 'request', 'Not available')}\n")
             except (FileNotFoundError, IOError) as e:
-                logger.error(f"Failed to write debug information: {e}")
+                logger.error("Failed to write debug information: %s", str(e), exc_info=True)
                 
             logger.info(f"XEnvironment: {Cashfree.XEnvironment}")
             logger.info(f"XClientId: {Cashfree.XClientId}")
@@ -395,18 +395,6 @@ def create_order_api(request):
                 return JsonResponse({'payment_session_id': order_entity.payment_session_id}, status=200)
             else:
                 return JsonResponse({'error': 'Order creation failed or status is not ACTIVE.'}, status=400)
-
-        except json.JSONDecodeError as e:
-            print(f"JSON Decode Error: {e}")
-            return JsonResponse({'error': 'Failed to decode JSON response from Cashfree'}, status=500)
-
-        except KeyError as e:
-            print(f"KeyError: {e}")
-            return JsonResponse({'error': f'Missing key in response: {e}'}, status=500)
-
-        except AttributeError as e:
-            print(f"AttributeError: {e}")
-            return JsonResponse({'error': f'Missing attribute in order entity: {e}'}, status=500)
 
         
         except Exception as e:
