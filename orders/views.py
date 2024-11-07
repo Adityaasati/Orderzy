@@ -2,7 +2,7 @@
 import json
 import uuid
 import os
-
+import tempfile
 # Third-Party Imports
 import requests
 import simplejson as json
@@ -361,7 +361,11 @@ def create_order_api(request):
             print("Cashfree.XEnvironment",Cashfree.XEnvironment)
             
                 
-            debug_file_path = '/home/orderzy/orderzy-dir/debug_info.txt' if os.path.exists('/home/orderzy/orderzy-dir') else 'debug_info.txt'
+            if os.path.exists('/tmp'):  # Common in Linux-based systems
+                debug_file_path = '/tmp/debug_info.txt'
+            else:
+    # Use a cross-platform approach for local environments or Windows
+                debug_file_path = os.path.join(tempfile.gettempdir(), 'debug_info.txt')
 
             try:
                 with open(debug_file_path, 'a') as f:
@@ -404,12 +408,11 @@ def create_order_api(request):
             print(f"AttributeError: {e}")
             return JsonResponse({'error': f'Missing attribute in order entity: {e}'}, status=500)
 
+        
         except Exception as e:
-            print(f"Other Exception: {e}")
-            return JsonResponse({'error': f'Unexpected error: {e}'}, status=500)
-        except json.JSONDecodeError as e:
-            print(f"Outer JSON Decode Error: {e}")
-            return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+            logger.error("Unexpected error in create_order_api: %s", str(e), exc_info=True)
+            return JsonResponse({'error': f'Unexpected error: {str(e)}'}, status=500)
+
 
     # Fallback for incorrect request method
     return JsonResponse({'error': 'Invalid request method'}, status=405)

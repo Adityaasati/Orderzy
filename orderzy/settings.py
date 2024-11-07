@@ -230,11 +230,12 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
-        'django.request': {  # Error-level logs for requests, with full stack trace on exceptions
-            'handlers': ['file'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
+        'django.request': {
+    'handlers': ['file'],
+    'level': 'DEBUG',  # Set to DEBUG to capture more details
+    'propagate': False,
+},
+
         'cashfree': {  # Custom logger for Cashfree
             'handlers': ['file'],
             'level': 'DEBUG',
