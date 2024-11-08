@@ -174,10 +174,13 @@
                     <span>{{ restaurant.user_profile.city }}, {{ restaurant.user_profile.state }}, {{ restaurant.user_profile.pin_code }}</span>
                     {% endif %} 
 					
-					{% if restaurant.kms %}
-                    <br>
-                    <span><small><b>{{restaurant.kms}} km </b>away</small></span>
+			
+
+                    {% if restaurant.kms|default_if_none:"" %}
+                        <br>
+                        <span><small><b>{{ restaurant.kms }} km </b>away</small></span>
                     {% endif %}
+
                   </div>
                   <div class="list-option">
                     <a

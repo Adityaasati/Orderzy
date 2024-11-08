@@ -222,10 +222,11 @@
       console.log('Response data:', data);
       document.getElementById('loader').style.display = 'none';
       console.log('Received payment_session_id:', data.payment_session_id);
-      if (data.payment_session_id){
+      if (data && data.payment_session_id) {
+        console.log('Received payment_session_id:', data.payment_session_id);
         cashfree.checkout({
-          paymentSessionId:data.payment_session_id,
-          redirectTarget: "_self"
+            paymentSessionId: data.payment_session_id,
+            redirectTarget: "_self"
         });
       } else {
         alert ('Order creation failed');
