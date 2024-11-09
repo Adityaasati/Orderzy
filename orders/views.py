@@ -370,7 +370,6 @@ def create_order_api(request):
                     f.write(f"XClientSecret: {Cashfree.XClientSecret}\n")
                     f.write(f"Order entity: {order_entity}\n")
                     f.write(f"Payment session ID: {getattr(order_entity, 'payment_session_id', 'Not found')}\n")
-                    f.write(f"Request URL: {getattr(response, 'request', 'Not available')}\n")
             except (FileNotFoundError, IOError) as e:
                 logger.error("Failed to write debug information: %s", str(e), exc_info=True)
                 
