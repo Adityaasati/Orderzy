@@ -349,36 +349,7 @@ def create_order_api(request):
                                                 create_order_request, None, None)
             order_entity = response.data 
             logger.debug("Response: %s", response.__dict__)
-            print(response, "response")
-            print(response.__dict__, "Full response content")
-            print("x_api_version",x_api_version)
-            print("Cashfree.XClientId",Cashfree.XClientId)
-            print("Cashfree.XClientSecret",Cashfree.XClientSecret)
-            print("Cashfree.XEnvironment",Cashfree.XEnvironment)
-            
-                
-            if os.path.exists('/tmp'):  # Common in Linux-based systems
-                debug_file_path = '/tmp/debug_info.txt'
-            else:
-    # Use a cross-platform approach for local environments or Windows
-                debug_file_path = os.path.join(tempfile.gettempdir(), 'debug_info.txt')
 
-            try:
-                with open(debug_file_path, 'a') as f:
-                    f.write(f"XEnvironment: {Cashfree.XEnvironment}\n")
-                    f.write(f"XClientId: {Cashfree.XClientId}\n")
-                    f.write(f"XClientSecret: {Cashfree.XClientSecret}\n")
-                    f.write(f"Order entity: {order_entity}\n")
-                    f.write(f"Payment session ID: {getattr(order_entity, 'payment_session_id', 'Not found')}\n")
-            except (FileNotFoundError, IOError) as e:
-                logger.error("Failed to write debug information: %s", str(e), exc_info=True)
-                
-            logger.info(f"XEnvironment: {Cashfree.XEnvironment}")
-            logger.info(f"XClientId: {Cashfree.XClientId}")
-            logger.info(f"XClientSecret: {Cashfree.XClientSecret}")
-            logger.info(f"Order entity: {order_entity}")
-            logger.info(f"Payment session ID: {getattr(order_entity, 'payment_session_id', 'Not found')}")
-            logger.info(f"Request URL: {getattr(response, 'request', 'Not available')}")
             
             if order_entity is not None and order_entity.order_status == 'ACTIVE':
                 print("order_entity.order_status",order_entity.order_status)
@@ -397,7 +368,6 @@ def create_order_api(request):
             return JsonResponse({'error': f'Unexpected error: {str(e)}'}, status=500)
 
 
-    # Fallback for incorrect request method
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
          
@@ -680,6 +650,7 @@ def payment_webhook(request):
                         restaurant_context = {
                             'order': order,
                             'to_email': i.fooditem.restaurant.user.email,
+                            'customer_subtotal': customer_subtotal,
                             'ordered_food_to_restaurant': ordered_food_to_restaurant,
                             'restaurant_subtotal': order_total_by_restaurant(order, i.fooditem.restaurant.id)['subtotal'],
                             'service_charge_data': order_total_by_restaurant(order, i.fooditem.restaurant.id)['service_charge_dict'],

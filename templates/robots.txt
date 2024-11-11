@@ -8,7 +8,8 @@ Disallow: /profile/
 Disallow: /restaurantDashboard/ 
 Disallow: /custDashboard/      
 Disallow: /restaurant_my_orders/    
-Disallow: /customer_my_orders/          
+Disallow: /customer_my_orders/       
+Disallow: /base/          
 Allow: /                  
 
 Sitemap: https://orderzy.in/sitemap.xml
