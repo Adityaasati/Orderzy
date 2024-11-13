@@ -46,8 +46,6 @@ from django.utils.http import urlencode
 
 logger = logging.getLogger('django')
 
-
-
 Cashfree.XClientId = settings.CASHFREE_X_CLIENT_ID
 Cashfree.XClientSecret = settings.CASHFREE_X_CLIENT_SECRET
 x_api_version = settings.X_API_VERSION
@@ -63,10 +61,8 @@ def place_order(request):
     
     cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
     cart_count = cart_items.count()
-    print("request.user.id",request.user.id)
     logger.info("User ID: %s", request.user.id)
 
-    print(request.user,"user")
     
     if cart_count <=0:
         return redirect('marketplace')
@@ -121,16 +117,13 @@ def place_order(request):
                 order.service_charge_data = json.dumps(service_charge_data, cls=DecimalEncoder)
                 order.total_data = json.dumps(total_data, cls=DecimalEncoder)
             except TypeError as e:
-                print(f"Error serializing data: {e}")
                 return JsonResponse({'error': 'Unable to serialize data.'}, status=500)
             
             order.total_charge = total_charge
             order.payment_method = request.POST['payment_method']
-            print("order.payment_method ",order.payment_method )
             order.pre_order_time = float(request.POST.get('pre_order_time', 0)) 
             num_of_people = form.cleaned_data.get('num_of_people', 0)
             order.num_of_people = num_of_people if num_of_people is not None else 0
-            print("order.pre_order_time",order.pre_order_time)
             order.save()  
 
             order.order_number = generate_order_number(order.id)
@@ -200,14 +193,13 @@ def place_order(request):
             return render(request, 'orders/place_order.html',context)
                 
         else:
-            print("form is not valid")
-            print("form.errors:", form.errors)
+            logger.error("Form is not valid")
+            logger.error("Form errors: %s", form.errors)
+
    
     else:
-        print("request is not post")        
+        logger.error("request is not post")       
     return render(request, 'orders/place_order.html')
-
-
 
 
 def fetch_order(order_number, transaction_id=None):
@@ -293,11 +285,9 @@ def create_order_api(request):
 
     if request.method == 'POST':
         try:
-            print(request.body) 
             data = json.loads(request.body)
             logger.debug("Request body: %s", request.body)
 
-            print("Data loaded:", data)
             logger.debug("Data loaded: %s", data)
 
             
@@ -313,23 +303,17 @@ def create_order_api(request):
         
             
             auth_token = generate_auth_token(request.user)
-            print(auth_token,"auth_token")
             logger.debug("Auth Token: %s", auth_token)
             
             
-            BASE_URL = 'https://orderzy.in' if not settings.DEBUG else 'https://c797-2409-40c4-276-ab4d-8ca3-d050-65e8-f7b7.ngrok-free.app'
+            BASE_URL = 'https://orderzy.in' if not settings.DEBUG else 'https://2346-152-58-56-32.ngrok-free.app'
             logger.debug("BASE_URL: %s", BASE_URL)
-            print("BASE URL ",BASE_URL)
 
             # Return and Notify URLs
             return_url = f"{BASE_URL}{reverse('order_complete')}?{urlencode({'order_no': order_id, 'trans_id': 'CASHFREE', 'auth_token': auth_token})}"
             notify_url = f"{BASE_URL}{reverse('payment_webhook')}"
             
-            print("return_url",return_url)
-            print("notify_url",notify_url)
-            
             order_meta = OrderMeta(return_url=return_url,notify_url=notify_url)
-            print("order_meta",order_meta)
             logger.debug("Notify URL: %s", notify_url)
             logger.debug("Return URL: %s", return_url)
      
@@ -341,7 +325,6 @@ def create_order_api(request):
             customer_details=customer_details,
             order_meta=order_meta)
             
-            print("create_order_request",create_order_request)
             logger.debug("Create Order Request: %s", create_order_request)
             
 
@@ -352,10 +335,7 @@ def create_order_api(request):
 
             
             if order_entity is not None and order_entity.order_status == 'ACTIVE':
-                print("order_entity.order_status",order_entity.order_status)
-                print("payment_session_id",order_entity.payment_session_id)
                 logger.debug("Order entity: %s", order_entity)
-
                 logger.info("Payment session ID: %s", order_entity.payment_session_id)
 
                 return JsonResponse({'payment_session_id': order_entity.payment_session_id}, status=200)
@@ -378,7 +358,6 @@ def process_order_in_background(order, restaurants_pendings):
     logging.info("Started processing order in the background for order number: %s", order.order_number)
 
     """Process order items in the background to avoid delaying user response."""
-    print("Entered in process_order_in_background")
     ordered_food_details = []
     grand_total = 0
     try:
@@ -456,17 +435,29 @@ def order_complete(request):
         except (json.JSONDecodeError, TypeError):
             service_charge_data = {}
 
-        # Delete the cart items after rendering order details
+        restaurant_id =  item.fooditem.restaurant.id
+        print('restaurant_id',restaurant_id)
         Cart.objects.filter(user=order.user).delete()
+        pending_order_queryset = PendingOrders.objects.filter(po_restaurant_id=restaurant_id).order_by('id')
+
+        pending_order = pending_order_queryset.last()
+        if pending_order is not None:
+            current_restaurant_order = pending_order.get_restaurant_order_number()
+            preparing_restaurant_order = pending_order.preparing_restaurant_order_number()
+            away_restaurant_order = (current_restaurant_order - preparing_restaurant_order) + 1
+            
 
         context = {
             'order': order,
             'ordered_food_details': ordered_food_details,
             'subtotal': subtotal,
             'service_charge_data': service_charge_data,
+            'away_restaurant_order':away_restaurant_order,
+            'current_restaurant_order':current_restaurant_order
+            
         }
 
-        # Trigger Pending Order Creation in a Background Thread if not already created
+        
         if not PendingOrders.objects.filter(po_order_number=order.order_number).exists():
             # Start processing pending orders for the completed order
             restaurants_pendings = order.restaurants.all()

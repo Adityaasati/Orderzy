@@ -6,6 +6,9 @@ from django.contrib.gis.db.models.functions import Distance
 from accounts.models import ContactMessage
 from accounts.forms import ContactForm
 from django.contrib import messages
+import logging
+
+logger = logging.getLogger('django')
 
 def is_valid_coordinate(value):
     try:
@@ -38,16 +41,19 @@ def get_or_set_current_location(request):
 
 
 def home(request):
+
     if get_or_set_current_location(request) is not None:
        
-        # pnt = GEOSGeometry('POINT(%s %s)' % (get_or_set_current_location(request)))
         lng, lat = get_or_set_current_location(request)
         pnt = GEOSGeometry(f'POINT({lng} {lat})')
-
         restaurants = Restaurant.objects.filter(user_profile__location__distance_lte=(pnt, D(km=1000))).annotate(distance=Distance("user_profile__location", pnt)).order_by("distance")
-
+        
         for r in restaurants:
             r.kms = round(r.distance.km,1)
+        if not restaurants.exists():
+            restaurants = Restaurant.objects.filter(
+                is_approved=True, user__is_active=True
+            )[:8]
     else:
         
         restaurants = Restaurant.objects.filter(is_approved=True, user__is_active=True)[:8]
@@ -55,6 +61,7 @@ def home(request):
     context = {
         'restaurants':restaurants
     }
+    
     return render(request, 'home.html',context)
 
 def base(request):

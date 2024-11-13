@@ -14,7 +14,9 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib import messages
+import logging
 
+logger = logging.getLogger('django')
 
 def marketplace(request):
     restaurants = Restaurant.objects.filter(is_approved=True, user__is_active=True)
@@ -198,10 +200,8 @@ def search(request):
         food_hubs_count = nearby_food_hubs.count()
 
     else:
-        print("Entered in else")
         note = "Sorry for your inconvenience. Currently we do not have your item."
         # messages.warning(request, "Sorry, Currently we do not have your item.")
-        print(note)
         
         nearby_food_hubs = 0
         food_hubs_count = 0

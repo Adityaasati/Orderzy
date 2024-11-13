@@ -330,12 +330,12 @@ def ready_po(request, id):
         defaults={'seating_plan_available': False}  # Default values if creating a new SeatingPlan
     )
     
-    
     if not seating_plan.seating_plan_available:
         if request.method == 'POST':
             pending_order = get_object_or_404(PendingOrders, pk=id)
             pending_order.po_status = 'Ready'
             pending_order.save()
+            
             return redirect('restaurant_pending_orders')
 
     if request.method == 'POST':

@@ -8,7 +8,9 @@ from datetime import datetime, timedelta
 from orders.models import Order,OrderedFood
 import simplejson as json
 from orders.models import PendingOrders
+import logging
 
+logger = logging.getLogger('django')
 
 @login_required(login_url='login')
 def cprofile(request):
@@ -22,8 +24,8 @@ def cprofile(request):
             messages.success(request, 'Profile Updated')
             return redirect('cprofile')
         else:
-            print(profile_form.errors)
-            print(user_form.errors)
+            logger.error("profile_form.errors",profile_form.errors)
+            logger.error("user_form.errors",user_form.errors)
     else:
         profile_form = UserProfileForm(instance=profile)
         user_form = UserInfoForm(instance=request.user)
@@ -107,8 +109,7 @@ def order_cancel(request, order_number):
             pending_order.save()
     except PendingOrders.DoesNotExist:
             # Handle the case where there is no related PendingOrder
-            print("No PendingOrder found for this order.")
-    messages.success(request, "Your order has been successfully cancelled.")
+        messages.success(request, "Your order has been successfully cancelled.")
 
     return redirect('customer_my_orders')  
 
@@ -137,7 +138,8 @@ def pre_order_time_change(request, order_number):
             pending_order.po_pre_order_time = changed_time
             pending_order.save()
         except PendingOrders.DoesNotExist:
-            print("No PendingOrder found for this order.")
+            logger.warning("No PendingOrder found for this order.")
+
 
         messages.success(request, "Your pre-order time has been successfully updated.")
         return redirect('customer_my_orders')

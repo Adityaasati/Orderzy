@@ -24,9 +24,9 @@ from django.conf import settings
 import os
 import datetime
 import re
+import logging
 
-
-
+logger = logging.getLogger('django')
 def check_role_restaurant(user):
     if user.role == 1:
         return True
@@ -47,7 +47,6 @@ def registerUser(request):
     elif request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():  
-            print("Form is valid")
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             username = form.cleaned_data['username']
@@ -64,13 +63,13 @@ def registerUser(request):
             user.save()
             user.is_active = True
             user.save()
-            print(f"User created: {user.username}")
 
             messages.success(request, "Your Account has been registered successfully!")
             return redirect('login')
         else:
-            print("Invalid form")
-            print(form.errors)
+            
+            logger.error("Invalid form")
+            logger.error(form.errors)
     else:
         form = UserForm()
     context = {
@@ -111,12 +110,10 @@ def registerRestaurant(request):
                 email_template = 'accounts/emails/account_verification_email.html'
                 send_verification_email(request, user, mail_subject, email_template)
                 # send_verification_email(request, user, mail_subject, email_template)
-                print(f"Sending email to {username}")
             elif re.match(r"^\+?\d{10,15}$", username):
                 
                 message = "Please activate your account using the following code: 12345" 
                 # send_whatsapp_message(username, message)
-                print(f"Sending WhatsApp message to {username}")
             else:
                 # Invalid username format
                 messages.error(request, "Username must be a valid email or phone number.")
@@ -124,7 +121,6 @@ def registerRestaurant(request):
             messages.success(request, 'Your Account is created successfully. Please wait for the Approval.')
             return redirect('login')
         else:
-            print(form.errors)
             return render(request, 'accounts/registerRestaurant.html', {'form': form, 'r_form': r_form})
 
     else:
@@ -137,35 +133,6 @@ def registerRestaurant(request):
         'r_form': r_form,
     }
     return render(request, 'accounts/registerRestaurant.html', context)
-
-# def login(request):
-#     if request.user.is_authenticated:
-#         messages.warning(request, "You are already logged in")
-#         return redirect('myAccount')
-#     if request.method == 'POST':
-#         form = LoginForm(request.POST)
-#         if form.is_valid():
-#             username = form.cleaned_data['identifier'].lower()
-#             password = form.cleaned_data['password']
-#             user = auth.authenticate(request, username=username, password=password)
-#             if user is not None :
-#                 if user.is_active:
-#                     auth.login(request, user)
-#                     messages.success(request, 'You are logged in')
-#                     return redirect('marketplace')
-                
-#                 else:
-#                     messages.error(request, 'Kindly wait until you receive approval before proceeding.')
-#             else:
-#                 messages.error(request, 'Invalid credentials')
-            
-#         else: 
-            
-#             print(form.errors) 
-#     else:
-        
-#         form = LoginForm()
-#     return render(request, 'accounts/login.html', {'form': form})
 
 def login(request):
     if request.user.is_authenticated:
@@ -207,7 +174,7 @@ def login(request):
             else:
                 messages.error(request, 'Invalid credentials')
         else:
-            print(form.errors)
+            logger.error(form.errors)
     else:
         form = LoginForm()
     
@@ -217,44 +184,36 @@ def login(request):
 
 
 def activate(request, uidb64, token):
-    print("Entered in activate")
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
         user = User._default_manager.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
-        print(f"Error decoding UID or fetching user: {e}")
         user = None
 
     if user is not None and default_token_generator.check_token(user, token):
         if not user.is_active:
             user.is_active = True
             user.save()
-            print(f"User {user.username} is now active: {user.is_active}")
 
 
             auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            print(f"User {user.username} has been logged in.")
             
             try:
                 email_validator = EmailValidator()
                 email_validator(user.username)  
-                print(f"Valid email: {user.username}")
                 messages.success(request, 'Congrats! Your account is activated.')
                 return redirect('myAccount')
             except ValidationError:
                 if re.match(r"^\+?\d{10,15}$", user.username):
-                    print(f"Valid phone number: {user.username}")
                     messages.success(request, 'Congrats! Your account is activated.')
                     return redirect('myAccount')
                 else:
-                    print(f"Invalid username format: {user.username}")
                     messages.error(request, 'Invalid username format.')
                     return redirect('myAccount')
         else:
             messages.info(request, 'Your account is already activated.')
             return redirect('myAccount')
     else:
-        print(f"Invalid token or user: {user}")
         messages.error(request, 'Invalid Activation Link')
         return redirect('myAccount')
 
@@ -284,13 +243,9 @@ def custDashboard(request):
 @login_required(login_url='login')
 @user_passes_test(check_role_restaurant)
 def restaurantDashboard(request):
-    print(request.user,"rquest.user")
     restaurant = Restaurant.objects.get(user=request.user)
-    print(restaurant)
-    
     orders = Order.objects.filter( restaurants__in=[restaurant.id],is_ordered=True).order_by('-created_at')
     recent_orders = orders[:10]
-
     current_month = datetime.datetime.now().month
     current_month_orders = orders.filter(restaurants__in=[restaurant.id], created_at__month=current_month)
     current_month_revenue = 0
@@ -299,7 +254,6 @@ def restaurantDashboard(request):
     
     filename = f"{restaurant.id}_menu_qr.png"
     file_path = os.path.join(settings.STATIC_URL, 'qr_codes', filename)
-    print('file_path',file_path)
     
     total_revenue = 0
     for i in orders:
@@ -352,12 +306,9 @@ def forgot_password(request):
             email_validator(identifier)  # If it's valid, this means it's an email
             user_filter = {'email': identifier}
         except ValidationError:
-            print(f"Invalid email, trying phone number: {identifier}")
             if re.match(r"^\+?\d{10,15}$", identifier):
-                print(f"Valid phone number: {identifier}")
                 user_filter = {'username': identifier}  # Assuming username stores the phone number
             else:
-                print(f"Invalid identifier: {identifier}")
                 messages.error(request, 'Please enter a valid email address')
                 return redirect('forgot_password')
 
@@ -370,7 +321,6 @@ def forgot_password(request):
                 send_verification_email(request, user, mail_subject, email_template)
                 messages.success(request, 'Password reset link has been sent to your email.')
             else:
-                print("Phone number")
                 reset_link = request.build_absolute_uri(reverse('reset_password_validate', kwargs={
                     'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
                     'token': default_token_generator.make_token(user),

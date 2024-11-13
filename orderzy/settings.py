@@ -4,20 +4,28 @@ from cashfree_pg.api_client import Cashfree
 from pathlib import Path
 from decouple import config
 import os
+import logging
+from logging.handlers import TimedRotatingFileHandler, RotatingFileHandler
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+logger = logging.getLogger('django')
+logs_dir = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(logs_dir):
+    os.makedirs(logs_dir)
 
 SECRET_KEY = config('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = ['139.59.2.143','127.0.0.1','orderzy.in','www.orderzy.in', 'c797-2409-40c4-276-ab4d-8ca3-d050-65e8-f7b7.ngrok-free.app']
+ALLOWED_HOSTS = ['139.59.2.143','127.0.0.1','orderzy.in','www.orderzy.in', '2346-152-58-56-32.ngrok-free.app']
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://c797-2409-40c4-276-ab4d-8ca3-d050-65e8-f7b7.ngrok-free.app', 'https://www.orderzy.in','https://orderzy.in'
+    'https://2346-152-58-56-32.ngrok-free.app ', 'https://www.orderzy.in','https://orderzy.in'
 ]
 
 # Application definition
@@ -205,37 +213,110 @@ else:
     SESSION_COOKIE_HTTPONLY = True
 
 
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'file': {
+#            'class': 'logging.handlers.TimedRotatingFileHandler',
+#         'filename': '/var/log/orderzy.log',  # Adjust the path to a suitable location
+#         'when': 'midnight',  # Rotate logs daily at midnight
+#         'backupCount': 7, 
+#             'formatter': 'verbose',  # Use the verbose format for detailed logs
+#         },
+#     },
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {module} {message} {exc_info}',  # Include exc_info for exceptions
+#             'style': '{',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#     'handlers': ['file'],
+#     'level': 'DEBUG',  # Set to DEBUG to capture all logs from django logger
+#     'propagate': False,
+# },
+#         'django.request': {
+#     'handlers': ['file'],
+#     'level': 'DEBUG',  # Set to DEBUG to capture more details
+#     'propagate': False,
+# },
+
+      
+#     },
+# }
+
+
+
+
+# LOG_FILE_PATH = os.path.join(logs_dir, 'django.log') if DEBUG == True else '/var/log/orderzy.log'
+
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': True,
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {module} {message} {exc_info}',
+#             'style': '{',
+#         },
+#     },
+#     'handlers': {
+#         'file': {
+#             'class': 'logging.handlers.RotatingFileHandler' if DEBUG == True else 'logging.handlers.TimedRotatingFileHandler',
+#             'filename': LOG_FILE_PATH,
+#             # Use 'maxBytes' only for 'RotatingFileHandler' in development
+#             **({'maxBytes': 1024 * 1024 * 5} if DEBUG == True else {'when': 'midnight'}),
+#             'backupCount': 5 if DEBUG == True else 7,
+#             'formatter': 'verbose',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file'],
+#             'level': 'DEBUG' if DEBUG == True else 'INFO',
+#             'propagate': False,
+#         },
+#         'django.request': {
+#             'handlers': ['file'],
+#             'level': 'ERROR',
+#             'propagate': False,
+#         },
+#     },
+# }
+
+
+LOG_FILE_PATH = os.path.join(logs_dir, 'django.log') if DEBUG else '/var/log/orderzy.log'
+
+# Logging Configuration
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-           'class': 'logging.handlers.TimedRotatingFileHandler',
-        'filename': '/var/log/orderzy.log',  # Adjust the path to a suitable location
-        'when': 'midnight',  # Rotate logs daily at midnight
-        'backupCount': 7, 
-            'formatter': 'verbose',  # Use the verbose format for detailed logs
-        },
-    },
+    'disable_existing_loggers': True,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {module} {message} {exc_info}',  # Include exc_info for exceptions
+            'format': '{levelname} {asctime} {module} {message}',
             'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler' if DEBUG else 'logging.handlers.TimedRotatingFileHandler',
+            'filename': LOG_FILE_PATH,
+            **({'maxBytes': 1024 * 1024 * 5, 'backupCount': 5} if DEBUG else {'when': 'midnight', 'backupCount': 7}),
+            'formatter': 'verbose',
         },
     },
     'loggers': {
         'django': {
-    'handlers': ['file'],
-    'level': 'DEBUG',  # Set to DEBUG to capture all logs from django logger
-    'propagate': True,
-},
+            'handlers': ['file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
         'django.request': {
-    'handlers': ['file'],
-    'level': 'DEBUG',  # Set to DEBUG to capture more details
-    'propagate': False,
-},
-
-      
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
     },
 }
-

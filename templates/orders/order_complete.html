@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %}{% load custom_filters %}
 {% load static %}
 {% block title %} Receipt  {% endblock %} 
 
@@ -23,6 +23,19 @@
                     <div class="col-md-6 col-12 text-md-right text-left">
                         {% if order.pre_order_time > 0 %}
                         <p class="mb-1 text-info">Pre Order Time: {{ order.pre_order_time }} mins</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 col-12 text-md-right text-right">
+                        {% if away_restaurant_order > 0 %}
+                        <p
+                    style="
+                      font-style: italic !important;
+                      color: #f28500 !important;
+                    "
+                  >
+                    Your order is  <strong>{{ away_restaurant_order }}</strong>
+                    <sup>{{ away_restaurant_order|ordinal }}</sup> in a queue.
+                  </p>
                         {% endif %}
                     </div>
                 </div>

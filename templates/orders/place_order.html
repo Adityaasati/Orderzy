@@ -28,7 +28,7 @@
                       color: #f28500 !important;
                     "
                   >
-                    You are <strong>{{ away_restaurant_order }}</strong>
+                    Your order is  <strong>{{ away_restaurant_order }}</strong>
                     <sup>{{ away_restaurant_order|ordinal }}</sup> in a queue.
                   </p>
                   {% endif %} {% endif %}
@@ -192,7 +192,6 @@
     const customer_id = "{{ user.id }}".padStart(3, '0');
     const customer_email = "{{user.username}}";
     const customer_phone = '9238008672';
-    console.log("customer_id",customer_id)
 
     const orderData = {
       customer_details: {
@@ -215,22 +214,17 @@
       body: JSON.stringify(orderData)
     })
     .then(response => {
-      console.log('Response status:', response.status);
       return response.json();
   })
     .then(data => {
-      console.log('Response data:', data);
       document.getElementById('loader').style.display = 'none';
-      console.log('Received payment_session_id:', data.payment_session_id);
       if (data && data.payment_session_id) {
-        console.log('Received payment_session_id:', data.payment_session_id);
         cashfree.checkout({
             paymentSessionId: data.payment_session_id,
             redirectTarget: "_self"
         });
       } else {
         alert ('Order creation failed');
-        console.log('Error: payment_session_id not found in response');
 
       }
     })
