@@ -157,8 +157,7 @@
             <tbody>
                 {% for food in ordered_food %}
                 <tr>
-                   
-                    <td style="padding: 10px 20px;"></td>
+                    <td style="padding: 10px 20px;">
                         <img src="http://{{domain}}{{food.fooditem.image.url}}" alt="Food Image" width="60" style="border-radius: 8px;">
                     </td>
                     <td style="padding: 10px 20px;">
@@ -171,6 +170,7 @@
                     <td style="padding: 10px 20px; font-size: 16px;">{{food.quantity}}</td>
                     <td style="padding: 10px 20px; font-size: 16px;">₹{{food.price}}</td>
                 </tr>
+                
                 {% endfor %}
             </tbody>
         </table>

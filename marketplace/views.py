@@ -171,6 +171,7 @@ def search(request):
     longitude = request.GET.get('lng', '')
     keyword = request.GET.get('keyword', '')
     selected_food_hub = request.GET.get('food_hub', '')
+    
 
     fetch_restaurants_by_fooditems = FoodItem.objects.filter(food_title__icontains=keyword, is_available=True).values_list('restaurant', flat=True)
     restaurants = Restaurant.objects.filter(
@@ -179,11 +180,13 @@ def search(request):
     )
 
     if selected_food_hub:
+        print("food hub")
         restaurants = restaurants.filter(food_hub__id=selected_food_hub)
 
     elif latitude and longitude:
+        print("lat long")
         pnt = GEOSGeometry('POINT(%s %s)' % (longitude, latitude))
-        
+
         # Update restaurant queryset with distance annotation
         restaurants = restaurants.filter(
             user_profile__location__distance_lte=(pnt, D(km=2000))
@@ -200,8 +203,6 @@ def search(request):
         food_hubs_count = nearby_food_hubs.count()
 
     else:
-        note = "Sorry for your inconvenience. Currently we do not have your item."
-        # messages.warning(request, "Sorry, Currently we do not have your item.")
         
         nearby_food_hubs = 0
         food_hubs_count = 0
@@ -210,8 +211,8 @@ def search(request):
         'restaurants': restaurants,
         'nearby_food_hubs': nearby_food_hubs,
         'food_hubs_count': food_hubs_count,
-        'source_location': address,
-        
+        'source_location': address, 
+        'keyword':keyword
     }
 
     return render(request, 'marketplace/listings.html', context)

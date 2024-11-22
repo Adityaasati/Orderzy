@@ -213,78 +213,7 @@ else:
     SESSION_COOKIE_HTTPONLY = True
 
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'file': {
-#            'class': 'logging.handlers.TimedRotatingFileHandler',
-#         'filename': '/var/log/orderzy.log',  # Adjust the path to a suitable location
-#         'when': 'midnight',  # Rotate logs daily at midnight
-#         'backupCount': 7, 
-#             'formatter': 'verbose',  # Use the verbose format for detailed logs
-#         },
-#     },
-#     'formatters': {
-#         'verbose': {
-#             'format': '{levelname} {asctime} {module} {message} {exc_info}',  # Include exc_info for exceptions
-#             'style': '{',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#     'handlers': ['file'],
-#     'level': 'DEBUG',  # Set to DEBUG to capture all logs from django logger
-#     'propagate': False,
-# },
-#         'django.request': {
-#     'handlers': ['file'],
-#     'level': 'DEBUG',  # Set to DEBUG to capture more details
-#     'propagate': False,
-# },
 
-      
-#     },
-# }
-
-
-
-
-# LOG_FILE_PATH = os.path.join(logs_dir, 'django.log') if DEBUG == True else '/var/log/orderzy.log'
-
-
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': True,
-#     'formatters': {
-#         'verbose': {
-#             'format': '{levelname} {asctime} {module} {message} {exc_info}',
-#             'style': '{',
-#         },
-#     },
-#     'handlers': {
-#         'file': {
-#             'class': 'logging.handlers.RotatingFileHandler' if DEBUG == True else 'logging.handlers.TimedRotatingFileHandler',
-#             'filename': LOG_FILE_PATH,
-#             # Use 'maxBytes' only for 'RotatingFileHandler' in development
-#             **({'maxBytes': 1024 * 1024 * 5} if DEBUG == True else {'when': 'midnight'}),
-#             'backupCount': 5 if DEBUG == True else 7,
-#             'formatter': 'verbose',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['file'],
-#             'level': 'DEBUG' if DEBUG == True else 'INFO',
-#             'propagate': False,
-#         },
-#         'django.request': {
-#             'handlers': ['file'],
-#             'level': 'ERROR',
-#             'propagate': False,
-#         },
-#     },
-# }
 
 
 LOG_FILE_PATH = os.path.join(logs_dir, 'django.log') if DEBUG else '/var/log/orderzy.log'
@@ -301,22 +230,37 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'class': 'logging.handlers.RotatingFileHandler' if DEBUG else 'logging.handlers.TimedRotatingFileHandler',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': LOG_FILE_PATH,
-            **({'maxBytes': 1024 * 1024 * 5, 'backupCount': 5} if DEBUG else {'when': 'midnight', 'backupCount': 7}),
+            'when': 'midnight',
+            'backupCount': 7,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['file'] if not DEBUG else ['file', 'console'],
             'level': 'DEBUG' if DEBUG else 'INFO',
             'propagate': False,
         },
-        'django.request': {
+        'django.server': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.db.backends': {
             'handlers': ['file'],
             'level': 'ERROR',
             'propagate': False,
+        },
+        'root': {
+            'handlers': ['file'],
+            'level': 'WARNING',
         },
     },
 }
