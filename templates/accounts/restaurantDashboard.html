@@ -60,19 +60,19 @@
                             </div>
                             <br><br>
                             
-                            <!-- <div class="restaurant-info">
+                            <div class="restaurant-info">
                                 <div class="text-holder">
                                     <h6>Restaurant QR Code</h6>
                                     <p>Download the QR code for your restaurant menu.</p>
-                                    <p>QR Code Image Path: {% static 'qr_codes/'|add:restaurant.qr_code_path %}</p>
+                                   
+                                    <img src="{% static 'qr_codes/' %}{{ restaurant.qr_code_path }}" alt="QR code for menu" id="qr-code-img" loading="lazy">
 
-                                    <img data-src="{% static 'qr_codes/'|add:restaurant.qr_code_path %}" alt="QR code for menu" id="qr-code-img" class="lazyload" loading="lazy">
-                                    <a href="{% static 'qr_codes/'|add:restaurant.qr_code_path %}" download="{{ restaurant.id }}_menu_qr.png" class="btn btn-primary mt-2">
+                                    <a href="{% static 'qr_codes/' %}{{ restaurant.qr_code_path }}" download="{{ restaurant.id }}_menu_qr.png" class="btn btn-primary mt-2">
                                         Download QR Code
                                     </a>
-                                    {{qr_code_path}}
+                                    
                                 </div>
-                            </div> -->
+                            </div>
                             <h5 class="text-uppercase">Recent Orders</h5>
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">

@@ -213,10 +213,8 @@ else:
     SESSION_COOKIE_HTTPONLY = True
 
 
-
-
-
 LOG_FILE_PATH = os.path.join(logs_dir, 'django.log') if DEBUG else '/var/log/orderzy.log'
+
 
 # Logging Configuration
 LOGGING = {

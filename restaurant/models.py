@@ -7,10 +7,11 @@ from django.contrib.gis.db import models as gismodels
 from django.contrib.gis.geos import Point
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-# from .utils import generate_qr
+from .utils import generate_qr
 from django.utils.text import slugify
 from django.contrib.sites.models import Site
-
+import os
+from django.conf import settings
 class FoodHub(models.Model):
     foodhub_name = models.CharField(max_length=100)
     latitude = models.CharField(max_length=20, blank=True, null=True)
@@ -38,8 +39,9 @@ class Restaurant(models.Model):
 
     @property
     def qr_code_path(self):
-        # Unique filename for each restaurant's QR code
         return f'{self.id}_menu_qr.png'
+
+
     
     def __str__(self):
         return self.restaurant_name
@@ -95,12 +97,20 @@ class Restaurant(models.Model):
     
 
 
+@receiver(post_save, sender=Restaurant)
+def generate_qr_code(sender, instance, created, **kwargs):
+    filename = instance.qr_code_path
+    file_path = os.path.join(settings.BASE_DIR, 'orderzy', 'static', 'qr_codes', filename)
+    print("filename",filename)
+    print("file_path",file_path)
+    
+    if not os.path.exists(file_path):
+        print(f"QR code file is missing. Generating QR for: {instance.restaurant_name} with URL: {instance.menu_url}")
+        generate_qr(instance.menu_url, filename)
+    else:
+        print(f"QR code already generated for {instance.restaurant_name}. No change to menu URL.")
 
-# @receiver(post_save, sender=Restaurant)
-# def generate_qr_code(sender, instance, **kwargs):
-#     print(f"Generating QR for: {instance.restaurant_name} with URL: {instance.menu_url}")
-#     filename = instance.qr_code_path
-#     generate_qr(instance.menu_url, filename)
+
 
 
         

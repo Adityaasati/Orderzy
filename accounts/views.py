@@ -253,7 +253,10 @@ def restaurantDashboard(request):
         current_month_revenue += i.get_total_by_restaurant()['subtotal']
     
     filename = f"{restaurant.id}_menu_qr.png"
-    file_path = os.path.join(settings.STATIC_URL, 'qr_codes', filename)
+    file_path = os.path.join('qr_codes', filename)
+
+    file_path = file_path.replace('\\', '/') 
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
     
     total_revenue = 0
     for i in orders:
@@ -267,6 +270,7 @@ def restaurantDashboard(request):
         'total_revenue':total_revenue,
         'current_month_revenue':current_month_revenue,
         'qr_code_path':file_path,
+
         
     }
     return render(request, 'accounts/restaurantDashboard.html',context)
