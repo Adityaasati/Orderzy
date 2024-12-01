@@ -96,7 +96,6 @@ def registerRestaurant(request):
                 username=form.cleaned_data['username'], 
                 email=email, phone_number=phone_number, password=password)
             user.role = User.RESTAURANT
-            # user.is_active = True
             user.save()
             restaurant = r_form.save(commit=False)
             restaurant.user = user
@@ -233,10 +232,18 @@ def myAccount(request):
 def custDashboard(request):
     orders = Order.objects.filter(user=request.user, is_ordered=True)
     recent_orders = orders[:5]
+    restaurant_slugs=[]
+    for order in recent_orders:
+        restaurant = order.restaurants.first()  # This returns the first restaurant in the ManyToManyField
+        if restaurant:
+            restaurant_slugs.append(restaurant.restaurant_slug) 
+            restaurant_url = restaurant.menu_url
+    restaurant_slug = restaurant_slugs[0]
     context = {
         'orders': orders,
         'orders_count':orders.count(),
         'recent_orders':recent_orders,
+        'restaurant_slug':restaurant_slug
     }
     return render(request, 'accounts/custDashboard.html',context)
 

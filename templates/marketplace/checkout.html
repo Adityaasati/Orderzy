@@ -101,13 +101,19 @@
                                                 </div>
                                             </div>
                                             
-                                            {% if seating_plan_available and num_of_restaurants == 1 %}
+                                            {% if seating_plan_available and num_of_restaurants == 1 and not is_existing_order %}
                                             <div class="row">
                                                 <div class="form-group col-md-6 col-sm-12 col-lg-6">
                                                     Number of People: {{ form.num_of_people|add_class:"form-control" }}
                                                 </div>
                                             </div>
                                             {%endif %}
+                                            {% if is_existing_order and seating_plan_available %}
+        <div class="form-group">
+            <label for="seat_number">Enter Seat Number</label>
+            <input type="text" name="seat_number" id="seat_number" class="form-control" placeholder="Enter your seat number">
+        </div>
+    {% endif %}
                                         </div>
 
                                     </div>
@@ -196,9 +202,9 @@
                                                 <div class="payment-method">
 
                                                     <label>
-                                                        <input type="radio" name="payment_method" value="PayPal" >
+                                                        <!-- <input type="radio" name="payment_method" value="PayPal" >
                                                         <img data-src="{% static 'images/PayPal.png' %}" alt="PayPal" class="lazyload"  loading="lazy"
-                                                            width="100">
+                                                            width="100"> -->
                                                     </label>
                                                     <label>
                                                         <input type="radio" name="payment_method" value="Cashfree" >

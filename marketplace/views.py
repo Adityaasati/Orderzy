@@ -29,6 +29,11 @@ def marketplace(request):
 
 def restaurant_detail(request, restaurant_slug):
     restaurant = get_object_or_404(Restaurant, restaurant_slug=restaurant_slug)
+    order_number = request.GET.get('order_number')  # Extract order number from URL query parameters
+
+    if order_number:  
+        request.session['order_number'] = order_number
+        request.session.modified = True
     try:
         seating_plan = SeatingPlan.objects.get(restaurant=restaurant)
         if seating_plan.tables_for_two == 0 & seating_plan.tables_for_four == 0 & seating_plan.tables_for_six ==0:
@@ -71,6 +76,7 @@ def restaurant_detail(request, restaurant_slug):
         'current_opening_hours':current_opening_hours,
         'cart_item_quantities':cart_item_quantities,
         'seating_available':seating_available,
+        'order_number':order_number
         }
         
     except:
@@ -79,7 +85,8 @@ def restaurant_detail(request, restaurant_slug):
         'categories':categories,
         'restaurant':restaurant,
         'opening_hours':opening_hours,
-        'current_opening_hours':current_opening_hours,}
+        'current_opening_hours':current_opening_hours,
+        'order_number':order_number}
     return render(request, 'marketplace/restaurant__detail.html',context)
     
 
@@ -220,6 +227,11 @@ def search(request):
 
 @login_required(login_url = 'login')
 def checkout(request):
+    order_number = request.session.get('order_number')
+    is_existing_order =  bool(order_number)
+    seat_number = None 
+    order = None
+        
     cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
     cart_count = cart_items.count()
     if cart_count <=0:
@@ -267,6 +279,8 @@ def checkout(request):
         'cart_items_with_totals':cart_items_with_totals,
         'num_of_restaurants':num_of_restaurants,
         'seating_plan_available':seating_plan_available,
+        'is_existing_order': is_existing_order,
+        'seat_number': seat_number
     }
     return render(request, 'marketplace/checkout.html',context)
 

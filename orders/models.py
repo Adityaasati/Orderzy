@@ -139,6 +139,7 @@ class PendingOrders(models.Model):
     po_restaurant_order = models.CharField(max_length=100, blank=True)
     po_restaurant_id = models.IntegerField(default=0)
     po_num_of_people = models.IntegerField() 
+    po_seat_number = models.CharField(max_length=10, null=True, blank=True)
     original_order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='pending_orders', blank=True, null=True)
     
     def __str__(self):
