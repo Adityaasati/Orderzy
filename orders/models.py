@@ -34,7 +34,7 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
     restaurants = models.ManyToManyField(Restaurant,blank=True)
-    order_number = models.CharField(max_length=20)
+    order_number = models.CharField(max_length=50)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone = models.CharField(max_length=15, blank=True)
@@ -51,8 +51,6 @@ class Order(models.Model):
     pre_order_time = models.FloatField(default=0) 
     num_of_people = models.IntegerField(null=True, blank=True) 
     transaction_id = models.CharField(max_length=255, blank=True, null=True)
-    
-
 
     @property
     def name(self):
@@ -139,6 +137,7 @@ class PendingOrders(models.Model):
     po_restaurant_order = models.CharField(max_length=100, blank=True)
     po_restaurant_id = models.IntegerField(default=0)
     po_num_of_people = models.IntegerField() 
+    po_seat_number = models.CharField(max_length=10, null=True, blank=True)
     original_order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='pending_orders', blank=True, null=True)
     
     def __str__(self):

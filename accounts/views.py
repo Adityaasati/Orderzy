@@ -228,17 +228,60 @@ def myAccount(request):
     redirectUrl = detectUser(user)
     return redirect(redirectUrl)
 
+
 @login_required(login_url='login')
 @user_passes_test(check_role_customer)
 def custDashboard(request):
     orders = Order.objects.filter(user=request.user, is_ordered=True)
     recent_orders = orders[:5]
+    restaurant_slugs = []
+    for order in recent_orders:
+        restaurant = order.restaurants.first()  # This returns the first restaurant in the ManyToManyField
+        if restaurant:
+            restaurant_slugs.append(restaurant.restaurant_slug) 
+            restaurant_url = restaurant.menu_url
+    restaurant_slug = restaurant_slugs[0]
     context = {
         'orders': orders,
-        'orders_count':orders.count(),
-        'recent_orders':recent_orders,
+        'orders_count': orders.count(),
+        'recent_orders': recent_orders,
+        'restaurant_url':restaurant_url,
+        'restaurant_slug':restaurant_slug
     }
-    return render(request, 'accounts/custDashboard.html',context)
+
+    print(restaurant_slugs, "restaurant_slugs") 
+
+    if restaurant_slugs:
+        restaurant_page_url = reverse('restaurant_detail', kwargs={'restaurant_slug': restaurant_slugs[0]})
+        print('restaurant_page_url:', restaurant_page_url)
+    else:
+        restaurant_page_url = None
+
+    # Return the rendered template
+    return render(request, 'accounts/custDashboard.html', context)
+
+# @login_required(login_url='login')
+# @user_passes_test(check_role_customer)
+# def custDashboard(request):
+#     orders = Order.objects.filter(user=request.user, is_ordered=True)
+#     recent_orders = orders[:5]
+#     restaurant_slugs = []
+#     for order in recent_orders:
+#         restaurants = order.order_placed_to()  # This is now a QuerySet of Restaurant objects
+#         for restaurant in restaurants:
+#             restaurant_slugs.append(restaurant.restaurant_slug)
+#     context = {
+#         'orders': orders,
+#         'orders_count':orders.count(),
+#         'recent_orders':recent_orders,
+#         'restaurant':restaurants
+#     }
+#     print(restaurants,"restaurant")
+#     print("restaurant.restaurant_slug",restaurants.restaurant_slug)
+#     restaurant_page_url = reverse('restaurant_page', kwargs={'restaurant_id': restaurants.restaurant_slug})
+#     print('restaurant_page_url',restaurant_page_url)
+
+#     return render(request, 'accounts/custDashboard.html',context)
 
 @login_required(login_url='login')
 @user_passes_test(check_role_restaurant)

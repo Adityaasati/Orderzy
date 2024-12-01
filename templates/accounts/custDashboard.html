@@ -71,6 +71,7 @@
                                                     <th scope="col">Details</th>
                                                     <th scope="col">Delete</th>
                                                     <th scope="col">Edit time</th>
+                                                    <th scope="col">Order More..</th>
 
                                                   </tr>
                                                 </thead>
@@ -84,6 +85,10 @@
                                                     <td><a href="{% url 'order_detail' order.order_number %}" class="btn btn-primary"> Details</a> </td>
                                                     <td><a href="{% url 'order_cancel' order.order_number %}" class="btn btn-danger"> Cancel</a> </td>
                                                     <td><a href="{% url 'pre_order_time_change' order.order_number %}" class="btn btn-secondary"> Edit </a> </td>
+                                                    <td>
+                                                        <a href="{% url 'restaurant_detail' restaurant_slug %}?order_number={{ order.order_number }}" class="btn btn-warning"> Continue Ordering </a>
+
+                                                    </td>
 
                                                   </tr>
                                                   {% endfor %}

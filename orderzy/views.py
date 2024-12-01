@@ -74,8 +74,6 @@ def about_us(request):
 def blog(request):
     return render(request, 'includes/blog.html')
 
-
-
 def contact_us(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
