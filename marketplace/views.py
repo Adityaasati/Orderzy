@@ -15,7 +15,6 @@ from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib import messages
 import logging
-from orders.models import Order
 
 logger = logging.getLogger('django')
 
@@ -30,7 +29,7 @@ def marketplace(request):
 
 def restaurant_detail(request, restaurant_slug):
     restaurant = get_object_or_404(Restaurant, restaurant_slug=restaurant_slug)
-    order_number = request.GET.get('order_number')  
+    order_number = request.GET.get('order_number')  # Extract order number from URL query parameters
 
     if order_number:  
         request.session['order_number'] = order_number
@@ -284,6 +283,5 @@ def checkout(request):
         'seat_number': seat_number
     }
     return render(request, 'marketplace/checkout.html',context)
-
 
 

@@ -22,10 +22,10 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = ['139.59.2.143','127.0.0.1','orderzy.in','www.orderzy.in', 'fc4d-2402-e280-21c6-748-c068-a9ce-6f35-2f47.ngrok-free.app']
+ALLOWED_HOSTS = ['139.59.2.143','127.0.0.1','orderzy.in','www.orderzy.in', '6ab1-2402-e280-21c6-748-b89c-a84a-1be6-764d.ngrok-free.app']
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://fc4d-2402-e280-21c6-748-c068-a9ce-6f35-2f47.ngrok-free.app', 'https://www.orderzy.in','https://orderzy.in'
+    'https://6ab1-2402-e280-21c6-748-b89c-a84a-1be6-764d.ngrok-free.app', 'https://www.orderzy.in','https://orderzy.in'
 ]
 
 # Application definition
@@ -217,48 +217,48 @@ LOG_FILE_PATH = os.path.join(logs_dir, 'django.log') if DEBUG else '/var/log/ord
 
 
 # # Logging Configuration
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': True,
-#     'formatters': {
-#         'verbose': {
-#             'format': '{levelname} {asctime} {module} {message}',
-#             'style': '{',
-#         },
-#     },
-#     'handlers': {
-#         'file': {
-#             'class': 'logging.handlers.TimedRotatingFileHandler',
-#             'filename': LOG_FILE_PATH,
-#             'when': 'midnight',
-#             'backupCount': 7,
-#             'formatter': 'verbose',
-#             'encoding': 'utf-8',
-#         },
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'verbose',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['file'] if not DEBUG else ['file', 'console'],
-#             'level': 'DEBUG' if DEBUG else 'INFO',
-#             'propagate': False,
-#         },
-#         'django.server': {
-#             'handlers': ['file'],
-#             'level': 'INFO',
-#             'propagate': False,
-#         },
-#         'django.db.backends': {
-#             'handlers': ['file'],
-#             'level': 'ERROR',
-#             'propagate': False,
-#         },
-#         'root': {
-#             'handlers': ['file'],
-#             'level': 'WARNING',
-#         },
-#     },
-# }
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': LOG_FILE_PATH,
+            'when': 'midnight',
+            'backupCount': 7,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'] if not DEBUG else ['file', 'console'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'root': {
+            'handlers': ['file'],
+            'level': 'WARNING',
+        },
+    },
+}

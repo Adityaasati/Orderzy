@@ -2,7 +2,6 @@
 import json
 import uuid
 import os
-import time
 import tempfile
 # Third-Party Imports
 import requests
@@ -232,9 +231,6 @@ def place_order(request):
     return render(request, 'orders/place_order.html')
 
 
-
-
-
 def fetch_order(order_number, transaction_id=None):
     """
     Fetches the Order based on order_number.
@@ -244,6 +240,7 @@ def fetch_order(order_number, transaction_id=None):
         order_number=order_number,
         is_ordered=True
     )
+
 
 
 def create_pending_order(order, restaurant,seat_number):
@@ -281,6 +278,7 @@ def create_pending_order(order, restaurant,seat_number):
         logging.info("current_ordered_food_details created for order: %s, count: %d", order.order_number, len(current_ordered_food_details))
 
 
+        # Determine initial order type based on pre_order_time
         order_type = "Preorder" if order.pre_order_time > 0 else "Immediate"
 
         seat = seat_number # Safely fetch seat_number from session
@@ -345,7 +343,7 @@ def create_order_api(request):
             logger.debug("Auth Token: %s", auth_token)
             
             
-            BASE_URL = 'https://orderzy.in' if not settings.DEBUG else 'https://fc4d-2402-e280-21c6-748-c068-a9ce-6f35-2f47.ngrok-free.app'
+            BASE_URL = 'https://orderzy.in' if not settings.DEBUG else 'https://6ab1-2402-e280-21c6-748-b89c-a84a-1be6-764d.ngrok-free.app'
             logger.debug("BASE_URL: %s", BASE_URL)
 
             # Return and Notify URLs
@@ -388,6 +386,8 @@ def create_order_api(request):
 
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+         
 
 
 
@@ -553,7 +553,6 @@ def order_complete(request):
             return redirect('order_processing_status_page') 
     messages.error(request, "You must be logged in to complete the order.")
     return redirect('home')
-
 
 
 
