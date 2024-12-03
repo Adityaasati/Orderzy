@@ -101,19 +101,27 @@
                                                 </div>
                                             </div>
                                             
-                                            {% if seating_plan_available and num_of_restaurants == 1 and not is_existing_order %}
+                                            {% if seating_plan_available and num_of_restaurants == 1%}
                                             <div class="row">
                                                 <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                                    Number of People: {{ form.num_of_people|add_class:"form-control" }}
+                                                    <label for="num_of_people" class="form-label fw-bold" style="font-size: 16px; color: #333;">Number of People*</label>
+                                                    {{ form.num_of_people|add_class:"form-control" }}
+                                                </div>
+                                            
+                                                <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                    <label for="seat_number" class="form-label fw-bold" style="font-size: 16px; color: #333;">Seat Number</label>
+                                                    {{ form.seat_number|add_class:"form-control" }}
+                                                    <div class="alert alert-info d-flex align-items-center mt-2 p-2 p-md-3" role="alert" style="border-left: 3px solid #007bff;">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        <span class="small small-md-normal">If you are seated, please enter your seat number for faster service.</span>
+                                                    </div>
+                                                    
                                                 </div>
                                             </div>
+                                            
+                                           
                                             {%endif %}
-                                            {% if is_existing_order and seating_plan_available %}
-        <div class="form-group">
-            <label for="seat_number">Enter Seat Number</label>
-            <input type="text" name="seat_number" id="seat_number" class="form-control" placeholder="Enter your seat number">
-        </div>
-    {% endif %}
+
                                         </div>
 
                                     </div>
@@ -134,12 +142,11 @@
                                 <div id="home" class="tab-pane in active">
                                     <div class="menu-itam-holder">
                                        
-                                        <div id="menu-item-list-6272" class="menu-item-list row">
-                   
+                                          <div id="menu-item-list-6272" class="menu-item-list row">
                                             <ul class="list-unstyled w-100">
                                                 {% for cart_item in cart_items_with_totals %}
-                                                <li id="cart-item-{{cart_item.item.id }}" class="d-flex align-items-center mb-3 row">
-                                                    <!-- Image holder -->
+                                                <li id="cart-item-{{cart_item.item.id}}" class="d-flex align-items-center mb-3 row">
+                                                   
                                                     {% if cart_item.item.fooditem.image %}
                                                     <div class="image-holder col-4 col-sm-2">
                                                         <img data-src="{{cart_item.item.fooditem.image.url}}" alt="Food Image" class="lazyload img-fluid rounded" loading="lazy" />
@@ -147,27 +154,24 @@
                                                     {% else %}
                                                     <img src="{% static 'images/bg3.png' %}" alt="Default Image" />
                                                     {% endif %}
-                                                    
+                                        
                                                     <!-- Text holder -->
                                                     <div class="text-holder col-8 col-sm-4">
                                                         <h6>{{cart_item.item.fooditem}}</h6>
                                                     </div>
-                                            
-                                                    <!-- Quantity Display -->
-                                                    <div class="quantity-holder col-12 col-sm-3 d-flex align-items-center justify-content-center mt-2 mt-sm-0">
-                                                        <span>{{cart_item.item.quantity}} Qty</span>
-                                                    </div>
-                                            
-                                                    <!-- Price -->
-                                                    <div class="price-holder col-12 col-sm-3 d-flex align-items-center justify-content-end mt-2 mt-sm-0">
-                                                        <span class="price cart-above-mobile">₹{{cart_item.total_price}}</span>
+                                        
+                                                    <!-- Quantity and Price Display -->
+                                                    <div class="quantity-price-holder col-12 col-sm-6 d-flex align-items-center justify-content-between mt-2 mt-sm-0">
+                                                        <span class="quantity-holder">{{cart_item.item.quantity}} Qty</span>
+                                                        <span class="price-holder cart-above-mobile">₹{{cart_item.total_price}}</span>
+                                                        <span class="price-holder cart-mobile-only">₹{{cart_item.total_price}}</span>
                                                     </div>
                                                 </li>
                                                 {% endfor %}
                                             </ul>
-                                            
-                                            
-                                          </div>
+                                        </div>
+                                        
+                                        
                                         
                                         <div>
                                             <ul class="list-unstyled">

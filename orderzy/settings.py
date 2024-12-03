@@ -22,10 +22,10 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = ['139.59.2.143','127.0.0.1','orderzy.in','www.orderzy.in', '6ab1-2402-e280-21c6-748-b89c-a84a-1be6-764d.ngrok-free.app']
+ALLOWED_HOSTS = ['139.59.2.143','127.0.0.1','orderzy.in','www.orderzy.in', '9ed1-2402-e280-21c6-748-c9ed-b3e1-ab6b-1723.ngrok-free.app']
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://6ab1-2402-e280-21c6-748-b89c-a84a-1be6-764d.ngrok-free.app', 'https://www.orderzy.in','https://orderzy.in'
+    'https://9ed1-2402-e280-21c6-748-c9ed-b3e1-ab6b-1723.ngrok-free.app', 'https://www.orderzy.in','https://orderzy.in'
 ]
 
 # Application definition
@@ -216,7 +216,7 @@ else:
 LOG_FILE_PATH = os.path.join(logs_dir, 'django.log') if DEBUG else '/var/log/orderzy.log'
 
 
-# # Logging Configuration
+# # # Logging Configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,

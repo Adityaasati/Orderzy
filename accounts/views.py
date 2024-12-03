@@ -25,6 +25,8 @@ import os
 import datetime
 import re
 import logging
+from django.db.models import Q
+
 
 logger = logging.getLogger('django')
 def check_role_restaurant(user):
@@ -230,11 +232,11 @@ def myAccount(request):
 @login_required(login_url='login')
 @user_passes_test(check_role_customer)
 def custDashboard(request):
-    orders = Order.objects.filter(user=request.user, is_ordered=True)
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
     recent_orders = orders[:5]
     restaurant_slugs=[]
     for order in recent_orders:
-        restaurant = order.restaurants.first()  # This returns the first restaurant in the ManyToManyField
+        restaurant = order.restaurants.first()  
         if restaurant:
             restaurant_slugs.append(restaurant.restaurant_slug) 
             restaurant_url = restaurant.menu_url
@@ -251,13 +253,24 @@ def custDashboard(request):
 @user_passes_test(check_role_restaurant)
 def restaurantDashboard(request):
     restaurant = Restaurant.objects.get(user=request.user)
-    orders = Order.objects.filter( restaurants__in=[restaurant.id],is_ordered=True).order_by('-created_at')
+
+    orders = Order.objects.filter(restaurants__in=[restaurant.id], is_ordered=True).order_by('-created_at')
+    cash_orders = orders.filter(payment_method='Cash', transaction_id='RESTAURANTORDER')
+    print("cash_orderss",cash_orders)
+
+    other_payments_orders = orders.filter(~Q(payment_method='Cash'))
+    print("others ",other_payments_orders)
+
+    orders = cash_orders | other_payments_orders
     recent_orders = orders[:10]
     current_month = datetime.datetime.now().month
+    print("current_month",current_month)
     current_month_orders = orders.filter(restaurants__in=[restaurant.id], created_at__month=current_month)
     current_month_revenue = 0
     for i in current_month_orders:
         current_month_revenue += i.get_total_by_restaurant()['subtotal']
+    
+    print("current_month_revenue",current_month_revenue)
     
     filename = f"{restaurant.id}_menu_qr.png"
     file_path = os.path.join('qr_codes', filename)
@@ -268,6 +281,8 @@ def restaurantDashboard(request):
     total_revenue = 0
     for i in orders:
         total_revenue +=i.get_total_by_restaurant()['subtotal']
+    print("total_revenue",total_revenue)
+    print("orders_count",orders.count())
     
     context = {
         'orders':orders,
@@ -311,7 +326,7 @@ def forgot_password(request):
     if request.method == 'POST':
         identifier = request.POST.get('identifier')  # Safely get identifier
 
-        # Try to validate as an email first
+      
         email_validator = EmailValidator()
         try:
             email_validator(identifier)  # If it's valid, this means it's an email

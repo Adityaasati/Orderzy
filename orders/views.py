@@ -63,25 +63,6 @@ def place_order(request):
     cart_count = cart_items.count()
     logger.info("User ID: %s", request.user.id)
 
-
-    seat_number = request.POST.get('seat_number')
-    order_number = request.session.get('order_number') 
-
-    if seat_number and order_number:
-        seat_numbers = request.session.get('seat_numbers', {})
-        seat_numbers[order_number] = seat_number
-        request.session['seat_numbers'] = seat_numbers
-        request.session.modified = True  
-        logger.info("place_order seat_number stored: %s", seat_numbers)
-
-
-
-    logger.debug("Session Data in place_order: %s", request.session.items())
-
-
-    old_order_number = request.session.get('order_number')
-    logger.info("place_order old_order_number: %s", old_order_number)
-
     if cart_count <=0:
         return redirect('marketplace')
     
@@ -141,22 +122,15 @@ def place_order(request):
             order.payment_method = request.POST['payment_method']
             order.pre_order_time = float(request.POST.get('pre_order_time', 0)) 
             num_of_people = form.cleaned_data.get('num_of_people', 0)
+            seat_number = form.cleaned_data.get('seat_number', 0)
+            order.seat_number = seat_number if seat_number is not None else "NA"
             order.num_of_people = num_of_people if num_of_people is not None else 0
             order.save()  
 
-            old_order_number = request.session.get('order_number')
             
             order.order_number = generate_order_number(order.id)
             order.restaurants.add(*restaurants_ids) 
-            new_order_number  =  order.order_number
-            request.session['old_order_number'] = old_order_number
-            request.session['order_number'] = new_order_number
-            request.session.modified = True
-            if old_order_number:
-                request.session['old_order_number'] = old_order_number
-            request.session['order_number'] = new_order_number
             
-            logging.info("Order number changed from %s to %s", old_order_number, new_order_number)
 
             if order.payment_method == "Cash":
                 order.is_ordered = True
@@ -281,7 +255,7 @@ def create_pending_order(order, restaurant,seat_number):
         # Determine initial order type based on pre_order_time
         order_type = "Preorder" if order.pre_order_time > 0 else "Immediate"
 
-        seat = seat_number # Safely fetch seat_number from session
+        seat = seat_number 
         order_num = order.order_number
         if order_num and seat:
             order_type = "Seated"
@@ -327,8 +301,6 @@ def create_order_api(request):
 
             logger.debug("Data loaded: %s", data)
 
-            
-
             customer_id = data['customer_details']['customer_id']
             customer_phone = data['customer_details']['customer_phone']
             order_id = data['order_id']
@@ -343,7 +315,7 @@ def create_order_api(request):
             logger.debug("Auth Token: %s", auth_token)
             
             
-            BASE_URL = 'https://orderzy.in' if not settings.DEBUG else 'https://6ab1-2402-e280-21c6-748-b89c-a84a-1be6-764d.ngrok-free.app'
+            BASE_URL = 'https://orderzy.in' if not settings.DEBUG else 'https://9ed1-2402-e280-21c6-748-c9ed-b3e1-ab6b-1723.ngrok-free.app'
             logger.debug("BASE_URL: %s", BASE_URL)
 
             # Return and Notify URLs
@@ -391,7 +363,7 @@ def create_order_api(request):
 
 
 
-def process_order_in_background(order, restaurants_pendings,seat_number=None):
+def process_order_in_background(order, restaurants_pendings,seat_number):
     logging.info("Started processing order in the background for order number: %s", order.order_number)
 
     """Process order items in the background to avoid delaying user response."""
@@ -420,28 +392,13 @@ def order_complete(request):
     order_number = request.GET.get('order_no') or request.POST.get('order_no')
     transaction_id = request.GET.get('trans_id') or request.POST.get('trans_id')
     auth_token = request.GET.get('auth_token') or request.POST.get('auth_token')
-
-    seat_number = request.session.get('seat_number')
-    seat_numbers = request.session.get('seat_numbers', {})
     
-    old_order_number = request.session.get('old_order_number')
-    new_order_number = request.session.get('order_number')
-    logger.debug("order_complete - old_order_number: %s, new_order_number: %s", old_order_number, new_order_number)
-
-    # Associate the current order_number with its seat_number
-    if old_order_number and old_order_number != order_number:
-    # Move the seat number to the new order number in the dictionary
-        if old_order_number in seat_numbers:
-            seat_numbers[order_number] = seat_numbers.pop(old_order_number)
-        elif seat_number: 
-            seat_numbers[order_number] = seat_number
-
-        request.session['seat_numbers'] = seat_numbers
-    request.session['order_number'] = order_number
-    request.session.modified = True
-
-
-    logging.info("Updated seat_numbers in session: %s", seat_numbers)
+    print("transaction_id",transaction_id, order_number)
+    if transaction_id == "RESTAURANTORDER":
+        order = fetch_order(order_number,transaction_id)
+        print("order",order)
+        order.transaction_id  = "RESTAURANTORDER"
+        order.save()
 
     if not request.user.is_authenticated:
         if auth_token:
@@ -456,7 +413,7 @@ def order_complete(request):
             messages.error(request, "You must be logged in to complete the order.")
             return redirect('login')
 
-    # Order validation
+
     if not order_number:
         messages.error(request, "Invalid order number.")
         return redirect('home')
@@ -519,11 +476,8 @@ def order_complete(request):
             # Start processing pending orders for the completed order
             restaurants_pendings = order.restaurants.all()
             logging.info("Starting background thread for pending order processing for order number: %s", order.order_number)
-            seat_number = seat_numbers.get(order_number, None)
-            
-
+            seat_number = order.seat_number
             thread = threading.Thread(target=process_order_in_background, args=(order, restaurants_pendings, seat_number))
-
             # thread = threading.Thread(target=process_order_in_background, args=(order, restaurants_pendings,seat_number or None))
             thread.daemon = False
             thread.start()
@@ -542,7 +496,7 @@ def order_complete(request):
             restaurants_pendings = order.restaurants.all()
             logging.info("Starting background thread for order number: %s", order.order_number)
 
-            seat_number = seat_numbers.get(order_number, None)
+            seat_number = order.seat_number
 
             thread = threading.Thread(target=process_order_in_background, args=(order, restaurants_pendings, seat_number))
 

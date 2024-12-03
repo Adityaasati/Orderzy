@@ -51,6 +51,8 @@ class Order(models.Model):
     pre_order_time = models.FloatField(default=0) 
     num_of_people = models.IntegerField(null=True, blank=True) 
     transaction_id = models.CharField(max_length=255, blank=True, null=True)
+    seat_number = models.CharField(max_length=255, blank=True, null=True)
+    
 
     @property
     def name(self):

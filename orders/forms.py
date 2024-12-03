@@ -6,6 +6,7 @@ class OrderForm(forms.ModelForm):
     pre_order_time = forms.FloatField(required=False, initial=0)
     email = forms.EmailField(required=False)
     num_of_people = forms.IntegerField(required=False, initial=None)
+    seat_number = forms.CharField(required=False, initial=None)
     
     
     def __init__(self, *args, **kwargs):

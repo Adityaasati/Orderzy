@@ -40,8 +40,12 @@
 
 
 
-.cart-mobile-only{
-    display: none;
+.cart-mobile-only {
+    display: none; /* Hidden by default */
+}
+
+.cart-above-mobile {
+    display: inline; /* Visible on larger screens */
 }
 
 @media (max-width: 480px) {

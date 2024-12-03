@@ -287,16 +287,25 @@ def order_detail(request, order_number):
 
 
 
+
 def my_orders(request):
     restaurant = Restaurant.objects.get(user=request.user)
-    orders = Order.objects.filter( restaurants__in=[restaurant.id],is_ordered=True).order_by('-created_at')
-    print("order",orders)
+
+    orders = Order.objects.filter(restaurants__in=[restaurant.id], is_ordered=True).order_by('-created_at')
+
+    cash_orders = orders.filter(payment_method='Cash', transaction_id='RESTAURANTORDER')
+    print("cash_orders",cash_orders)
+
+    other_payments_orders = orders.filter(~Q(payment_method='Cash'))
+
+    orders = (cash_orders | other_payments_orders).distinct().order_by('-created_at')
 
     context = {
-        'orders':orders,
+        'orders': orders,
     }
-    
-    return render(request, 'restaurant/my_orders.html',context)
+
+    return render(request, 'restaurant/my_orders.html', context)
+
 
 
 @login_required(login_url='login')
@@ -304,10 +313,7 @@ def my_orders(request):
 def pending_orders(request):
     restaurant = Restaurant.objects.get(user=request.user)
     pending_orders = PendingOrders.objects.filter( po_restaurant_id=restaurant.id,po_is_ordered=True).order_by('-po_created_at')
-    print("Session Data:  in pending_orders:", request.session.items())
-    logger.debug("Session Data in pending_orders: %s", request.session.items())
 
-    
     order_number = request.session.get('order_number')
     seat_numbers = request.session.get('seat_numbers', {})
     seat_number = seat_numbers.get(order_number, None)
@@ -337,43 +343,6 @@ def accept_po(request, id):
         
     return redirect('restaurant_pending_orders')
 
-        
-# def ready_po(request, id):
-#     restaurant = Restaurant.objects.get(user=request.user)
-    
-#     seating_plan, created = SeatingPlan.objects.get_or_create(
-#         restaurant=restaurant,
-#         defaults={'seating_plan_available': False}  # Default values if creating a new SeatingPlan
-#     )
-#     pending_order = get_object_or_404(PendingOrders, pk=id)
-#     print('pending_order.po_order_type == Seated',pending_order.po_order_type)
-    
-    
-#     if not seating_plan.seating_plan_available or pending_order.po_order_type == 'Seated':
-#         if request.method == 'POST':
-#             pending_order = get_object_or_404(PendingOrders, pk=id)
-#             pending_order.po_status = 'Ready'
-#             pending_order.save()
-            
-#             return redirect('restaurant_pending_orders')
-
-#     if request.method == 'POST':
-#         pending_order = get_object_or_404(PendingOrders, pk=id)
-#         pending_order.po_status = 'Ready'
-#         pending_order.save()
-
-#         if pending_order.po_num_of_people > 0 & pending_order.po_num_of_people <=2:
-#             seating_plan.tables_for_two-=1
-#             seating_plan.save() 
-#         elif pending_order.po_num_of_people >2 & pending_order.po_num_of_people <=4:
-#             seating_plan.tables_for_four-=1
-#             seating_plan.save() 
-#         elif pending_order.po_num_of_people >4 & pending_order.po_num_of_people <=6:
-#             seating_plan.tables_for_six-=1
-#             seating_plan.save() 
-            
-#         return redirect('restaurant_pending_orders')
-    
 
 def ready_po(request, id):
     restaurant = Restaurant.objects.get(user=request.user)
@@ -423,65 +392,30 @@ def delete_po(request, id):
             print("Error is", e)
             return redirect('restaurant_pending_orders')
        
-        
-        
-        
-# def completed_po(request, id):
-#     restaurant = Restaurant.objects.get(user=request.user)
-#     seating_plan, created = SeatingPlan.objects.get_or_create(
-#         restaurant=restaurant,
-#         defaults={'seating_plan_available': False}  # Default values if creating a new SeatingPlan
-#     )
-    
-#     if not seating_plan.seating_plan_available:
-#         if request.method == 'POST':
-#             pending_order = get_object_or_404(PendingOrders, pk=id)
-#             pending_order.po_status = 'Completed'
-#             pending_order.save()
-#             return redirect('restaurant_pending_orders')
-            
-        
-#     if request.method == 'POST':
-#         pending_order = get_object_or_404(PendingOrders, pk=id)
-#         pending_order.po_status = 'Completed'
-#         pending_order.save()
-#         if pending_order.po_num_of_people > 0 & pending_order.po_num_of_people <=2:
-#             seating_plan.tables_for_two+=1
-#             seating_plan.save() 
-#         elif pending_order.po_num_of_people >2 & pending_order.po_num_of_people <=4:
-#             seating_plan.tables_for_four+=1
-#             seating_plan.save() 
-#         elif pending_order.po_num_of_people >4 & pending_order.po_num_of_people <=6:
-#             seating_plan.tables_for_six+=1
-#             seating_plan.save() 
-#     return redirect('restaurant_pending_orders')
 
     
 def completed_po(request, id):
     restaurant = Restaurant.objects.get(user=request.user)
 
-    # Get or create the seating plan for the restaurant
+    
     seating_plan, created = SeatingPlan.objects.get_or_create(
         restaurant=restaurant,
-        defaults={'seating_plan_available': False}  # Default values if creating a new SeatingPlan
+        defaults={'seating_plan_available': False}  
     )
 
     # Fetch the pending order
     pending_order = get_object_or_404(PendingOrders, pk=id)
 
-    # If seating plan is unavailable or order type is 'Seated', skip seating plan adjustments
     if not seating_plan.seating_plan_available or pending_order.po_order_type == 'Seated':
         if request.method == 'POST':
             pending_order.po_status = 'Completed'
             pending_order.save()
             return redirect('restaurant_pending_orders')
 
-    # Process seating plan adjustments for other order types
     if request.method == 'POST':
         pending_order.po_status = 'Completed'
         pending_order.save()
 
-        # Adjust the seating plan based on the number of people
         if pending_order.po_num_of_people > 0 and pending_order.po_num_of_people <= 2:
             seating_plan.tables_for_two += 1
         elif pending_order.po_num_of_people > 2 and pending_order.po_num_of_people <= 4:
@@ -489,7 +423,7 @@ def completed_po(request, id):
         elif pending_order.po_num_of_people > 4 and pending_order.po_num_of_people <= 6:
             seating_plan.tables_for_six += 1
 
-        seating_plan.save()  # Save changes to seating plan
+        seating_plan.save() 
         return redirect('restaurant_pending_orders')
    
 

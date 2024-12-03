@@ -10,5 +10,7 @@ urlpatterns = [
     path('create_order_api/', views.create_order_api, name='create_order_api'),
     path('payment-webhook/', views.payment_webhook, name='payment_webhook'),
     path('order_complete/', views.order_complete, name='order_complete'),
+    # path('restaurant_cash_order/', views.restaurant_cash_order, name='restaurant_cash_order'),
+
     
 ]
